@@ -7909,42 +7909,19 @@ Pandas version: 3.0.2
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># CDC dataset URLs</span>
-<span class="c1"># Note: these may need updating if CDC changes their hosting</span>
-<span class="c1"># CDC dataset URLs (via data.cdc.gov Socrata API - stable IDs)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'DATA_RAW points to: </span><span class="si">{</span><span class="n">DATA_RAW</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Files in DATA_RAW:'</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">DATA_RAW</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  - </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Looking for: </span><span class="si">{</span><span class="n">DATA_RAW</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s2">"svi_2022.csv"</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Exists: </span><span class="si">{</span><span class="p">(</span><span class="n">DATA_RAW</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s2">"svi_2022.csv"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-
-<span class="n">SVI_URL</span> <span class="o">=</span> <span class="s1">'https://data.cdc.gov/api/views/u6k2-rtt3/rows.csv?accessType=DOWNLOAD'</span>
-<span class="n">PLACES_URL</span> <span class="o">=</span> <span class="s1">'https://data.cdc.gov/api/views/cwsq-ngmh/rows.csv?accessType=DOWNLOAD'</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">download_if_missing</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Download a file if not already present locally."""</span>
-    <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Already cached: </span><span class="si">{</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB)'</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dest</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Downloading </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1"> ...'</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">8192</span><span class="p">):</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Saved to </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB)'</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dest</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># CDC datasets are downloaded manually from:</span>
+<span class="c1">#   SVI:    https://svi.cdc.gov/dataDownloads/data-download.html</span>
+<span class="c1">#   PLACES: https://data.cdc.gov/500-Cities-Places/PLACES-Local-Data-for-Better-Health-Census-Tract-D/cwsq-ngmh</span>
+<span class="c1"># Saved locally so the notebook is fully reproducible.</span>
 
 <span class="n">svi_path</span> <span class="o">=</span> <span class="n">DATA_RAW</span> <span class="o">/</span> <span class="s1">'svi_2022.csv'</span>
 <span class="n">places_path</span> <span class="o">=</span> <span class="n">DATA_RAW</span> <span class="o">/</span> <span class="s1">'places_2024.csv'</span>
 
-<span class="k">assert</span> <span class="n">svi_path</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">'Missing: </span><span class="si">{</span><span class="n">svi_path</span><span class="si">}</span><span class="s1">. Download manually from svi.cdc.gov'</span>
-<span class="k">assert</span> <span class="n">places_path</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">'Missing: </span><span class="si">{</span><span class="n">places_path</span><span class="si">}</span><span class="s1">. Download manually from data.cdc.gov'</span>
+<span class="k">assert</span> <span class="n">svi_path</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">'Missing: </span><span class="si">{</span><span class="n">svi_path</span><span class="si">}</span><span class="s1">. See URLs in cell comment above.'</span>
+<span class="k">assert</span> <span class="n">places_path</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">'Missing: </span><span class="si">{</span><span class="n">places_path</span><span class="si">}</span><span class="s1">. See URLs in cell comment above.'</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SVI: </span><span class="si">{</span><span class="n">svi_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'PLACES: </span><span class="si">{</span><span class="n">places_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB'</span><span class="p">)</span>
@@ -7960,13 +7937,7 @@ Pandas version: 3.0.2
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>DATA_RAW points to: c:\Users\haidm\Desktop\social-impact-analysis\data\raw
-Files in DATA_RAW:
-  - places_2024.csv (867.9 MB)
-  - svi_2022.csv (61.1 MB)
-Looking for: c:\Users\haidm\Desktop\social-impact-analysis\data\raw\svi_2022.csv
-Exists: True
-SVI: 61.1 MB
+<pre>SVI: 61.1 MB
 PLACES: 867.9 MB
 </pre>
 </div>
