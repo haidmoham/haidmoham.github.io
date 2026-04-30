@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Mohammad Haider</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MH</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html" class="nav-cta active">Contact</a></li>
+    </ul>
+    <button class="nav-burger">☰</button>
+  </nav>
+
+  <div class="page-hero">
+    <p class="section-eyebrow">Get In Touch</p>
+    <h1>Contact</h1>
+    <p>Open to senior analyst, data engineering, and BI roles. Let's connect.</p>
+  </div>
+
+  <div class="contact-layout">
+    <div class="contact-info-block">
+      <h3>Contact Info</h3>
+
+      <div class="contact-detail">
+        <span>Email</span>
+        <a href="mailto:haidmoham@gmail.com">haidmoham@gmail.com</a>
+      </div>
+      <div class="contact-detail">
+        <span>Phone</span>
+        <a href="tel:+14342705977">+1 (434) 270-5977</a>
+      </div>
+      <div class="contact-detail">
+        <span>Location</span>
+        <strong>Charlottesville, VA</strong>
+      </div>
+      <div class="contact-detail">
+        <span>LinkedIn</span>
+        <a href="https://linkedin.com/in/haidmoham" target="_blank">linkedin.com/in/haidmoham</a>
+      </div>
+      <div class="contact-detail">
+        <span>GitHub</span>
+        <a href="https://github.com/haidmoham" target="_blank">github.com/haidmoham</a>
+      </div>
+
+      <div style="margin-top:2rem; padding:1.25rem; background:var(--navy-card); border:1px solid var(--border); border-radius:var(--radius-lg);">
+        <div style="font-size:0.78rem; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.6rem;">Currently Open To</div>
+        <div style="font-size:0.88rem; color:var(--text-muted); line-height:1.8;">
+          Senior Data Analyst roles<br/>
+          Data Engineering positions<br/>
+          BI / Analytics Engineering<br/>
+          Remote or Charlottesville area
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-card">
+      <div style="margin-bottom:1.5rem;">
+        <h3 style="color:#fff; margin-bottom:0.3rem;">Send a Message</h3>
+        <p style="font-size:0.88rem; color:var(--text-muted);">I typically respond within 24 hours.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Jane Smith" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="jane@company.com" />
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" placeholder="Job opportunity / Collaboration / ..." />
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="Tell me about the role or what you have in mind..."></textarea>
+      </div>
+      <button class="btn btn-primary form-submit" onclick="handleSubmit()">Send Message</button>
+      <p class="form-note" id="form-note" style="display:none; color:var(--teal); margin-top:0.75rem; text-align:center; font-weight:600;">✓ Message sent! I'll be in touch soon.</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2025 Mohammad Haider</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
+      <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    function handleSubmit() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      if (!name || !email || !message) {
+        alert('Please fill in your name, email, and message.');
+        return;
+      }
+      document.getElementById('form-note').style.display = 'block';
+      document.querySelector('.form-submit').disabled = true;
+      document.querySelector('.form-submit').textContent = 'Sent!';
+    }
+  </script>
+</body>
+</html>
