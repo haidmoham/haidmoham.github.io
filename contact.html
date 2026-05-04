@@ -78,24 +78,31 @@
         <p style="font-size:0.88rem; color:var(--text-muted);">I typically respond within 24 hours.</p>
       </div>
 
-      <div class="form-group">
-        <label for="name">Your Name</label>
-        <input type="text" id="name" placeholder="Jane Smith" />
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="jane@company.com" />
-      </div>
-      <div class="form-group">
-        <label for="subject">Subject</label>
-        <input type="text" id="subject" placeholder="Job opportunity / Collaboration / ..." />
-      </div>
-      <div class="form-group">
-        <label for="message">Message</label>
-        <textarea id="message" placeholder="Tell me about the role or what you have in mind..."></textarea>
-      </div>
-      <button class="btn btn-primary form-submit" onclick="handleSubmit()">Send Message</button>
-      <p class="form-note" id="form-note" style="display:none; color:var(--teal); margin-top:0.75rem; text-align:center; font-weight:600;">✓ Message sent! I'll be in touch soon.</p>
+      <div data-fs-success style="display:none; color:var(--teal); font-weight:600; text-align:center; padding:1rem 0;">✓ Message sent! I'll be in touch soon.</div>
+      <div data-fs-error style="display:none; color:#f87171; font-size:0.85rem; margin-bottom:1rem;"></div>
+
+      <form id="contact-form">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="Jane Smith" data-fs-field required />
+          <span data-fs-error="name" style="color:#f87171; font-size:0.8rem;"></span>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="jane@company.com" data-fs-field required />
+          <span data-fs-error="email" style="color:#f87171; font-size:0.8rem;"></span>
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="Job opportunity / Collaboration / ..." />
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Tell me about the role or what you have in mind..." data-fs-field required></textarea>
+          <span data-fs-error="message" style="color:#f87171; font-size:0.8rem;"></span>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit" data-fs-submit-btn>Send Message</button>
+      </form>
     </div>
   </div>
 
@@ -108,18 +115,9 @@
   </footer>
 
   <script>
-    function handleSubmit() {
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const message = document.getElementById('message').value;
-      if (!name || !email || !message) {
-        alert('Please fill in your name, email, and message.');
-        return;
-      }
-      document.getElementById('form-note').style.display = 'block';
-      document.querySelector('.form-submit').disabled = true;
-      document.querySelector('.form-submit').textContent = 'Sent!';
-    }
+    window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+    formspree('initForm', { formElement: '#contact-form', formId: 'xykowgkw' });
   </script>
+  <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 </body>
 </html>
