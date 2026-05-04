@@ -39,7 +39,7 @@ if (-not (Test-Path $exportTarget)) {
 
 # Fix the browser tab title (nbconvert uses filename by default)
 $content = Get-Content $exportTarget -Raw
-$content = $content -replace '<title>[^<]*</title>', '<title>Social Vulnerability vs. Health Outcomes — Mohammad Haider</title>'
+$content = $content -replace '<title>[^<]*</title>', '<title>Social Vulnerability vs. Health Outcomes — Phase 1 | Mohammad Haider</title>'
 Set-Content $exportTarget $content -NoNewline
 
 $sizeKB = [math]::Round((Get-Item $exportTarget).Length / 1KB, 1)
