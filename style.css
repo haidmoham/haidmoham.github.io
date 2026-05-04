@@ -93,7 +93,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .chart-trend { margin-top: 1.2rem; font-size: 0.82rem; font-weight: 600; color: var(--teal); border-top: 1px solid var(--border); padding-top: 0.85rem; }
 
 /* STATS */
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .stat { display: flex; flex-direction: column; align-items: center; padding: 1rem 1rem; border-right: 1px solid var(--border); }
 .stat:last-child { border-right: none; }
 .stat-num { font-family: 'Playfair Display', serif; font-size: 2.3rem; font-weight: 700; color: var(--gold); line-height: 1; }
