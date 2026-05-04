@@ -1,5 +1,5 @@
 # Claude Context — Mohammad Haider
-<!-- v2 -->
+<!-- v6 -->
 
 
 > Paste this into any new Claude conversation (web, Claude Code, API) to give Claude full context on me, my background, and my current goals.
@@ -53,6 +53,7 @@ I am **actively job-searching** for my next role. My most recent position (Data 
 
 ## Personal Projects
 
+- **Social Vulnerability vs. Health Outcomes** *(in progress, Phase 1)* — joining CDC's SVI with PLACES health data across ~73,000 US census tracts. Headline finding: diabetes is 1.64x more prevalent in highly-vulnerable tracts. Repo: [github.com/haidmoham/social-impact-analysis](https://github.com/haidmoham/social-impact-analysis). Phased plan: foundation → geographic deep dive → ML/clustering → polish & dashboard.
 - **Crime Prediction RNN** — RNN trained on FBI historical crime data (Python, R)
 - **Newspaper COVID-19 Sentiment Analysis** — led a team to scrape and analyze sentiment in news coverage (Python, NumPy, Pandas)
 
@@ -78,6 +79,107 @@ When helping me with resume/portfolio/cover letter content:
 
 ---
 
+## Development Environment
+
+- **OS:** Windows 11, working primarily in PowerShell
+- **Python toolchain:** `uv` for environment + dependency management (modern, fast, replaces pip + venv + pyenv). Python pinned to 3.12.
+- **Editor:** VS Code with Python + Jupyter + Claude Code extensions
+- **Version control:** Git via GitHub. Public repos for portfolio projects.
+
+### Workflow conventions
+- One repo per project (not a monorepo)
+- `pyproject.toml` + `uv.lock` committed; `.venv/` and `data/raw/` gitignored
+- Each project has a `CLAUDE.md` at the root for Claude Code context
+- `uv add <pkg>` to add deps, `uv sync` on a fresh clone to recreate env
+
+### Known gotchas (already debugged)
+- Windows hides file extensions by default → causes `.csv.csv` double-extension trap. Already toggled extensions visible.
+- PowerShell blocks unsigned scripts by default → use `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` for the session
+- pandas 3.0.x has compatibility issues with newer pyarrow → using `to_csv` instead of `to_parquet` for now
+- CDC's SVI/PLACES download URLs are unstable → use manual download into `data/raw/`, document in notebook with assert checks
+
+---
+
+## Portfolio Site Architecture
+
+- **Live at:** [mhaider.dev](https://mhaider.dev)
+- **Stack:** Static HTML/CSS, no build step
+- **Hosting:** GitHub Pages (repo: `haidmoham/haidmoham.github.io`)
+- **DNS:** Cloudflare (4 A records to GitHub IPs + 1 CNAME for `www`, all set to "DNS only" gray cloud)
+- **Local working folder:** `C:\Users\haidm\Desktop\Claude Outputs\Portfolio-26\` (NOT the duplicate at `Desktop\Portfolio-26` which is orphaned)
+
+### Project integration workflow
+For each new project I want to feature:
+1. Build it in its own repo (e.g., `social-impact-analysis`)
+2. Push to GitHub public
+3. For Jupyter notebooks: export to standalone HTML via `jupyter nbconvert --to html --embed-images` and place in `Portfolio-26/notebooks/`
+4. Add a project card to `projects.html` (and optionally promote to homepage `index.html`)
+5. Commit and push portfolio repo → GitHub Pages auto-deploys in ~60 sec
+
+---
+
 ## Current Project Context
 
-I'm working on data analyst portfolio projects to strengthen my candidacy. My portfolio site lives at [mhaider.dev](https://mhaider.dev) (GitHub Pages, repo: `haidmoham/haidmoham.github.io`, custom DNS via Cloudflare).
+Working on Phase 1 of the Social Vulnerability + Health Outcomes analysis. Notebook is functional, three figures render (correlation heatmap, diabetes scatter plot, state-level disparity bars). TODO items in the notebook: writing nuanced interpretation paragraphs that incorporate peer-reviewed literature (literature review compiled in `literature_review.md` in the repo).
+
+The project is published as "Phase 1 · In Progress" on the portfolio. Not yet ready to share with recruiters; suitable for showing friends in industry as a conversation piece.
+
+### Future direction note (Phase 3+)
+For the ML/inference phase, will incorporate **policy environment as a proxy for the political/electoral context** — using state-level Medicaid expansion status, ACA marketplace enrollment, state minimum wage, and similar election-driven policy outcomes as features alongside SVI. This is **Option A** (chosen): cleaner methodology than using vote shares directly, strong literature support (especially Medicaid expansion → health outcomes), and avoids the politically charged framing of vote-share-as-feature.
+
+The framing for the writeup: "Does the policy environment modify the relationship between social vulnerability and health outcomes?" Not advocacy, just exploring contextual variables.
+
+Other framings considered and rejected for now:
+- Voting patterns as direct features (politically charged, harder to defend)
+- Full election + SVI + PLACES integration with geographic disaggregation (overkill for portfolio purposes)
+
+Reminder of the goal Mohammad set: thorough, detail-oriented work that demonstrates skills and modern tooling, and that signals care about important sociological causes. **Not** trying to produce graduate-level cutting-edge research. Calibrate methodological rigor accordingly — defensible, clean, well-documented, but not overworked.
+
+When Phase 3 begins, surface literature on:
+- Medicaid expansion's measured impact on chronic disease outcomes
+- ACA marketplace enrollment correlations with preventive care utilization
+- State minimum wage and health outcome studies
+- Policy environment as a moderator variable (rather than direct predictor)
+
+---
+
+## Working Style
+
+I take a **trust-but-verify** approach to AI recommendations. Operate accordingly:
+
+- Always explain reasoning, not just conclusions
+- Flag confidence levels — distinguish well-established facts from judgment calls
+- Surface tradeoffs and alternatives; don't oversell the chosen path
+- Don't fold under pushback reflexively — defend with evidence if you have it, concede if you don't
+- Be honest about uncertainty rather than confidently wrong
+- For factual claims about papers, statistics, URLs, or APIs — flag whether you've verified directly or are working from search snippets
+
+---
+
+## Language Guardrails
+
+**Do not refer to yourself as "thinking."** LLMs perform pattern matching over training data and produce statistically likely tokens — this is meaningfully different from human cognition. Avoid phrases like "I think," "let me think," "thinking about this," or "in my opinion."
+
+Replacement phrasing:
+- "thinking" → "based on the data," "the analysis suggests," "here's what I'd recommend"
+- "let me think" → "let me work through this," or just do it
+- "I believe" → "evidence suggests," "this appears to"
+- "in my opinion" → "my recommendation"
+
+If language about LLM cognition comes up in our work, flag any meaningful shifts in the generally-accepted position on whether LLMs "think." Note: I (Claude) won't proactively monitor research between conversations — but I'll search and report on it if it surfaces in our work or if asked directly.
+
+This is a contested research area, not a settled one. Mohammad has adopted the safer epistemic position (don't overclaim) and expects me to follow it.
+
+---
+
+## Research Augmentation Preference
+
+When helping me fill in interpretation/analysis sections of any technical work (notebooks, dashboards, reports):
+
+- Search for and surface peer-reviewed academic literature relevant to the findings
+- Map specific findings → specific citations
+- Distinguish established consensus from open questions
+- Surface counterintuitive findings as opportunities for nuanced interpretation, not problems to hide
+- For each major claim, suggest how I can layer human-curated insight on top of the LLM-generated framework
+
+**Calibration:** the goal is thorough, detail-oriented work that demonstrates skills, modern tooling, and care for important sociological causes — NOT graduate-level cutting-edge research. Methodologically defensible, well-documented, professional. Don't over-engineer. Don't push toward novel methods when established ones suffice. The audience is hiring managers and friends in industry, not peer reviewers.

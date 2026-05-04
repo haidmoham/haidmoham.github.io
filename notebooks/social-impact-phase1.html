@@ -7806,9 +7806,8 @@ a.anchor-link {
 <strong>Date:</strong> April 2026
 <strong>Phase:</strong> 1 of 4 — Foundation</p>
 <hr/>
-<h2 id="The-Question">The Question<a class="anchor-link" href="#The-Question">¶</a></h2><p>If we know how socioeconomically vulnerable a community is, how well can we predict the health of the people who live there?</p>
-<p>Health outcomes in America vary dramatically across geography. A diabetes diagnosis, a mental health crisis, or a chronic disease isn't just a medical event — it often correlates strongly with where a person lives and the conditions of their community.</p>
-<p>This analysis joins two CDC datasets at the census tract level — the <strong>Social Vulnerability Index (SVI)</strong> and <strong>PLACES</strong> — to quantify that relationship.</p>
+<h2 id="The-Question">The Question<a class="anchor-link" href="#The-Question">¶</a></h2><p>Can socioeconomic status serve as a predictor of health outcomes? While health outcomes across America can vary dramatically, they can also be influenced by socioeconomic and political factors. Every diagnosis, crisis, or preventative treatment is indicative of a larger system; one where outcomes can be strongly correlated with where someone lives or what means they possess.</p>
+<p>This analysis joins two CDC datasets at the census tract level — the <strong>Social Vulnerability Index (SVI)</strong> and <strong>PLACES</strong> — to analyze potential such relationships.</p>
 <h2 id="What-This-Notebook-Does">What This Notebook Does<a class="anchor-link" href="#What-This-Notebook-Does">¶</a></h2><ol>
 <li>Downloads SVI and PLACES data from CDC (one-time, cached locally)</li>
 <li>Joins them on census tract FIPS code</li>
@@ -7817,8 +7816,8 @@ a.anchor-link {
 <li>Surfaces state-level patterns</li>
 </ol>
 <h2 id="Caveats-Up-Front">Caveats Up Front<a class="anchor-link" href="#Caveats-Up-Front">¶</a></h2><ul>
-<li>This is <strong>observational data</strong>. We can describe associations but not causation.</li>
-<li>Both datasets are estimates with their own uncertainty bounds.</li>
+<li>This is <strong>observational data</strong>. We can describe associations but <strong>not causation</strong>.</li>
+<li>Both datasets are <strong>estimates</strong> with their own uncertainty bounds.</li>
 <li>Census tract is a coarse unit — there's variation within tracts we can't see.</li>
 </ul>
 </div>
@@ -8784,8 +8783,7 @@ Population covered: 313,597,796
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Step-5:-The-Headline-Finding-%E2%80%94-Correlations">Step 5: The Headline Finding — Correlations<a class="anchor-link" href="#Step-5:-The-Headline-Finding-%E2%80%94-Correlations">¶</a></h2><p>How strongly does each SVI theme correlate with each health outcome?
-Spoiler: very strongly, but the strength varies by condition.</p>
+<h2 id="Step-5:-Correlations">Step 5: Correlations<a class="anchor-link" href="#Step-5:-Correlations">¶</a></h2><p>How strongly does each SVI theme correlate with each health outcome?</p>
 </div>
 </div>
 </div>
@@ -8794,7 +8792,7 @@ Spoiler: very strongly, but the strength varies by condition.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [59]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">svi_cols_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'svi_overall'</span><span class="p">,</span> <span class="s1">'svi_socioeconomic'</span><span class="p">,</span> <span class="s1">'svi_household'</span><span class="p">,</span> <span class="s1">'svi_minority'</span><span class="p">,</span> <span class="s1">'svi_housing'</span><span class="p">]</span>
@@ -8802,7 +8800,7 @@ Spoiler: very strongly, but the strength varies by condition.</p>
 
 <span class="n">corr</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">svi_cols_list</span> <span class="o">+</span> <span class="n">outcome_cols</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">svi_cols_list</span><span class="p">,</span> <span class="n">outcome_cols</span><span class="p">]</span>
 
-<span class="c1"># Pretty labels</span>
+<span class="c1"># Labels</span>
 <span class="n">corr</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Overall SVI'</span><span class="p">,</span> <span class="s1">'Socioeconomic'</span><span class="p">,</span> <span class="s1">'Household'</span><span class="p">,</span> <span class="s1">'Minority Status'</span><span class="p">,</span> <span class="s1">'Housing/Transport'</span><span class="p">]</span>
 <span class="n">corr</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">FOCUS_MEASURES</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">corr</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
 
@@ -8841,23 +8839,7 @@ Spoiler: very strongly, but the strength varies by condition.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="What-this-shows">What this shows<a class="anchor-link" href="#What-this-shows">¶</a></h3><p><strong>TODO after running:</strong> Write 2-3 sentences interpreting the heatmap. Look for:</p>
-<ul>
-<li>Which SVI theme correlates most strongly with each outcome?</li>
-<li>Are there outcomes that DON'T track with vulnerability? (Often interesting to flag.)</li>
-<li>Any sign-flipping (negative correlations) that needs explanation?</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Step-6:-The-Headline-Scatter-Plot">Step 6: The Headline Scatter Plot<a class="anchor-link" href="#Step-6:-The-Headline-Scatter-Plot">¶</a></h2><p>One image, one finding. Pick the highest-correlation pair and show it cleanly.</p>
+<h2 id="Step-6:-The-Scatter-Plot">Step 6: The Scatter Plot<a class="anchor-link" href="#Step-6:-The-Scatter-Plot">¶</a></h2>
 </div>
 </div>
 </div>
@@ -8939,7 +8921,59 @@ Ratio: 1.64x
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Step-7:-State-Level-Disparities">Step 7: State-Level Disparities<a class="anchor-link" href="#Step-7:-State-Level-Disparities">¶</a></h2><p>National averages obscure regional patterns. Where is the SVI-health relationship sharpest?</p>
+<h3 id="What-This-Shows">What This Shows<a class="anchor-link" href="#What-This-Shows">¶</a></h3><p>In this analysis, the relationship between socioeconomic vulnerability and adverse
+health outcomes is clear. Across ~73,000 US census tracts, the socioeconomic theme
+of the Social Vulnerability Index correlates with diabetes prevalence at r=0.60,
+poor mental health at r=0.68, and current smoking at r=0.65, the strongest signals
+observed across all SVI components. Translating this into concrete terms: census
+tracts in the highest vulnerability quintile show diabetes prevalence of 15.6%,
+compared to 9.5% in the lowest. This constitutes a 1.64x difference, consistent
+with findings in the broader literature. Bevan et al. (2024) documented a 66%
+increase in diabetes-related cardiovascular mortality associated with social
+vulnerability, and separately cited work by Khan et al. demonstrating an 84%
+increase in CVD deaths among vulnerable populations.</p>
+<p>The Minority Status theme presents a more nuanced picture. Correlations with
+coronary heart disease (r=-0.19) and high blood pressure (r=-0.05) are near-zero
+or slightly negative, which appears counterintuitive given the well-documented
+relationship between minority status and adverse health outcomes in the broader
+literature. Two explanations are worth considering.</p>
+<p>First, access barriers documented in the Hispanic Paradox literature offer a
+plausible mechanism. Structural obstacles including cost, provider availability,
+and healthcare avoidance reduce utilization among certain minority populations,
+producing artificially favorable health statistics for groups that may carry
+significant undiagnosed disease burden.</p>
+<p>Second, cultural dietary patterns may contribute to genuinely improved cardiovascular
+outcomes in certain minority subpopulations. This remains speculative and would
+require further reading to support with any confidence.</p>
+<p>It is also worth noting a methodological limitation in how these correlations were
+computed. The correlation matrix does not control for the socioeconomic theme, meaning
+the Minority Status signal reflects residual variance after socioeconomic vulnerability
+has already explained much of the outcome variation. More rigorous analysis —
+controlling for the observed interplay between socioeconomic status, ethnic background,
+and health outcomes — would be required to draw stronger conclusions about the
+independent relationship between minority status and the health outcomes examined here.</p>
+<h4 id="References">References<a class="anchor-link" href="#References">¶</a></h4><ul>
+<li>Bevan, G. H., et al. (2024). <em>Journal of the American Heart Association</em>, 13(2). <a href="https://www.ahajournals.org/doi/10.1161/JAHA.123.029649">https://www.ahajournals.org/doi/10.1161/JAHA.123.029649</a></li>
+<li>HHS ASPE (2022). <a href="https://aspe.hhs.gov/sites/default/files/documents/e2b650cd64cf84aae8ff0fae7474af82/SDOH-Evidence-Review.pdf">https://aspe.hhs.gov/sites/default/files/documents/e2b650cd64cf84aae8ff0fae7474af82/SDOH-Evidence-Review.pdf</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Step-7:-State-Level-Disparities">Step 7: State-Level Disparities<a class="anchor-link" href="#Step-7:-State-Level-Disparities">¶</a></h2><blockquote>
+<p><strong>Phase 2 TODO:</strong> This section surfaces initial geographic patterns in the
+SVI→diabetes relationship across states. Interpretation and writeup deferred
+to Phase 2, where a full geographic deep dive — including interactive maps,
+urban/rural dimensions, and the "twin tracts" analysis — will provide the
+necessary context to draw meaningful conclusions from these state-level
+correlations.</p>
+</blockquote>
 </div>
 </div>
 </div>
@@ -8995,20 +9029,37 @@ Ratio: 1.64x
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Phase-1-Summary">Phase 1 Summary<a class="anchor-link" href="#Phase-1-Summary">¶</a></h2><p><strong>TODO after running:</strong> Write 4-6 sentences summarizing what we learned.</p>
-<p>Suggested structure:</p>
-<ol>
-<li>The headline number (e.g., "diabetes rates are X.Xx higher in the most vulnerable tracts")</li>
-<li>Which vulnerability dimension matters most</li>
-<li>Where the disparity is sharpest geographically</li>
-<li>The explicit caveat about correlation vs. causation</li>
-<li>What Phase 2 will explore</li>
-</ol>
-<h2 id="Next-Steps-(Phase-2)">Next Steps (Phase 2)<a class="anchor-link" href="#Next-Steps-(Phase-2)">¶</a></h2><ul>
-<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Build interactive choropleth map with Folium/Plotly</li>
-<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Explore "twin tracts" — pairs with similar SVI but divergent outcomes</li>
-<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Add urban/rural dimension (CDC's NCHS Urban-Rural Classification)</li>
-<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"/>Sensitivity analysis: do findings hold when we control for population age?</li>
+<h2 id="Introduction-to-Phase-2">Introduction to Phase 2<a class="anchor-link" href="#Introduction-to-Phase-2">¶</a></h2><p>In the above plot, we see that there exist meanignful</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Phase-1-Summary">Phase 1 Summary<a class="anchor-link" href="#Phase-1-Summary">¶</a></h2><p>This analysis strongly supports the relationship between socioeconomic vulnerability
+and adverse health outcomes across US census tracts. The dominant signal is
+socioeconomic status, which correlates more strongly with diabetes, poor mental
+health, and smoking prevalence than any other SVI component. This is particularly
+meaningful given the longitudinal depth of census data — robust, geographically
+granular records of socioeconomic conditions over time may create a foundation for
+targeted outreach programs, and work such as Bevan et al. (2024) suggests that
+SVI-derived insights could inform both health and social interventions for at-risk
+communities.</p>
+<p>The Minority Status theme warrants further exploration. Different minority groups
+experience radically different levels of access to health and social programs, and
+the analysis as constructed has no mechanism to control for this variance.</p>
+<p>It is important to note that this study is observational in nature. The correlations
+documented here describe association, not causation, and should be interpreted
+accordingly. Phase 2 will explore the geographic distribution of these findings,
+examine the interplay between socioeconomic and geographic factors, and aim to paint
+a more complete picture of the conditions shaping health outcomes across the country.</p>
+<h4 id="References">References<a class="anchor-link" href="#References">¶</a></h4><ul>
+<li>Bevan, G. H., et al. (2024). <em>Journal of the American Heart Association</em>, 13(2). <a href="https://www.ahajournals.org/doi/10.1161/JAHA.123.029649">https://www.ahajournals.org/doi/10.1161/JAHA.123.029649</a></li>
+<li>HHS ASPE (2022). <a href="https://aspe.hhs.gov/sites/default/files/documents/e2b650cd64cf84aae8ff0fae7474af82/SDOH-Evidence-Review.pdf">https://aspe.hhs.gov/sites/default/files/documents/e2b650cd64cf84aae8ff0fae7474af82/SDOH-Evidence-Review.pdf</a></li>
 </ul>
 </div>
 </div>
