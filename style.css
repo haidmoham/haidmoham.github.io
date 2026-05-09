@@ -258,6 +258,9 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .what-i-do-accent.teal { color: var(--teal); }
 .what-i-do-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
 
+/* PROJECT DATE */
+.project-date { font-size: 0.75rem; color: var(--text-muted); margin: 0.3rem 0 0.5rem; letter-spacing: 0.02em; }
+
 /* CLIENT VALUE */
 .client-value {
   margin-top: 1rem; padding: 0.85rem 1rem;
