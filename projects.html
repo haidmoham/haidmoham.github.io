@@ -6,7 +6,7 @@
   <meta property="og:title" content="Projects — Mohammad Haider" />
   <meta property="og:description" content="Selected work: social vulnerability & health outcomes analysis, SSAS cube migration at Microsoft, Tableau analytics at UVA." />
   <meta property="og:url" content="https://mhaider.dev/projects.html" />
-  <meta property="og:image" content="https://mhaider.dev/profile.jpg" />
+  <meta property="og:image" content="https://mhaider.dev/og-image.png" />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,24 +36,6 @@
   <div class="projects-section">
     <div class="projects-full-grid">
 
-      <div class="project-card-full" style="border-color: rgba(200,169,81,0.3);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-          <div class="project-tag">AI &amp; Automation · Personal</div>
-          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(200,169,81,0.1); border:1px solid rgba(200,169,81,0.25); padding:0.22rem 0.6rem; border-radius:4px;">Active</span>
-        </div>
-        <div class="project-date">May 2026 – Present</div>
-        <h3>Automated Image Generation Pipeline (FLUX.1-dev / ComfyUI)</h3>
-        <p>Built a local automated pipeline using FLUX.1-dev and ComfyUI to generate, batch-process, and organize AI-generated images from structured prompt inputs — enabling repeatable, high-volume creative output without manual intervention.</p>
-        <ul class="project-bullets">
-          <li>Parameterized prompt templates feeding directly into ComfyUI workflows via API</li>
-          <li>Automated batch queuing, output naming, and file organization</li>
-          <li>Local GPU inference (no API costs) with reproducible seed control</li>
-          <li>Extensible to other diffusion models and workflow variations</li>
-        </ul>
-        <div class="project-meta"><span>Python</span><span>ComfyUI</span><span>FLUX.1-dev</span><span>REST API</span><span>diffusers</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Repetitive visual content quietly eats hours. This pipeline handles batching, queuing, and file organization end-to-end — on local hardware, so no per-image API costs.</div>
-      </div>
-
       <div class="project-card-full" style="border-color: rgba(56,191,161,0.35);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Health Equity Analysis</div>
@@ -68,18 +50,36 @@
           <li>Identified DC, Connecticut, and Louisiana as states with sharpest within-state disparities</li>
         </ul>
         <div class="project-meta"><span>Python</span><span>pandas</span><span>scikit-learn</span><span>matplotlib</span><span>geopandas</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Government datasets are messy and rarely designed to talk to each other. Getting useful signal out of them is most of the work — the charts are the easy part.</div>
+        <div class="client-value"><strong>Worth noting:</strong> SVI and PLACES are both well-maintained public datasets, but they weren't designed to be joined. Getting the geographic grain right across 73,000 census tracts took longer than the analysis itself. Once that was clean, the 1.64x diabetes finding came out clearly — which is either obvious or alarming depending on who you ask.</div>
         <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
           <a href="notebooks/social-impact-phase1.html" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">View Notebook →</a>
           <a href="https://github.com/haidmoham/social-impact-analysis" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">View on GitHub →</a>
         </div>
       </div>
 
+      <div class="project-card-full" style="border-color: rgba(200,169,81,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <div class="project-tag">AI &amp; Automation · Personal</div>
+          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(200,169,81,0.1); border:1px solid rgba(200,169,81,0.25); padding:0.22rem 0.6rem; border-radius:4px;">Active</span>
+        </div>
+        <div class="project-date">May 2026 – Present</div>
+        <h3>Automated Image Generation Pipeline (FLUX.1-dev / ComfyUI)</h3>
+        <p>Built a local automated pipeline using FLUX.1-dev and ComfyUI to generate, batch-process, and organize AI-generated images from structured prompt inputs — so you can run high-volume generation without babysitting the process.</p>
+        <ul class="project-bullets">
+          <li>Parameterized prompt templates feeding directly into ComfyUI workflows via API</li>
+          <li>Automated batch queuing, output naming, and file organization</li>
+          <li>Local GPU inference (no API costs) with reproducible seed control</li>
+          <li>Extensible to other diffusion models and workflow variations</li>
+        </ul>
+        <div class="project-meta"><span>Python</span><span>ComfyUI</span><span>FLUX.1-dev</span><span>REST API</span><span>diffusers</span></div>
+        <div class="client-value"><strong>Worth noting:</strong> The interesting part isn't the generation — it's that once the prompts are parameterized and the queue is set up, there's nothing left to babysit. Runs on local GPU, files organize themselves, no per-image API costs accumulating in the background.</div>
+      </div>
+
       <div class="project-card-full">
         <div class="project-tag">Data Engineering · Microsoft</div>
         <div class="project-date">Jul 2021 – Jul 2024</div>
         <h3>SSAS Multidimensional → Tabular Migration</h3>
-        <p>Led the migration of enterprise-grade SSAS Multidimensional Cubes to a Tabular Model, fundamentally improving the analytics infrastructure used by finance and accounting teams.</p>
+        <p>Led the migration of enterprise SSAS Multidimensional Cubes to a Tabular Model, improving the analytics infrastructure used by finance and accounting teams.</p>
         <ul class="project-bullets">
           <li>200x faster experience when filtering data</li>
           <li>300% improvement in processing speed</li>
@@ -87,21 +87,21 @@
           <li>Automated incident generation post-migration</li>
         </ul>
         <div class="project-meta"><span>SQL</span><span>MDAX</span><span>SSAS</span><span>Azure</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> This is what a clean migration looks like at scale — faster queries, no outages, finance team still happy. The pitfalls are real and well-documented; the key is knowing which ones to actually worry about.</div>
+        <div class="client-value"><strong>Worth noting:</strong> The 200x stat is real. What made it clean was scoping narrowly — this was a migration, not a redesign. The main risks were DAX parity with existing MDX logic and partition strategy. Those are where most of these go wrong.</div>
       </div>
 
       <div class="project-card-full">
         <div class="project-tag">ETL &amp; Pipelines · Microsoft</div>
         <div class="project-date">Jul 2021 – Jul 2024</div>
         <h3>Petabyte-Scale ETL Pipelines</h3>
-        <p>Designed and maintained robust scheduled ETL pipelines processing hundreds of petabytes of raw data to deliver clean, analysis-ready datasets for financial reporting.</p>
+        <p>Designed and maintained scheduled ETL pipelines processing hundreds of petabytes of raw data to deliver clean datasets for financial reporting.</p>
         <ul class="project-bullets">
           <li>SQL and MDAX queries across massive unfiltered sources</li>
           <li>Enabled financials-related decision-making for accounting staff</li>
           <li>Created live production dashboards for end users</li>
         </ul>
         <div class="project-meta"><span>SQL</span><span>MDAX</span><span>Azure Data Factory</span><span>Azure Data Lake</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Raw data in a warehouse doesn't help anyone. These pipelines turned hundreds of petabytes of noise into something the accounting team could actually use — and they ran on schedule.</div>
+        <div class="client-value"><strong>Worth noting:</strong> At this scale, the query logic isn't the hard part. What makes a pipeline actually reliable is how it fails — whether it surfaces errors loudly and specifically when something upstream changes. Silent corruption in financial data is worse than downtime.</div>
       </div>
 
       <div class="project-card-full">
@@ -115,7 +115,7 @@
           <li>Helped stakeholders onboard to the dashboards and the Tableau platform</li>
         </ul>
         <div class="project-meta"><span>Tableau</span><span>Requirements Gathering</span><span>Stakeholder Communication</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> A dashboard nobody opens is just a file. The work I cared about here was making sure people actually used it — which meant the requirements conversation mattered as much as the build.</div>
+        <div class="client-value"><strong>Worth noting:</strong> The requirements conversation is most of the job. People know the data they want to see; they're less sure what question they're actually trying to answer. Getting that right upfront is the difference between a dashboard that gets used and one that gets opened once.</div>
       </div>
 
       <div class="project-card-full">
@@ -129,21 +129,21 @@
           <li>Worked through cleanup tasks across multiple stakeholder workbooks</li>
         </ul>
         <div class="project-meta"><span>Tableau</span><span>Telemetry</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Slow Tableau that nobody knows how to diagnose is a common problem. Telemetry tells you exactly where the time is going — then you fix those specific things, not everything.</div>
+        <div class="client-value"><strong>Worth noting:</strong> Performance problems in Tableau usually concentrate in a few specific places — extract size, custom SQL that reruns on every page load, LODs that don't need to be LODs. Telemetry makes it obvious which. The 20% improvement came from fixing those, not a blanket cleanup.</div>
       </div>
 
       <div class="project-card-full">
         <div class="project-tag">App Modernization · Microsoft</div>
         <div class="project-date">Jul 2021 – Jul 2024</div>
         <h3>Desktop-to-Web Configuration Tool Migration</h3>
-        <p>Migrated a legacy configuration tool from a desktop application to a modern web-based interface, improving engineer productivity and release velocity.</p>
+        <p>Migrated a legacy configuration tool from desktop to a web-based interface, improving engineer productivity and release velocity.</p>
         <ul class="project-bullets">
           <li>15% increase in engineer productivity</li>
           <li>Faster and more frequent update cycle</li>
           <li>Built with ASP.NET and modern web stack</li>
         </ul>
         <div class="project-meta"><span>ASP.NET</span><span>.NET Framework</span><span>HTML</span><span>CSS</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> The old tool updated whenever someone remembered to push a release. Moving it to web fixed that — and stopped the "it only works on my machine" conversations.</div>
+        <div class="client-value"><strong>Worth noting:</strong> The main issue wasn't the software — it was that updates required remembering to ship them, so they rarely happened. Moving to web made deployment automatic and removed the per-machine installation problem. The 15% productivity gain is mostly that friction gone.</div>
       </div>
 
       <div class="project-card-full">
@@ -156,7 +156,7 @@
           <li>Data cleaning and feature engineering in Python and R</li>
         </ul>
         <div class="project-meta"><span>Python</span><span>R</span><span>RNN</span><span>pandas</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Multi-decade FBI crime data is about as messy as real-world datasets get. Getting a model to surface meaningful regional trends from it requires more data wrangling than modeling — that ratio is pretty typical.</div>
+        <div class="client-value"><strong>Worth noting:</strong> The FBI changed crime category definitions multiple times across the dataset, so most of the work was reconciling those methodology shifts before the RNN touched any of it. Typical for multi-decade public data.</div>
       </div>
 
       <div class="project-card-full">
@@ -169,7 +169,7 @@
           <li>NumPy and Pandas for data manipulation and modeling</li>
         </ul>
         <div class="project-meta"><span>Python</span><span>NumPy</span><span>Pandas</span><span>NLP</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Text data piles up fast and stays unread. A pipeline that scrapes, classifies, and tracks sentiment automatically means you're actually looking at the signal instead of just collecting it.</div>
+        <div class="client-value"><strong>Worth noting:</strong> Scraping was easy. The harder problem was that COVID news vocabulary shifted fast enough that a model trained on early 2020 articles was nearly useless by summer. We ended up retraining on rolling windows to keep it useful over time.</div>
       </div>
 
     </div>
