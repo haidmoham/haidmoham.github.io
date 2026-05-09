@@ -1,5 +1,5 @@
 # Claude Context — Mohammad Haider
-<!-- v6 -->
+<!-- v7 -->
 
 
 > Paste this into any new Claude conversation (web, Claude Code, API) to give Claude full context on me, my background, and my current goals.
@@ -23,6 +23,8 @@ I am **actively job-searching** for my next role. My most recent position (Data 
 - Senior Data Analyst roles
 - Data Engineering positions
 - BI / Analytics Engineering
+
+I am also **available for select consulting engagements** alongside the job search. The portfolio now reflects both audiences simultaneously — "Open to Work" signals remain visible for recruiters; a dedicated Work With Me page (mhaider.dev/work-with-me.html) handles consulting outreach. When writing copy for the site, thread both audiences rather than choosing one.
 
 ## Education
 
@@ -53,7 +55,8 @@ I am **actively job-searching** for my next role. My most recent position (Data 
 
 ## Personal Projects
 
-- **Social Vulnerability vs. Health Outcomes** *(in progress, Phase 1)* — joining CDC's SVI with PLACES health data across ~73,000 US census tracts. Headline finding: diabetes is 1.64x more prevalent in highly-vulnerable tracts. Repo: [github.com/haidmoham/social-impact-analysis](https://github.com/haidmoham/social-impact-analysis). Phased plan: foundation → geographic deep dive → ML/clustering → polish & dashboard.
+- **Automated Image Generation Pipeline** *(active)* — local pipeline using FLUX.1-dev and ComfyUI to generate, batch-process, and organize AI-generated images from structured prompt inputs. Parameterized prompt templates → ComfyUI workflows via API, automated batch queuing and file organization, local GPU inference (no API costs), reproducible seed control. Stack: Python, ComfyUI, REST API, diffusers. This is the most recent work and should be listed first on the portfolio.
+- **Social Vulnerability vs. Health Outcomes** *(Phase 1 published)* — joining CDC's SVI with PLACES health data across ~73,000 US census tracts. Headline finding: diabetes is 1.64x more prevalent in highly-vulnerable tracts. Repo: [github.com/haidmoham/social-impact-analysis](https://github.com/haidmoham/social-impact-analysis). Phased plan: foundation → geographic deep dive → ML/clustering → polish & dashboard. **Status: Phase 1 is published on the portfolio and suitable to share with recruiters.** Previously marked "not ready" — that is now outdated.
 - **Crime Prediction RNN** — RNN trained on FBI historical crime data (Python, R)
 - **Newspaper COVID-19 Sentiment Analysis** — led a team to scrape and analyze sentiment in news coverage (Python, NumPy, Pandas)
 
@@ -108,21 +111,30 @@ When helping me with resume/portfolio/cover letter content:
 - **DNS:** Cloudflare (4 A records to GitHub IPs + 1 CNAME for `www`, all set to "DNS only" gray cloud)
 - **Local working folder:** `C:\Users\haidm\Desktop\Claude Outputs\Portfolio-26\` (NOT the duplicate at `Desktop\Portfolio-26` which is orphaned)
 
+### Current page structure
+- `index.html` — hero, stats, "What I Do" (3-column services section), featured projects
+- `about.html` — bio threading both job-search and consulting audiences, experience, education
+- `projects.html` — full project grid; AI pipeline card is first (most recent work first)
+- `resume.html` — full work history
+- `work-with-me.html` — consulting services, fit checklist, process, CTA
+- `contact.html` — contact form
+
 ### Project integration workflow
 For each new project I want to feature:
 1. Build it in its own repo (e.g., `social-impact-analysis`)
 2. Push to GitHub public
 3. For Jupyter notebooks: export to standalone HTML via `jupyter nbconvert --to html --embed-images` and place in `Portfolio-26/notebooks/`
-4. Add a project card to `projects.html` (and optionally promote to homepage `index.html`)
-5. Commit and push portfolio repo → GitHub Pages auto-deploys in ~60 sec
+4. Add a project card to `projects.html` — most recent work goes first
+5. Add a "Worth noting:" callout to the card (not "What this means for clients" — that label was replaced). Tone: matter-of-fact observation about the work, not a sales pitch.
+6. Commit and push portfolio repo → GitHub Pages auto-deploys in ~60 sec
 
 ---
 
 ## Current Project Context
 
-Working on Phase 1 of the Social Vulnerability + Health Outcomes analysis. Notebook is functional, three figures render (correlation heatmap, diabetes scatter plot, state-level disparity bars). TODO items in the notebook: writing nuanced interpretation paragraphs that incorporate peer-reviewed literature (literature review compiled in `literature_review.md` in the repo).
+**Social Vulnerability + Health Outcomes (Phase 1):** Published on the portfolio. Notebook is functional, three figures render (correlation heatmap, diabetes scatter plot, state-level disparity bars). Phase 1 is complete and ready to share with recruiters. TODO: nuanced interpretation paragraphs incorporating peer-reviewed literature (literature review compiled in `literature_review.md` in the repo) — this is a Phase 1 polish item, not blocking.
 
-The project is published as "Phase 1 · In Progress" on the portfolio. Not yet ready to share with recruiters; suitable for showing friends in industry as a conversation piece.
+**AI Image Generation Pipeline:** Active personal project. Local FLUX.1-dev / ComfyUI pipeline. Not yet published as a standalone repo — currently featured on the portfolio without a GitHub link.
 
 ### Future direction note (Phase 3+)
 For the ML/inference phase, will incorporate **policy environment as a proxy for the political/electoral context** — using state-level Medicaid expansion status, ACA marketplace enrollment, state minimum wage, and similar election-driven policy outcomes as features alongside SVI. This is **Option A** (chosen): cleaner methodology than using vote shares directly, strong literature support (especially Medicaid expansion → health outcomes), and avoids the politically charged framing of vote-share-as-feature.
