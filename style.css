@@ -234,17 +234,29 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 
 /* WHAT I DO */
-.what-i-do { max-width: 1200px; margin: 0 auto; padding: 5rem 2.5rem; }
-.what-i-do-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 0; }
+.what-i-do {
+  background: var(--navy-mid);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5rem 0;
+}
+.what-i-do-inner { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; }
+.what-i-do-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .what-i-do-card {
-  background: var(--navy-card); border: 1px solid var(--border);
+  background: var(--navy-card);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: var(--radius-lg); padding: 2rem;
   transition: border-color 0.2s, transform 0.2s;
 }
-.what-i-do-card:hover { border-color: rgba(200,169,81,0.35); transform: translateY(-2px); }
-.what-i-do-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
-.what-i-do-card h3 { color: #fff; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600; }
-.what-i-do-card p { font-size: 0.9rem; color: var(--text-muted); }
+.what-i-do-card:hover { border-color: rgba(200,169,81,0.45); transform: translateY(-3px); }
+.what-i-do-accent {
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+}
+.what-i-do-accent.gold { color: var(--gold); }
+.what-i-do-accent.teal { color: var(--teal); }
+.what-i-do-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
 
 /* CLIENT VALUE */
 .client-value {
