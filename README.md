@@ -10,15 +10,6 @@ Personal portfolio site for Mohammad Haider — Data Analyst &amp; Engineer.
 - Hosted on GitHub Pages
 - DNS via Cloudflare
 
-## Local development
-
-Just open `index.html` in a browser, or run a local server:
-
-```bash
-python3 -m http.server 8000
-# then visit http://localhost:8000
-```
-
 ## Structure
 
 ```
