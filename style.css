@@ -226,6 +226,79 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .form-submit { width: 100%; padding: 0.85rem; border: none; font-family: 'Sora', sans-serif; }
 .form-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.75rem; text-align: center; }
 
+/* HERO AVAILABILITY */
+.hero-availability {
+  font-size: 0.88rem; font-weight: 500; color: var(--teal);
+  margin-top: -1rem; margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
+/* WHAT I DO */
+.what-i-do { max-width: 1200px; margin: 0 auto; padding: 5rem 2.5rem; }
+.what-i-do-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 0; }
+.what-i-do-card {
+  background: var(--navy-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 2rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.what-i-do-card:hover { border-color: rgba(200,169,81,0.35); transform: translateY(-2px); }
+.what-i-do-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+.what-i-do-card h3 { color: #fff; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600; }
+.what-i-do-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+/* CLIENT VALUE */
+.client-value {
+  margin-top: 1rem; padding: 0.85rem 1rem;
+  background: rgba(200,169,81,0.06); border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.86rem; color: var(--text-muted); line-height: 1.6;
+}
+.client-value strong { color: var(--gold-light); }
+
+/* WORK WITH ME PAGE */
+.wwm-layout { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem 5rem; }
+.wwm-layout section { margin-bottom: 5rem; }
+.wwm-layout h2 { margin-bottom: 2rem; }
+
+.wwm-services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.wwm-service-card {
+  background: var(--navy-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 2rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.wwm-service-card:hover { border-color: rgba(200,169,81,0.35); transform: translateY(-2px); }
+.wwm-service-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+.wwm-service-card h3 { color: #fff; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600; }
+.wwm-service-card > p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.1rem; }
+
+.wwm-intro { font-size: 1rem; color: var(--text-muted); max-width: 680px; margin-bottom: 2rem; }
+.wwm-fit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.wwm-fit-item {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  background: var(--navy-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem 1.5rem;
+}
+.wwm-fit-check { color: var(--teal); font-weight: 700; font-size: 1rem; flex-shrink: 0; margin-top: 0.15rem; }
+.wwm-fit-item p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+.wwm-steps { display: flex; flex-direction: column; gap: 1.5rem; max-width: 700px; }
+.wwm-step { display: flex; gap: 1.5rem; align-items: flex-start; }
+.wwm-step-num {
+  font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
+  color: var(--gold); line-height: 1; flex-shrink: 0; width: 2.5rem;
+}
+.wwm-step h3 { color: #fff; font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+.wwm-step p { font-size: 0.9rem; color: var(--text-muted); }
+
+.wwm-cta-section { text-align: center; }
+.wwm-cta-card {
+  background: var(--navy-mid); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 3.5rem 2.5rem;
+  max-width: 640px; margin: 0 auto;
+}
+.wwm-cta-card h2 { color: #fff; margin-bottom: 1rem; }
+.wwm-cta-card > p { color: var(--text-muted); max-width: 480px; margin: 0 auto; }
+
 /* ANIM */
 @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation: fadeUp 0.7s both; }
@@ -244,6 +317,9 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   .projects-full-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
   .nav-burger { display: block; }
+  .what-i-do-grid { grid-template-columns: 1fr; }
+  .wwm-services-grid { grid-template-columns: 1fr; }
+  .wwm-fit-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   .skills-grid { grid-template-columns: 1fr; }
