@@ -36,6 +36,26 @@
   <div class="projects-section">
     <div class="projects-full-grid">
 
+      <div class="project-card-full" style="border-color: rgba(240,180,41,0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <div class="project-tag">Personal · Full-Stack Web App</div>
+          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(200,169,81,0.12); border:1px solid rgba(200,169,81,0.3); padding:0.22rem 0.6rem; border-radius:4px;">Live</span>
+        </div>
+        <h3>RareDex — Pokémon TCG Card Scanner</h3>
+        <p>A mobile-first web app that identifies Pokémon TCG cards via camera scan, retrieves live market prices, and exports collections to Google Sheets. Built for collectors and card shop trade-ins.</p>
+        <ul class="project-bullets">
+          <li>OCR pipeline using Google Cloud Vision + OpenCV to extract collector numbers from card images</li>
+          <li>Batch upload mode processes full card albums sequentially with a progress indicator</li>
+          <li>Google OAuth + Sheets export with configurable trade-in percentage calculations</li>
+          <li>Play-stamp detection for Prize Pack Series variants with TCGPlayer price lookup</li>
+        </ul>
+        <div class="project-meta"><span>Python</span><span>Flask</span><span>Google Cloud Vision</span><span>OpenCV</span><span>gspread</span><span>Vanilla JS</span></div>
+        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
+          <a href="https://rare-dex.up.railway.app" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
+          <a href="https://github.com/haidmoham/raredex" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">View on GitHub →</a>
+        </div>
+      </div>
+
       <div class="project-card-full" style="border-color: rgba(56,191,161,0.35);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Health Equity Analysis</div>
