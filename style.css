@@ -331,6 +331,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   .skills-grid { grid-template-columns: repeat(2, 1fr); }
   .projects-full-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
+  .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); padding: 1rem 1.5rem 1.5rem; gap: 1rem; border-bottom: 1px solid var(--border); }
   .nav-burger { display: block; }
   .what-i-do-grid { grid-template-columns: 1fr; }
   .wwm-services-grid { grid-template-columns: 1fr; }

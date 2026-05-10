@@ -125,5 +125,10 @@
     formspree('initForm', { formElement: '#contact-form', formId: 'xykowgkw' });
   </script>
   <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+  <script>
+    document.querySelector('.nav-burger').addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
 </body>
 </html>
