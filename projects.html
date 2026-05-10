@@ -49,6 +49,7 @@
           <li>Batch upload mode processes full card albums sequentially with a progress indicator</li>
           <li>Google OAuth + Sheets export with configurable trade-in percentage calculations</li>
           <li>Play-stamp detection for Prize Pack Series variants with TCGPlayer price lookup</li>
+          <li>Era-spanning regression suite: 25 cards across Black & White → Scarlet & Violet covering every card type (Pokémon, Supporter, Item, Stadium, Special Energy), all passing against the live API</li>
         </ul>
         <div class="project-meta"><span>Python</span><span>Flask</span><span>Google Cloud Vision</span><span>OpenCV</span><span>gspread</span><span>Vanilla JS</span></div>
         <div class="client-value"><strong>Worth noting:</strong> The OCR targets the collector number rather than the card name — numbers are small, isolated, and uniform, while card names have art interference and stylized fonts. That one decision made the pipeline dramatically more reliable, and means the app works on any card regardless of language.</div>
