@@ -43,15 +43,16 @@
         </div>
         <div class="project-date">May 2026 – Present</div>
         <h3>RareDex — Pokémon TCG Card Scanner</h3>
-        <p>A mobile-first web app that identifies Pokémon TCG cards via camera scan, retrieves live market prices, and exports collections to Google Sheets. Built for collectors and card shop trade-ins.</p>
+        <p>A mobile-first web app that identifies Pokémon TCG cards via camera scan, retrieves live market prices, and exports collections via shareable link or CSV download. Built for collectors and card shop trade-ins.</p>
         <ul class="project-bullets">
           <li>OCR pipeline using Google Cloud Vision + OpenCV to extract collector numbers from card images</li>
+          <li>Live video viewfinder mode with motion detection and debounce confirmation — scans while you sweep cards</li>
           <li>Batch upload mode processes full card albums sequentially with a progress indicator</li>
-          <li>Google OAuth + Sheets export with configurable trade-in percentage calculations</li>
+          <li>Google OAuth + magic-link auth (two-track, keyed on email); configurable trade-in percentage calculator; shareable export links and CSV download</li>
           <li>Play-stamp detection for Prize Pack Series variants with TCGPlayer price lookup</li>
           <li>Era-spanning regression suite: 25 cards across Black & White → Scarlet & Violet covering every card type (Pokémon, Supporter, Item, Stadium, Special Energy), all passing against the live API</li>
         </ul>
-        <div class="project-meta"><span>Python</span><span>Flask</span><span>Google Cloud Vision</span><span>OpenCV</span><span>gspread</span><span>Vanilla JS</span></div>
+        <div class="project-meta"><span>Python</span><span>Flask</span><span>PostgreSQL</span><span>Google Cloud Vision</span><span>OpenCV</span><span>Vanilla JS</span></div>
         <div class="client-value"><strong>Worth noting:</strong> The OCR targets the collector number rather than the card name — numbers are small, isolated, and uniform, while card names have art interference and stylized fonts. That one decision made the pipeline dramatically more reliable, and means the app works on any card regardless of language.</div>
         <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
           <a href="https://rare-dex.com" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
