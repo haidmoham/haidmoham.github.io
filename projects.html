@@ -30,7 +30,7 @@
   <div class="page-hero">
     <p class="section-eyebrow">Portfolio</p>
     <h1>Projects</h1>
-    <p>A selection of professional and personal work spanning data engineering, BI, machine learning, and NLP.</p>
+    <p>A selection of professional and personal work spanning data engineering, BI, machine learning, and creative software.</p>
   </div>
 
   <div class="projects-section">
@@ -66,7 +66,7 @@
         </div>
         <div class="project-date">May 2026 – Present</div>
         <h3>Voidpulse — GPU Particle Visualizer</h3>
-        <p>A browser-native audio visualizer in the style of the classic iTunes Magnetosphere plugin. 60,000 GPU particles form a swirling cloud that breathes, pulses, and morphs in real time to whatever audio is playing — mic, system audio, or file upload.</p>
+        <p>A GPU particle visualizer modeled on the classic iTunes Magnetosphere plugin, running entirely in the browser. 60,000 particles react in real time to live audio via the Web Audio API — mic input, system audio capture, or file upload.</p>
         <ul class="project-bullets">
           <li>Custom GLSL vertex shader drives per-particle deformation: bass controls radial breathing and point size, mid displaces along Y, treble adds high-frequency jitter</li>
           <li>2-octave analytic curl-noise flow field keeps the cloud in constant divergence-free motion without any physics sim overhead</li>
@@ -112,12 +112,12 @@
         </div>
         <div class="project-date">May 2026 – Present</div>
         <h3>Automated Image Generation Pipeline (FLUX.1-dev / ComfyUI)</h3>
-        <p>Built a local automated pipeline using FLUX.1-dev and ComfyUI to generate, batch-process, and organize AI-generated images from structured prompt inputs — so you can run high-volume generation without babysitting the process.</p>
+        <p>A local automated pipeline using FLUX.1-dev and ComfyUI that generates, batch-processes, and organizes AI images from structured prompt inputs — runs unattended, no per-image supervision required.</p>
         <ul class="project-bullets">
           <li>Parameterized prompt templates feeding directly into ComfyUI workflows via API</li>
           <li>Automated batch queuing, output naming, and file organization</li>
           <li>Local GPU inference (no API costs) with reproducible seed control</li>
-          <li>Extensible to other diffusion models and workflow variations</li>
+          <li>Workflow JSON is version-controlled — swap models or prompt structures without rewriting the pipeline</li>
         </ul>
         <div class="project-meta"><span>Python</span><span>ComfyUI</span><span>FLUX.1-dev</span><span>REST API</span><span>diffusers</span></div>
         <div class="client-value"><strong>Worth noting:</strong> The interesting part isn't the generation — it's that once the prompts are parameterized and the queue is set up, there's nothing left to babysit. Runs on local GPU, files organize themselves, no per-image API costs accumulating in the background.</div>
@@ -129,7 +129,7 @@
         <h3>SSAS Multidimensional → Tabular Migration</h3>
         <p>Led the migration of enterprise SSAS Multidimensional Cubes to a Tabular Model, improving the analytics infrastructure used by finance and accounting teams.</p>
         <ul class="project-bullets">
-          <li>200x faster experience when filtering data</li>
+          <li>200x faster query response when filtering data</li>
           <li>300% improvement in processing speed</li>
           <li>Enabled independent scaling of cube components</li>
           <li>Automated incident generation post-migration</li>
@@ -144,9 +144,9 @@
         <h3>Petabyte-Scale ETL Pipelines</h3>
         <p>Designed and maintained scheduled ETL pipelines processing hundreds of petabytes of raw data to deliver clean datasets for financial reporting.</p>
         <ul class="project-bullets">
-          <li>SQL and MDAX queries across massive unfiltered sources</li>
-          <li>Enabled financials-related decision-making for accounting staff</li>
-          <li>Created live production dashboards for end users</li>
+          <li>SQL and MDAX queries against raw, unfiltered petabyte-scale sources</li>
+          <li>Delivered clean financial datasets powering accounting team reporting</li>
+          <li>Built and maintained live Tableau dashboards for finance stakeholders</li>
         </ul>
         <div class="project-meta"><span>SQL</span><span>MDAX</span><span>Azure Data Factory</span><span>Azure Data Lake</span></div>
         <div class="client-value"><strong>Worth noting:</strong> At this scale, the query logic isn't the hard part. What makes a pipeline actually reliable is how it fails — whether it surfaces errors loudly and specifically when something upstream changes. Silent corruption in financial data is worse than downtime.</div>
@@ -170,11 +170,11 @@
         <div class="project-tag">BI Performance · UVA</div>
         <div class="project-date">May 2025 – Mar 2026</div>
         <h3>Tableau Site Optimization</h3>
-        <p>Contributed to the optimization of UVA's Tableau environment, with a focus on performance cleanup and telemetry-driven monitoring.</p>
+        <p>Led performance optimization of UVA's Tableau environment — telemetry-driven diagnosis, targeted cleanup across stakeholder workbooks.</p>
         <ul class="project-bullets">
           <li>20% faster workbook load times organization-wide</li>
           <li>Telemetry monitoring to identify bottlenecks</li>
-          <li>Worked through cleanup tasks across multiple stakeholder workbooks</li>
+          <li>Audited and resolved performance issues across multiple stakeholder workbooks</li>
         </ul>
         <div class="project-meta"><span>Tableau</span><span>Telemetry</span></div>
         <div class="client-value"><strong>Worth noting:</strong> Performance problems in Tableau usually concentrate in a few specific places — extract size, custom SQL that reruns on every page load, LODs that don't need to be LODs. Telemetry makes it obvious which. The 20% improvement came from fixing those, not a blanket cleanup.</div>
