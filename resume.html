@@ -1,160 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resume — Mohammad Haider</title>
-  <meta property="og:title" content="Resume — Mohammad Haider" />
-  <meta name="description" content="Full work history and resume for Mohammad Haider, data & software engineer." />
-  <meta property="og:description" content="Full work history and resume for Mohammad Haider, data & software engineer." />
-  <meta property="og:url" content="https://mhaider.dev/resume.html" />
-  <meta property="og:image" content="https://mhaider.dev/og-image.png" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Resume — Mohammad Haider" />
-  <meta name="twitter:description" content="Full work history and resume for Mohammad Haider, data & software engineer." />
-  <meta name="twitter:image" content="https://mhaider.dev/og-image.png" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=4" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resume — Mohammad Haider</title>
+<meta property="og:title" content="Resume — Mohammad Haider" />
+<meta name="description" content="Full work history and resume for Mohammad Haider, data engineer and analyst." />
+<meta property="og:description" content="Full work history and resume for Mohammad Haider, data engineer and analyst." />
+<meta property="og:url" content="https://mhaider.dev/resume.html" />
+<meta property="og:image" content="https://mhaider.dev/og-image.png" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Resume — Mohammad Haider" />
+<meta name="twitter:description" content="Full work history and resume for Mohammad Haider, data engineer and analyst." />
+<meta name="twitter:image" content="https://mhaider.dev/og-image.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css?v=4" />
+
+<style>
+/* ─── Print stylesheet ──────────────────────────────────────────── */
+@media print {
+  /* Hide all site chrome */
+  .nav, .page-hero, .download-bar, .footer, .nav-burger { display: none !important; }
+
+  body { background: #fff; color: #111; font-family: 'Sora', sans-serif; font-size: 11pt; }
+
+  .resume-section {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Print header replaces page-hero */
+  .print-header {
+    display: block !important;
+    padding: 0 0 1.2rem 0;
+    border-bottom: 2px solid #111;
+    margin-bottom: 1.4rem;
+  }
+
+  .print-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22pt;
+    margin: 0 0 0.25rem 0;
+    color: #111;
+  }
+
+  .print-header .print-contact {
+    font-size: 9pt;
+    color: #444;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .resume-block { page-break-inside: avoid; margin-bottom: 1.2rem; }
+  .resume-block-title {
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #555;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .resume-entry { margin-bottom: 0.9rem; page-break-inside: avoid; }
+  .resume-entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.3rem; }
+  .resume-entry-header h4 { font-size: 11pt; font-weight: 600; color: #111; margin: 0; }
+  .resume-entry-header .co { font-size: 10pt; color: #333; }
+  .resume-dates { font-size: 9pt; color: #555; text-align: right; }
+  .resume-bullets { margin: 0.3rem 0 0 1.1rem; padding: 0; }
+  .resume-bullets li { font-size: 10pt; color: #222; margin-bottom: 0.25rem; line-height: 1.5; }
+
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.5rem; }
+  .skills-category-label { font-size: 8pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #555; margin-bottom: 0.2rem; }
+  .skills-category-value { font-size: 9.5pt; color: #222; }
+
+  /* Summary block */
+  .resume-summary { font-size: 10.5pt; color: #222; line-height: 1.6; margin-bottom: 1.2rem; }
+
+  a { color: #111; text-decoration: none; }
+}
+
+/* ─── Screen: print header hidden ──────────────────────────────── */
+@media screen {
+  .print-header { display: none; }
+}
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <a href="index.html" class="nav-logo">MH</a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="projects.html">Projects</a></li>
-      <li><a href="resume.html" class="active">Resume</a></li>
-      <li><a href="work-with-me.html">Work With Me</a></li>
-      <li><a href="contact.html" class="nav-cta">Contact</a></li>
-    </ul>
-    <button class="nav-burger">☰</button>
-  </nav>
 
-  <div class="page-hero">
-    <p class="section-eyebrow">Credentials</p>
-    <h1>Resume</h1>
-    <p>Full work history, education, and technical skills.</p>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">MH</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="resume.html" class="active">Resume</a></li>
+    <li><a href="work-with-me.html">Work With Me</a></li>
+    <li><a href="contact.html" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="nav-burger">☰</button>
+</nav>
+
+<div class="page-hero">
+  <p class="section-eyebrow">Credentials</p>
+  <h1>Resume</h1>
+  <p>Full work history, education, and technical skills.</p>
+</div>
+
+<div class="resume-section">
+
+  <div class="download-bar">
+    <a href="/Haider_DataEngineer_Resume_May26.pdf" class="btn btn-outline" download>Download PDF ↓</a>
+    <span style="font-size:0.8rem; color:var(--text-muted); margin-left:0.75rem;">or use your browser's print function for a current copy</span>
   </div>
 
-  <div class="resume-section">
-    <div class="download-bar">
-      <a href="/Haider_DataEngineer_Resume_May26.pdf" class="btn btn-outline" download>Download PDF ↓</a>
-    </div>
-
-    <div class="resume-block">
-      <div class="resume-block-title">Experience</div>
-
-      <div class="resume-entry">
-        <div class="resume-entry-header">
-          <div>
-            <h4>Data Analyst</h4>
-            <div class="co">University of Virginia</div>
-          </div>
-          <div style="text-align:right">
-            <div class="resume-dates">May 2025 – March 2026</div>
-            <div class="resume-dates">Charlottesville, VA</div>
-          </div>
-        </div>
-        <ul class="resume-bullets">
-          <li>Contributed to Tableau site optimization that achieved 20% faster workbook load times through concentrated cleanup and telemetry monitoring.</li>
-          <li>Led individual stakeholder analytics projects from start to finish — meeting with university partners to collect raw data, gather requirements, and deliver tailored dashboards.</li>
-          <li>Provided ongoing support for less technical stakeholders; helped them onboard to dashboards and the Tableau platform.</li>
-          <li>Collaborated with analytics team to proactively push dashboards to completion on time.</li>
-        </ul>
-      </div>
-
-      <div class="resume-entry">
-        <div class="resume-entry-header">
-          <div>
-            <h4>Software Engineer</h4>
-            <div class="co">Microsoft</div>
-          </div>
-          <div style="text-align:right">
-            <div class="resume-dates">July 2021 – July 2024</div>
-            <div class="resume-dates">Redmond, WA</div>
-          </div>
-        </div>
-        <ul class="resume-bullets">
-          <li>Created robust scheduled ETL pipelines using SQL and MDAX queries to extract and filter meaningful data from sources ranging up to hundreds of petabytes.</li>
-          <li>Built live production dashboards enabling financials-related decision-making for accounting staff and end users.</li>
-          <li>Led migration of SSAS Multidimensional Cubes to Tabular Model — resulting in 200x faster filtering and 300% processing speed improvement, with independent scaling and automated incident generation.</li>
-          <li>Migrated a configuration tool from desktop to web application, increasing engineer productivity by 15% and enabling more rapid update cycles.</li>
-        </ul>
-      </div>
-
-      <div class="resume-entry">
-        <div class="resume-entry-header">
-          <div>
-            <h4>Software Engineering Intern</h4>
-            <div class="co">Microsoft</div>
-          </div>
-          <div style="text-align:right">
-            <div class="resume-dates">Summers 2017 &amp; 2018</div>
-            <div class="resume-dates">Redmond, WA</div>
-          </div>
-        </div>
-        <ul class="resume-bullets">
-          <li>Ported the Most Recently Used (MRU) feature to a new architecture, focusing on enhancing system reliability and performance.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="resume-block">
-      <div class="resume-block-title">Education</div>
-      <div class="resume-entry">
-        <div class="resume-entry-header">
-          <div>
-            <h4>B.S. Statistics and Data Science</h4>
-            <div class="co">Virginia Tech</div>
-          </div>
-          <div style="text-align:right">
-            <div class="resume-dates">2015 – 2021</div>
-            <div class="resume-dates">Blacksburg, VA</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="resume-block">
-      <div class="resume-block-title">Technical Skills</div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div>
-          <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Languages</div>
-          <div style="font-size:0.9rem; color:var(--text)">Python, R, SQL, Java, C, HTML, CSS</div>
-        </div>
-        <div>
-          <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Cloud &amp; Data</div>
-          <div style="font-size:0.9rem; color:var(--text)">Azure Data Factory, Azure Data Lake, Azure Kusto, Azure Databricks, Apache Spark</div>
-        </div>
-        <div>
-          <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Visualization</div>
-          <div style="font-size:0.9rem; color:var(--text)">Tableau, Power BI, SSAS Tabular, MDAX</div>
-        </div>
-        <div>
-          <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Frameworks</div>
-          <div style="font-size:0.9rem; color:var(--text)">.NET, ASP.NET, Git, NumPy, Pandas, LaTeX</div>
-        </div>
-        <div style="grid-column:1/-1">
-          <div style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;">Data Science</div>
-          <div style="font-size:0.9rem; color:var(--text)">Machine Learning, Statistics, Logistic Analysis, Data Visualization, Signal Processing, NLP, RNN</div>
-        </div>
-      </div>
+  <!-- Print-only header (hidden on screen) -->
+  <div class="print-header">
+    <h1>Mohammad Haider</h1>
+    <div class="print-contact">
+      <span>hi@mhaider.dev</span>
+      <span>mhaider.dev</span>
+      <span>linkedin.com/in/haidmoham</span>
+      <span>github.com/haidmoham</span>
     </div>
   </div>
 
-  <footer class="footer">
-    <span>© 2026 Mohammad Haider</span>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
-      <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
+  <!-- Summary -->
+  <div class="resume-block">
+    <div class="resume-block-title">Summary</div>
+    <p class="resume-summary" style="font-size:0.95rem; color:var(--text); line-height:1.7; margin:0;">
+      Data engineer and analyst with 3+ years at Microsoft building petabyte-scale ETL pipelines and financial reporting infrastructure, and recent analytics work at the University of Virginia. Focused on the intersection of data engineering and product impact — building systems that turn raw data into decisions. Currently pursuing roles at mission-driven organizations where data work has direct, measurable human outcomes.
+    </p>
+  </div>
+
+  <!-- Experience -->
+  <div class="resume-block">
+    <div class="resume-block-title">Experience</div>
+
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>Data Analyst</h4>
+          <div class="co">University of Virginia</div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">May 2025 – March 2026</div>
+          <div class="resume-dates">Charlottesville, VA</div>
+        </div>
+      </div>
+      <ul class="resume-bullets">
+        <li>Reduced Tableau workbook load times by 20% across the organization through systematic cleanup and telemetry-driven performance monitoring — enabling faster access to dashboards for non-technical staff university-wide.</li>
+        <li>Owned end-to-end delivery of stakeholder analytics projects: requirements gathering, data pipeline construction, and dashboard delivery across multiple university departments simultaneously.</li>
+        <li>Established onboarding and support process for non-technical stakeholders, reducing friction in dashboard adoption and eliminating repeat support requests.</li>
+      </ul>
     </div>
-  </footer>
-  <script>
-    document.querySelector('.nav-burger').addEventListener('click', function() {
-      document.querySelector('.nav-links').classList.toggle('open');
-    });
-  </script>
+
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>Software Engineer — Data & Analytics</h4>
+          <div class="co">Microsoft</div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">July 2021 – July 2024</div>
+          <div class="resume-dates">Redmond, WA</div>
+        </div>
+      </div>
+      <ul class="resume-bullets">
+        <li>Designed and maintained scheduled ETL pipelines in SQL and MDAX processing data sources ranging up to hundreds of petabytes — transforming raw telemetry into structured datasets used for financial reporting and operational decisions.</li>
+        <li>Built live production dashboards consumed by accounting staff and finance leadership, directly supporting decision-making on financial operations at Microsoft scale.</li>
+        <li>Led migration of SSAS Multidimensional Cubes to Tabular Model, achieving 200x faster filtering and 300% improvement in processing speed; introduced independent scaling and automated incident generation, reducing on-call load for the team.</li>
+        <li>Migrated a configuration tool from a legacy desktop app to a web-based application, increasing engineer productivity by 15% and enabling rapid iteration cycles that previously required full release cycles.</li>
+      </ul>
+    </div>
+
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>Software Engineering Intern</h4>
+          <div class="co">Microsoft</div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">Summers 2017 &amp; 2018</div>
+          <div class="resume-dates">Redmond, WA</div>
+        </div>
+      </div>
+      <ul class="resume-bullets">
+        <li>Ported the Most Recently Used (MRU) feature to a new architecture across two consecutive internships, contributing to system reliability improvements that shipped to production.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="resume-block">
+    <div class="resume-block-title">Projects</div>
+
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>Social Vulnerability &amp; Health Outcomes in America</h4>
+          <div class="co">Independent Research — Phase 1 of 4 published</div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">2026 — ongoing</div>
+        </div>
+      </div>
+      <ul class="resume-bullets">
+        <li>Joined CDC's Social Vulnerability Index (SVI) and PLACES datasets at the census tract level across 73,000+ US tracts covering 313M people — performing multi-dimensional correlation analysis between socioeconomic vulnerability and six chronic health outcomes.</li>
+        <li>Surfaced a 1.64x diabetes prevalence gap between high- and low-vulnerability tracts (15.6% vs 9.5%), consistent with peer-reviewed findings; documented methodology, caveats, and a phased research agenda for reproducibility.</li>
+        <li>Stack: Python, Pandas, NumPy, Matplotlib, Seaborn, CDC public data APIs. <a href="https://mhaider.dev/notebooks/social-impact-phase1.html" target="_blank" style="color:var(--accent)">Phase 1 notebook →</a></li>
+      </ul>
+    </div>
+
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>RareDex</h4>
+          <div class="co">Production Web App — <a href="https://rare-dex.com" target="_blank" style="color:var(--accent)">rare-dex.com</a></div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">2025 — ongoing</div>
+        </div>
+      </div>
+      <ul class="resume-bullets">
+        <li>Built and shipped a production Pokémon TCG card scanner: users photograph cards on mobile, the app identifies them via computer vision and returns real-time market prices; corrections feed back into the model to improve future accuracy.</li>
+        <li>Implemented a user correction feedback loop that turns every scan error into a labeled training signal — a lightweight data flywheel operating at the product layer.</li>
+        <li>Full auth system (magic link + Google OAuth), collection management, CSV export, and privacy/terms documentation. Live and actively used.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Education -->
+  <div class="resume-block">
+    <div class="resume-block-title">Education</div>
+    <div class="resume-entry">
+      <div class="resume-entry-header">
+        <div>
+          <h4>B.S. Statistics and Data Science</h4>
+          <div class="co">Virginia Tech</div>
+        </div>
+        <div style="text-align:right">
+          <div class="resume-dates">2015 – 2021</div>
+          <div class="resume-dates">Blacksburg, VA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <div class="resume-block">
+    <div class="resume-block-title">Technical Skills</div>
+    <div class="skills-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+      <div>
+        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Languages</div>
+        <div style="font-size:0.9rem; color:var(--text);">Python, SQL, R, Java, C, HTML, CSS</div>
+      </div>
+
+      <div>
+        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Data Engineering</div>
+        <div style="font-size:0.9rem; color:var(--text);">ETL pipeline design, Azure Data Factory, Azure Data Lake, Azure Kusto, Apache Spark, Azure Databricks, SSAS Tabular</div>
+      </div>
+
+      <div>
+        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Analytics &amp; Visualization</div>
+        <div style="font-size:0.9rem; color:var(--text);">Tableau, Power BI, Pandas, NumPy, Matplotlib, Seaborn, statistical modeling, A/B analysis</div>
+      </div>
+
+      <div>
+        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Infrastructure &amp; Tools</div>
+        <div style="font-size:0.9rem; color:var(--text);">Git, Azure cloud suite, .NET / ASP.NET, REST APIs, Cloudflare, GitHub Pages</div>
+      </div>
+
+      <div style="grid-column:1/-1">
+        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Data Science</div>
+        <div style="font-size:0.9rem; color:var(--text);">Machine learning, regression and classification modeling, NLP, recurrent neural networks, signal processing, experimental design</div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /resume-section -->
+
+<footer class="footer">
+  <span>© 2026 Mohammad Haider</span>
+  <div class="footer-links">
+    <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
+    <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelector('.nav-burger').addEventListener('click', function() {
+    document.querySelector('.nav-links').classList.toggle('open');
+  });
+</script>
+
 </body>
 </html>
