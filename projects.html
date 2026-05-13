@@ -59,6 +59,31 @@
         </div>
       </div>
 
+      <div class="project-card-full" style="border-color: rgba(140, 80, 255, 0.35);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <div class="project-tag">Personal · Creative / WebGL</div>
+          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(200,169,81,0.12); border:1px solid rgba(200,169,81,0.3); padding:0.22rem 0.6rem; border-radius:4px;">Live</span>
+        </div>
+        <div class="project-date">May 2026 – Present</div>
+        <h3>Voidpulse — GPU Particle Visualizer</h3>
+        <p>A browser-native audio visualizer in the style of the classic iTunes Magnetosphere plugin. 60,000 GPU particles form a swirling cloud that breathes, pulses, and morphs in real time to whatever audio is playing — mic, system audio, or file upload.</p>
+        <ul class="project-bullets">
+          <li>Custom GLSL vertex shader drives per-particle deformation: bass controls radial breathing and point size, mid displaces along Y, treble adds high-frequency jitter</li>
+          <li>2-octave analytic curl-noise flow field keeps the cloud in constant divergence-free motion without any physics sim overhead</li>
+          <li>6 morphable particle shapes (sphere, heart, torus, galaxy spiral, cube, helix) with smooth collapse-and-bloom transitions routed through the sphere</li>
+          <li>Beat detection uses a two-envelope onset detector with an 8-frame refractory window — punchy on hits, no strobing between beats</li>
+          <li>Cinematic mode auto-cuts between 6 named camera angles every 12–20s and pairs each cut with a random palette swap</li>
+          <li>EffectComposer post-processing stack: UnrealBloomPass + OutputPass (sRGB + tonemap), tunable from the UI panel</li>
+          <li>Audio-reactive gravity wells orbit the cloud and pull particles into visible clusters; count and pull strength are live-tunable</li>
+        </ul>
+        <div class="project-meta"><span>three.js r160</span><span>WebGL / GLSL</span><span>Web Audio API</span><span>Flask</span><span>Railway</span></div>
+        <div class="client-value"><strong>Worth noting:</strong> All the signal processing happens in the browser — no backend audio pipeline, just the Web Audio API's AnalyserNode feeding FFT data into shader uniforms 60 times a second. The GPU handles 60,000 particles per frame; the CPU handles the band math and beat detection. The constraint that made the whole thing interesting: tab audio capture via <code>getDisplayMedia</code> lets the visualizer react to whatever's already playing in another tab, with no system audio driver required.</div>
+        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
+          <a href="https://voidpulse.up.railway.app/" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
+          <a href="https://github.com/haidmoham/voidpulse" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">View on GitHub →</a>
+        </div>
+      </div>
+
       <div class="project-card-full" style="border-color: rgba(56,191,161,0.35);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Health Equity Analysis</div>
@@ -169,31 +194,6 @@
         <div class="client-value"><strong>Worth noting:</strong> The main issue wasn't the software — it was that updates required remembering to ship them, so they rarely happened. Moving to web made deployment automatic and removed the per-machine installation problem. The 15% productivity gain is mostly that friction gone.</div>
       </div>
 
-      <div class="project-card-full">
-        <div class="project-tag">Machine Learning · Personal</div>
-        <h3>Crime Prediction Recurrent Neural Network</h3>
-        <p>Investigated trends in violent crime rates across the U.S. using a Recurrent Neural Network trained on FBI historical crime data.</p>
-        <ul class="project-bullets">
-          <li>Trained RNN on multi-decade FBI crime dataset</li>
-          <li>Surfaced regional trend patterns and anomalies</li>
-          <li>Data cleaning and feature engineering in Python and R</li>
-        </ul>
-        <div class="project-meta"><span>Python</span><span>R</span><span>RNN</span><span>pandas</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> The FBI changed crime category definitions multiple times across the dataset, so most of the work was reconciling those methodology shifts before the RNN touched any of it. Typical for multi-decade public data.</div>
-      </div>
-
-      <div class="project-card-full">
-        <div class="project-tag">NLP &amp; Sentiment · Personal</div>
-        <h3>Newspaper COVID-19 Sentiment Analysis</h3>
-        <p>Led a team project to scrape news articles from multiple sources and perform sentiment analysis focused on COVID-19 media coverage.</p>
-        <ul class="project-bullets">
-          <li>Web scraping pipeline across multiple major news outlets</li>
-          <li>Sentiment classification and trend analysis over time</li>
-          <li>NumPy and Pandas for data manipulation and modeling</li>
-        </ul>
-        <div class="project-meta"><span>Python</span><span>NumPy</span><span>Pandas</span><span>NLP</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> Scraping was easy. The harder problem was that COVID news vocabulary shifted fast enough that a model trained on early 2020 articles was nearly useless by summer. We ended up retraining on rolling windows to keep it useful over time.</div>
-      </div>
 
     </div>
   </div>
