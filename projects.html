@@ -59,6 +59,29 @@
         </div>
       </div>
 
+      <div class="project-card-full" style="border-color: rgba(108, 71, 245, 0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <div class="project-tag">Personal · Data Engineering</div>
+          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(200,169,81,0.12); border:1px solid rgba(200,169,81,0.3); padding:0.22rem 0.6rem; border-radius:4px;">Live</span>
+        </div>
+        <div class="project-date">May 2026 – Present</div>
+        <h3>Indigo Circuit — Competitive PTCG Intelligence Platform</h3>
+        <p>A competitive Pokémon TCG analytics platform that ingests major tournament results, runs them through a dbt + Snowflake pipeline, and surfaces live rankings, meta breakdowns, and player profiles via a Flask dashboard.</p>
+        <ul class="project-bullets">
+          <li>End-to-end data pipeline: raw scrape from Limitless TCG → dbt staging → mart layer computing ATP scores, seasonal rankings, archetype stats, and top-finisher history</li>
+          <li>Champion / Elite Four / Gym Leader tier system — segments the top 100 players and top 8 archetypes into named tiers; the framing is thematic but the segmentation does real analytical work</li>
+          <li>Meta breakdown across 30+ archetypes: appearance rate, Day 2 conversion rate, Top 8 rate, and win rate — format-aware, adjusts automatically to the active card set rotation</li>
+          <li>Player profiles with Plotly placement-history charts, archetype breakdowns, and full tournament records going back across seasons</li>
+          <li>TTL-cached Snowflake queries with a pre-warm thread on deploy — every endpoint is warm before the first real request; cold query latency is never on the critical path</li>
+          <li>Dynamic OG embed image (Pillow, 1200×630) generated server-side with live champion data; all pages under 300ms</li>
+        </ul>
+        <div class="project-meta"><span>Python</span><span>dbt</span><span>Snowflake</span><span>Flask</span><span>Plotly</span><span>Railway</span></div>
+        <div class="client-value"><strong>Worth noting:</strong> Snowflake queries take 1–2 seconds cold. Running them live on every request would make the site unusable. The solution was a TTL cache with a background pre-warm thread that fires 3 seconds after deploy and hits every heavy endpoint. First real user always gets a cached response. It's a small thing, but it's the difference between a demo that works in a screencast and a product someone actually uses.</div>
+        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
+          <a href="https://indigocircuit.app" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
+        </div>
+      </div>
+
       <div class="project-card-full" style="border-color: rgba(140, 80, 255, 0.35);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Creative / WebGL</div>
