@@ -212,9 +212,9 @@
         </div>
       </div>
       <ul class="resume-bullets">
-        <li>Built an end-to-end competitive intelligence platform for the Pokémon TCG tournament scene: Python ingest pipeline pulls live standings and pairings from the Limitless TCG API into Snowflake, transformed via a multi-layer dbt project (staging views → player career stats, archetype win rates, and head-to-head record mart tables).</li>
-        <li>Designed dbt models covering player tournament history, deck archetype loyalty and win rate by meta, and a seasonal ranking system with an ATP-style points formula weighted by field size and event tier — a demonstrably more accurate model than the official CP system.</li>
-        <li>Flask dashboard deployed on Railway; stack: Python, Snowflake, dbt Core, Flask, Plotly.js, Railway.</li>
+        <li>Built a Python ingest pipeline from the Limitless TCG API into Snowflake and a dbt transformation layer — staging views feeding mart models for player career stats, archetype win rates by meta period, and head-to-head records.</li>
+        <li>Designed a seasonal ranking system using an ATP-style points formula weighted logarithmically by field size and by event tier — a more accurate skill signal than the official CP system, which ignores field size entirely.</li>
+        <li>Stack: Python, Snowflake, dbt Core, Flask, Plotly.js, Railway. <a href="https://indigocircuit.app" target="_blank" style="color:var(--accent)">indigocircuit.app →</a></li>
       </ul>
     </div>
 
