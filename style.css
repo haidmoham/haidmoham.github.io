@@ -49,6 +49,11 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   padding: 0.4rem 1rem; border-radius: 6px; font-weight: 600;
 }
 .nav-links a.nav-cta:hover { background: var(--gold-light); }
+.nav-links a.nav-cta-outline {
+  border: 1.5px solid var(--gold); color: var(--gold);
+  padding: 0.35rem 1rem; border-radius: 6px; font-weight: 600;
+}
+.nav-links a.nav-cta-outline:hover { background: rgba(212,175,55,0.1); }
 .nav-burger { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
 
 /* BUTTONS */
