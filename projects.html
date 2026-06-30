@@ -47,8 +47,16 @@
         <p>My parents are smart people who never got a fair shot at learning in English. I wanted to fix that.</p>
         <p>You pick a topic, set your language, and Seekho explains it twice. Once in English, once in yours. Then it asks you to explain it back. If you can do that, you got it.</p>
         <p>I built it for my parents.</p>
-        <div class="project-meta"><span>Flask</span><span>Claude</span><span>Gemini TTS</span><span>Railway</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> The language you learn in matters. Most tools don't account for that.</div>
+        <ul class="project-bullets">
+          <li>Bilingual explanations: every paragraph appears first in English, then immediately in the learner's native language, with each new term glossed in its native script the moment it is introduced; "gravity," for instance, is paired with کشش ثقل</li>
+          <li>Feynman teach-back loop: after each lesson the learner explains it back, and Seekho grades which concepts landed, then asks one focused follow-up on the gap; the feedback is bilingual too</li>
+          <li>"Interview me" onboarding: a short Socratic conversation auto-calibrates the explanation level from elementary to professional, so there's nothing to configure up front</li>
+          <li>Audio narration of every lesson through Gemini TTS, dual-track in both English and the learner's own language</li>
+          <li>Cost-aware model routing: Claude Haiku 4.5 by default, with a premium "Deep mode" that escalates to Opus 4.8; a daily fair-use cap keeps the unit economics solvent</li>
+          <li>Seekho Plus subscription ($10/mo) on Stripe, with signature-verified webhooks as the source of truth, magic-link auth, and a premium gate that is enforced server-side and revokes immediately on cancel</li>
+        </ul>
+        <div class="project-meta"><span>Python</span><span>Flask</span><span>Claude</span><span>Gemini TTS</span><span>Stripe</span><span>Railway</span></div>
+        <div class="client-value"><strong>Worth noting:</strong> The language you learn in matters, and most tools ignore it. Seekho puts the explanation in English and the learner's own language side by side, so the English itself becomes learnable instead of being the wall in front of the idea. That same bilingual decision is what lets the Feynman teach-back measure whether someone understood the concept, not just whether they know the English words for it.</div>
         <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
           <a href="https://seekho.fyi" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
         </div>
