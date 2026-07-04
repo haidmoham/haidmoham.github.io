@@ -117,7 +117,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .project-card:hover { border-color: rgba(61,139,255,0.4); transform: translateY(-3px); }
 .featured-card { background: var(--navy-light); }
 .project-tag {
-  display: inline-block; font-size: 0.7rem; font-weight: 600;
+  display: inline-block; white-space: nowrap; font-size: 0.7rem; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.1em;
   color: var(--text-muted); background: rgba(255,255,255,0.05);
   padding: 0.25rem 0.7rem; border-radius: 4px; margin-bottom: 0.9rem;
