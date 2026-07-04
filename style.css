@@ -324,6 +324,24 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .fade-in { animation: fadeUp 0.7s both; }
 .fade-in:nth-child(2) { animation-delay: 0.12s; }
 
+/* SCROLL REVEAL — active only when JS sets .reveal-on (no-JS / reduced-motion = fully visible, no flash) */
+.reveal-on .section-header,
+.reveal-on .what-i-do-card,
+.reveal-on .project-card,
+.reveal-on .project-card-full,
+.reveal-on .skill-card,
+.reveal-on .wwm-service-card,
+.reveal-on .wwm-step,
+.reveal-on .wwm-fit-item,
+.reveal-on .resume-block,
+.reveal-on .timeline-item,
+.reveal-on .cta-strip,
+.reveal-on .see-all {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.22,0.61,0.36,1), transform 0.6s cubic-bezier(0.22,0.61,0.36,1);
+}
+.reveal-on .is-in { opacity: 1 !important; transform: none !important; }
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; padding-top: 6rem; }
