@@ -16,7 +16,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
@@ -34,7 +34,10 @@
     <button class="nav-burger">☰</button>
   </nav>
 
-  <section class="hero">
+  <div class="hero-stage">
+    <canvas id="galaxy-canvas" aria-hidden="true"></canvas>
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <section class="hero">
     <div class="hero-content fade-in">
       <p class="hero-eyebrow">Mohammad Haider · Open to Work</p>
       <h1 class="hero-title">Data &amp; analytics <em>engineer.</em></h1>
@@ -63,6 +66,7 @@
       </div>
     </div>
   </section>
+  </div>
 
   <section class="stats">
     <div class="stat"><span class="stat-num">4+</span><span class="stat-label">Years Experience</span></div>
@@ -158,5 +162,6 @@
     });
   </script>
   <script src="main.js?v=1" defer></script>
+  <script src="galaxy.js?v=1" defer></script>
 </body>
 </html>
