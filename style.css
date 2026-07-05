@@ -133,9 +133,21 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .cta-strip h2 { color: #fff; margin-bottom: 1.5rem; }
 
 /* FOOTER */
-.footer { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2.5rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); }
+.footer { position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2.5rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); }
 .footer-links { display: flex; gap: 1.5rem; }
 .footer-links a:hover { color: var(--gold); }
+
+/* FOOTER EASTER EGG: pixel Thousand Sunny sailing along the top border */
+.footer-sunny-track { position: absolute; top: 10px; left: -44px; width: 44px; height: 28px; pointer-events: none; animation: sunny-sail 26s linear infinite; }
+.footer-sunny { width: 100%; height: 100%; color: var(--gold); opacity: 0.8; animation: sunny-bob 1.6s steps(4) infinite alternate; }
+.footer-sunny svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; fill: currentColor; }
+.footer-sunny .sunny-flag { transform-origin: 10px 1px; animation: sunny-flag 0.8s steps(2) infinite alternate; }
+@keyframes sunny-sail { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 88px)); } }
+@keyframes sunny-bob { from { transform: translateY(0); } to { transform: translateY(2px); } }
+@keyframes sunny-flag { from { transform: rotate(0deg); } to { transform: rotate(10deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .footer-sunny-track, .footer-sunny, .footer-sunny .sunny-flag { animation: none; }
+}
 
 /* PAGE HERO */
 .page-hero { padding: 8rem 2.5rem 3rem; max-width: 1200px; margin: 0 auto; }
