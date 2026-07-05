@@ -44,6 +44,14 @@ Global identity/background context is in `~/.claude/CLAUDE.md`. This file covers
 5. If significant enough, promote to featured grid on `index.html`
 6. Commit + push
 
+## End-of-task knowledge promotion
+
+After each substantive portfolio task, ask whether the work revealed a reusable
+site convention, deployment gotcha, copy pattern, asset pipeline, or portfolio
+positioning lesson. If yes, preserve repo-local details here and route broader
+career/portfolio lessons to `~/brain` via `/librarian` or `/codify`. If no,
+no-op quietly.
+
 ---
 
 ## Current Project Status
