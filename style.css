@@ -146,7 +146,8 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 @keyframes sunny-bob { from { transform: translateY(0); } to { transform: translateY(2px); } }
 @keyframes sunny-flag { from { transform: rotate(0deg); } to { transform: rotate(10deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .footer-sunny-track, .footer-sunny, .footer-sunny .sunny-flag { animation: none; }
+  .footer-sunny-track { left: 12px; animation: none; }
+  .footer-sunny, .footer-sunny .sunny-flag { animation: none; }
 }
 
 /* PAGE HERO */
