@@ -56,6 +56,7 @@ no-op quietly.
 
 ## Current Project Status
 
-**AI Image Generation Pipeline** — active, on portfolio, no GitHub link yet  
-**Social Vulnerability + Health Outcomes** — Phase 1 published, recruiter-ready, linked to notebook + GitHub  
-**Crime Prediction RNN / COVID Sentiment** — older work, on portfolio, no active development
+**Indigo Circuit** — primary career artifact: production dbt/DuckDB data system plus Glicko-2 and Bayesian matchup modeling
+**Social Vulnerability + Health Outcomes** — secondary career artifact: Phase 1 published, linked to notebook + GitHub
+**Career-facing exclusion:** Minesweeper is a fun collaboration with a friend, not a durable career artifact; do not add it back to the portfolio or resume
+**Interim rule:** lead with Indigo Circuit and SVI until stronger authored research/ML-signal artifacts replace them
