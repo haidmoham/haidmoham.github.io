@@ -231,23 +231,6 @@
       </ul>
     </div>
 
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Minesweeper Probability Solver</h4>
-          <div class="co">Production Web App — <a href="https://sweepersolver.up.railway.app" target="_blank" style="color:var(--accent)">sweepersolver.up.railway.app</a></div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">June 2026</div>
-        </div>
-      </div>
-      <ul class="resume-bullets">
-        <li>Computes exact per-cell mine probabilities: backtracking enumeration over independent constraint components, combined with the unconstrained region via log-space binomial convolution under the global mine count.</li>
-        <li>Computer-vision front end reads the board from a screenshot: edge-density grid detection and a color-fraction cell classifier, isolated from the solver by a typed contract so each layer tests independently.</li>
-        <li>Differential oracle harness validates the solver against brute-force enumeration; it caught an approximation fallback that mislabeled 80%-probability mines as safe. 161 solver tests.</li>
-      </ul>
-    </div>
-
   </div>
 
   <!-- Education -->

@@ -1,6 +1,6 @@
 # mhaider.dev
 
-Personal portfolio site for Mohammad Haider — Data Analyst &amp; Engineer.
+Personal portfolio site for Mohammad Haider — Data &amp; Analytics Engineer.
 
 🌐 **Live at:** [mhaider.dev](https://mhaider.dev)
 

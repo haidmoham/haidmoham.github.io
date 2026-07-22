@@ -38,30 +38,6 @@
   <div class="projects-section">
     <div class="projects-full-grid">
 
-      <div class="project-card-full" style="border-color: rgba(61,139,255,0.35);">
-        <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-          <div class="project-tag">Personal · Computer Vision + Probability</div>
-          <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(61,139,255,0.12); border:1px solid rgba(61,139,255,0.3); padding:0.22rem 0.6rem; border-radius:4px;">Live</span>
-        </div>
-        <div class="project-date">June 2026</div>
-        <h3>Minesweeper Probability Solver</h3>
-        <p>A friend wanted to know the real odds behind every Minesweeper click. This tells him: screenshot the board, and it computes the exact probability that each hidden cell is a mine, the safest next move, and the cells that are certainly mines.</p>
-        <p>Exact means exact. There is no Monte Carlo sampling and no heuristic in the answer; the number it prints is the true probability given everything visible on the board.</p>
-        <ul class="project-bullets">
-          <li>Exact solver: backtracking enumeration over independent frontier components, combined with the unconstrained region via log-space binomial convolution under the global mine count</li>
-          <li>Computer-vision board reader: edge-density grid detection (Canny + morphological close) and a color-fraction cell classifier that keys on structural rules rather than template matching</li>
-          <li>A typed GridState contract separates perception from solving, so each layer is tested in isolation</li>
-          <li>Differential oracle harness validates the solver against brute-force enumeration; 161 solver tests</li>
-          <li>Enumeration cost is gated on a node budget rather than component size, after the oracle showed cell count is a poor proxy for search cost</li>
-          <li>Detection overlay draws exactly what the detector grabbed, so a bad crop is visible before anything downstream runs</li>
-        </ul>
-        <div class="project-meta"><span>Python</span><span>OpenCV</span><span>NumPy</span><span>Streamlit</span><span>Railway</span></div>
-        <div class="client-value"><strong>Worth noting:</strong> The dangerous bug never showed in the UI: a silent fallback approximation labeled a cell with an 80% mine probability as provably safe, and every test stayed green while it did. The differential oracle against brute-force enumeration is what caught it. Numbers people act on need an independent check that can prove them wrong; eyeballing the output never would have.</div>
-        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; gap:1.25rem; flex-wrap:wrap;">
-          <a href="https://sweepersolver.up.railway.app" target="_blank" style="font-size:0.85rem; font-weight:600; color:var(--gold);">Open App →</a>
-        </div>
-      </div>
-
       <div class="project-card-full" style="border-color: rgba(140, 80, 255, 0.35);">
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Full-Stack Web App</div>
@@ -110,7 +86,7 @@
         </div>
       </div>
 
-      <div class="project-card-full" style="border-color: rgba(108, 71, 245, 0.4);">
+      <div class="project-card-full" style="border-color: rgba(108, 71, 245, 0.4); order:-2;">
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Data Eng</div>
           <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); background:rgba(61,139,255,0.12); border:1px solid rgba(61,139,255,0.3); padding:0.22rem 0.6rem; border-radius:4px;">Live</span>
@@ -158,7 +134,7 @@
         </div>
       </div>
 
-      <div class="project-card-full" style="border-color: rgba(61,139,255,0.35);">
+      <div class="project-card-full" style="border-color: rgba(61,139,255,0.35); order:-1;">
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
           <div class="project-tag">Personal · Health Equity Analysis</div>
           <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--teal); background:rgba(61,139,255,0.12); border:1px solid rgba(61,139,255,0.25); padding:0.22rem 0.6rem; border-radius:4px;">Phase 1 · Complete</span>
