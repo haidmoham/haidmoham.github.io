@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working Notes — Mohammad Haider</title>
+  <meta name="description" content="An inspectable record of Mohammad Haider's engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta property="og:title" content="Working Notes — Mohammad Haider" />
+  <meta property="og:description" content="An inspectable record of engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta property="og:url" content="https://mhaider.dev/notes.html" />
+  <meta property="og:image" content="https://mhaider.dev/og-image.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Working Notes — Mohammad Haider" />
+  <meta name="twitter:description" content="An inspectable record of engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta name="twitter:image" content="https://mhaider.dev/og-image.png" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=16" />
+  <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">MH</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="notes.html" class="nav-notes active" aria-current="page">Working Notes</a></li>
+      <li><a href="resume.html" class="nav-cta-outline">Resume</a></li>
+      <li><a href="available.html" class="nav-cta">Available</a></li>
+      <li><a href="work-with-me.html">Work With Me</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+    <button class="nav-burger">☰</button>
+  </nav>
+
+  <header class="page-hero">
+    <p class="section-eyebrow">Public engineering practice <span class="notes-progress">· In progress</span></p>
+    <h1>Working Notes</h1>
+    <p>A place to inspect the work behind the work: reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing.</p>
+    <details class="notes-principles">
+      <summary>How I use this space</summary>
+      <div class="notes-principles-panel">
+        <ol class="notes-principles-list">
+          <li>
+            <span class="notes-principle-num">01</span>
+            <h2>Start with a real technical question.</h2>
+            <p>Write when there is an approach to test, a constraint to work through, an assumption to examine, or a result worth understanding.</p>
+          </li>
+          <li>
+            <span class="notes-principle-num">02</span>
+            <h2>Keep the decision trail visible.</h2>
+            <p>Show the options considered, the tradeoffs made, the revisions that followed, and the evidence that changed the direction.</p>
+          </li>
+          <li>
+            <span class="notes-principle-num">03</span>
+            <h2>Show the work when it helps.</h2>
+            <p>Use runnable demonstrations, notebooks, or implementation detail when they make a claim easier to inspect—not just to decorate it.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+  </header>
+
+  <main class="notes-section">
+    <section class="notes-index" aria-labelledby="notes-index-title">
+      <h2 id="notes-index-title" class="section-eyebrow">Notes index</h2>
+
+      <article class="notes-pinned">
+        <p class="notes-pinned-label">Pinned anchor</p>
+        <a href="notes/the-loop-must-terminate-in-reality.html" class="notes-post-card notes-entry-link">
+          <p class="notes-post-status">Draft · Local review</p>
+          <div>
+            <h2>The Loop Must Terminate in Reality</h2>
+            <p>Using AI as a Socratic Collaborator Without Outsourcing Judgment</p>
+          </div>
+          <span class="notes-entry-link-label">Read draft →</span>
+        </a>
+      </article>
+
+      <section class="notes-chronological" aria-labelledby="latest-notes-title">
+        <h2 id="latest-notes-title">Latest notes</h2>
+        <ol class="notes-chronological-list">
+          <!-- Add non-pinned notes here in reverse chronological order. -->
+        </ol>
+        <p class="notes-empty">The next non-pinned note will appear here.</p>
+      </section>
+    </section>
+
+    <aside class="notes-practice notes-footnote" aria-label="What to expect in Working Notes">
+      <span>What to expect</span>
+      <p>Decision trails · implementation detail · revisions and demos · notebooks and technical writing</p>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Mohammad Haider</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
+      <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
+    </div>
+  </footer>
+  <script>
+    document.querySelector('.nav-burger').addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+    document.querySelector('.notes-principles').addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && this.open) {
+        this.open = false;
+        this.querySelector('summary').focus();
+      }
+    });
+  </script>
+  <script src="main.js?v=1" defer></script>
+</body>
+</html>
