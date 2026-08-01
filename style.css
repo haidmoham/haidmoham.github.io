@@ -259,6 +259,9 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .timeline-item .org { color: var(--teal); font-size: 0.88rem; font-weight: 600; }
 .timeline-item .dates { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; }
 .timeline-item p { font-size: 0.9rem; color: var(--text-muted); }
+.timeline-bullets { list-style: none; margin: .7rem 0 0; }
+.timeline-bullets li { position: relative; padding: .18rem 0 .18rem 1.15rem; color: var(--text-muted); font-size: .88rem; line-height: 1.65; }
+.timeline-bullets li::before { content: '▸'; position: absolute; left: 0; top: .24rem; color: var(--gold); font-size: .7rem; }
 
 /* PROJECTS */
 .projects-section { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem 5rem; }
@@ -505,6 +508,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .avail-item-body strong { color: var(--text); font-weight: 500; font-size: .97rem; line-height: 1.4; }
 .avail-item-body strong a { color: var(--gold); border-bottom: 1px solid currentColor; }
 .avail-item-body span { color: var(--text-muted); font-size: .92rem; line-height: 1.55; }
+.avail-item-body .avail-detail { padding-left: .85rem; border-left: 1px solid rgba(125,174,255,.3); font-size: .82rem; line-height: 1.6; }
 .avail-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .35rem; }
 .avail-tag { font-size: .78rem; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 4px; padding: .2rem .6rem; color: var(--text-muted); }
 .avail-divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
