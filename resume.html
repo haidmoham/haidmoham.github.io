@@ -1,310 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Resume — Mohammad Haider</title>
-<meta property="og:title" content="Resume — Mohammad Haider" />
-<meta name="description" content="Full work history and resume for Mohammad Haider, data engineer and software engineer." />
-<meta property="og:description" content="Full work history and resume for Mohammad Haider, data engineer and software engineer." />
-<meta property="og:url" content="https://mhaider.dev/resume.html" />
-<meta property="og:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Mohammad Haider — Data & Analytics Engineer" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Resume — Mohammad Haider" />
-<meta name="twitter:description" content="Full work history and resume for Mohammad Haider, data engineer and analyst." />
-<meta name="twitter:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" />
-<meta name="twitter:image:alt" content="Mohammad Haider — Data & Analytics Engineer" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css?v=15" />
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume — Mohammad Haider</title><meta property="og:title" content="Resume — Mohammad Haider" />
+  <meta name="description" content="Resume and role-specific downloads for Mohammad Haider, a data and software engineer." /><meta property="og:description" content="Resume and role-specific downloads for Mohammad Haider, a data and software engineer." />
+  <meta property="og:url" content="https://mhaider.dev/resume.html" /><meta property="og:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:image:alt" content="Mohammad Haider — Data &amp; Software Engineer" /><meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Resume — Mohammad Haider" /><meta name="twitter:description" content="Resume and role-specific downloads for Mohammad Haider." /><meta name="twitter:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" /><meta name="twitter:image:alt" content="Mohammad Haider — Data &amp; Software Engineer" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" /><link rel="preconnect" href="https://fonts.googleapis.com" /><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" /><link rel="stylesheet" href="style.css?v=18" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
-
-<style>
-/* ─── Print stylesheet ──────────────────────────────────────────── */
-@media print {
-  /* Hide all site chrome */
-  .nav, .page-hero, .download-bar, .footer, .nav-burger { display: none !important; }
-
-  body { background: #fff; color: #111; font-family: 'Sora', sans-serif; font-size: 11pt; }
-
-  .resume-section {
-    max-width: 100%;
-    padding: 0;
-    margin: 0;
-  }
-
-  /* Print header replaces page-hero */
-  .print-header {
-    display: block !important;
-    padding: 0 0 1.2rem 0;
-    border-bottom: 2px solid #111;
-    margin-bottom: 1.4rem;
-  }
-
-  .print-header h1 {
-    font-family: 'Fraunces', serif;
-    font-size: 22pt;
-    margin: 0 0 0.25rem 0;
-    color: #111;
-  }
-
-  .print-header .print-contact {
-    font-size: 9pt;
-    color: #444;
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .resume-block { page-break-inside: avoid; margin-bottom: 1.2rem; }
-  .resume-block-title {
-    font-size: 8pt;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #555;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 0.3rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .resume-entry { margin-bottom: 0.9rem; page-break-inside: avoid; }
-  .resume-entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.3rem; }
-  .resume-entry-header h4 { font-size: 11pt; font-weight: 600; color: #111; margin: 0; }
-  .resume-entry-header .co { font-size: 10pt; color: #333; }
-  .resume-dates { font-size: 9pt; color: #555; text-align: right; }
-  .resume-bullets { margin: 0.3rem 0 0 1.1rem; padding: 0; }
-  .resume-bullets li { font-size: 10pt; color: #222; margin-bottom: 0.25rem; line-height: 1.5; }
-
-  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.5rem; }
-  .skills-category-label { font-size: 8pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #555; margin-bottom: 0.2rem; }
-  .skills-category-value { font-size: 9.5pt; color: #222; }
-
-  /* Summary block */
-  .resume-summary { font-size: 10.5pt; color: #222; line-height: 1.6; margin-bottom: 1.2rem; }
-
-  a { color: #111; text-decoration: none; }
-}
-
-/* ─── Screen: print header hidden ──────────────────────────────── */
-@media screen {
-  .print-header { display: none; }
-}
-</style>
+  <style>@media print{.nav,.page-hero,.resume-downloads,.footer,.nav-burger{display:none!important}body{background:#fff;color:#111;font-family:'Sora',sans-serif;font-size:11pt}.resume-section{max-width:100%;padding:0;margin:0}.resume-block{border:0;padding:0;margin:0 0 1.2rem;background:#fff}.resume-block-title{color:#555;border-bottom:1px solid #ccc}.resume-entry h4,.resume-entry .co,.resume-bullets li,.skills-category-value{color:#111}.resume-dates{color:#555}.print-header{display:block!important;border-bottom:2px solid #111;padding-bottom:1rem;margin-bottom:1.2rem}.print-header h1{font-family:'Fraunces',serif;font-size:22pt;margin:0 0 .25rem}.print-contact{display:flex;gap:1rem;flex-wrap:wrap;font-size:9pt;color:#444}}@media screen{.print-header{display:none}}</style>
 </head>
 <body>
-
-<nav class="nav">
-  <a href="index.html" class="nav-logo">MH</a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="projects.html">Projects</a></li>
-    <li><a href="notes.html" class="nav-notes">Working Notes</a></li>
-    <li><a href="resume.html" class="nav-cta-outline active">Resume</a></li>
-      <li><a href="available.html" class="nav-cta">Available</a></li>
-    <li><a href="work-with-me.html">Work With Me</a></li>
-    <li><a href="contact.html" class="nav-cta">Contact</a></li>
-  </ul>
-  <button class="nav-burger">☰</button>
-</nav>
-
-<div class="page-hero">
-  <p class="section-eyebrow">Credentials</p>
-  <h1>Resume</h1>
-  <p>Full work history, education, and technical skills.</p>
-</div>
-
-<div class="resume-section">
-
-  <div class="download-bar">
-    <a href="/Haider_DataEngineer_Resume_May26.pdf" class="btn btn-outline" download>Download PDF ↓</a>
-    <span style="font-size:0.8rem; color:var(--text-muted); margin-left:0.75rem;">or use your browser's print function for a current copy</span>
-  </div>
-
-  <!-- Print-only header (hidden on screen) -->
-  <div class="print-header">
-    <h1>Mohammad Haider</h1>
-    <div class="print-contact">
-      <span>hi@mhaider.dev</span>
-      <span>mhaider.dev</span>
-      <span>linkedin.com/in/haidmoham</span>
-      <span>github.com/haidmoham</span>
-    </div>
-  </div>
-
-  <!-- Summary -->
-  <div class="resume-block">
-    <div class="resume-block-title">Summary</div>
-    <p class="resume-summary" style="font-size:0.95rem; color:var(--text); line-height:1.7; margin:0;">
-      Data engineer and software engineer with 3+ years at Microsoft on petabyte-scale ETL and financial reporting infrastructure. Production apps, analytics systems, and a published research project shipped in 2026.
-    </p>
-  </div>
-
-  <!-- Experience -->
-  <div class="resume-block">
-    <div class="resume-block-title">Experience</div>
-
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Data Analyst</h4>
-          <div class="co">University of Virginia</div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">May 2025 – March 2026</div>
-          <div class="resume-dates">Charlottesville, VA</div>
-        </div>
-      </div>
-      <ul class="resume-bullets">
-        <li>Reduced Tableau load times 20% via telemetry-driven performance monitoring — faster dashboard access for non-technical staff across all university departments.</li>
-        <li>Delivered analytics projects end-to-end across multiple departments: requirements through pipeline construction, dashboard delivery, and handoff.</li>
-      </ul>
-    </div>
-
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Software Engineer — Data & Analytics</h4>
-          <div class="co">Microsoft</div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">July 2021 – July 2024</div>
-          <div class="resume-dates">Redmond, WA</div>
-        </div>
-      </div>
-      <ul class="resume-bullets">
-        <li>Designed ETL pipelines in SQL and MDAX processing hundreds of petabytes of telemetry into structured datasets for financial reporting and operational decisions.</li>
-        <li>Built production dashboards for accounting staff and finance leadership driving financial operations decisions at Microsoft scale.</li>
-        <li>Led SSAS Multidimensional → Tabular migration: 200x faster filtering, 300% processing improvement; added automated incident generation, cutting on-call load.</li>
-      </ul>
-    </div>
-
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Software Engineering Intern</h4>
-          <div class="co">Microsoft</div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">Summers 2017 &amp; 2018</div>
-          <div class="resume-dates">Redmond, WA</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Projects -->
-  <div class="resume-block">
-    <div class="resume-block-title">Projects</div>
-
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Indigo Circuit</h4>
-          <div class="co">Production Web App — <a href="https://indigocircuit.app" target="_blank" style="color:var(--accent)">indigocircuit.app</a></div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">May 2026 — ongoing</div>
-        </div>
-      </div>
-      <ul class="resume-bullets">
-        <li>Python ingest into DuckDB with a dbt transformation layer; a nightly pipeline rebuilds player career stats, archetype win rates, and head-to-head records behind a fail-closed validation gate.</li>
-        <li>Glicko-2 skill ratings (rating, deviation, volatility) recomputed nightly; a Bayesian win-rate model powers a deck EV calculator with meta-weighted estimates and 90% credible intervals.</li>
-        <li>Seasonal rankings use an ATP-style points formula with logarithmic field-size scaling: a measurably fairer design than the official Championship Points system, which ignores field size.</li>
-      </ul>
-    </div>
-
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>Social Vulnerability &amp; Health Outcomes in America</h4>
-          <div class="co">Independent Research — Phase 1 of 4 published</div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">May 2026 — ongoing</div>
-        </div>
-      </div>
-      <ul class="resume-bullets">
-        <li>Joined CDC SVI and PLACES datasets across 73,000+ census tracts covering 313M people; ran correlation analysis between socioeconomic vulnerability and six chronic health outcomes.</li>
-        <li>Surfaced a 1.64x diabetes prevalence gap between high- and low-vulnerability tracts (15.6% vs 9.5%); documented methodology and a phased research agenda for reproducibility.</li>
-      </ul>
-    </div>
-
-  </div>
-
-  <!-- Education -->
-  <div class="resume-block">
-    <div class="resume-block-title">Education</div>
-    <div class="resume-entry">
-      <div class="resume-entry-header">
-        <div>
-          <h4>B.S. Statistics and Data Science</h4>
-          <div class="co">Virginia Tech</div>
-        </div>
-        <div style="text-align:right">
-          <div class="resume-dates">2015 – 2021</div>
-          <div class="resume-dates">Blacksburg, VA</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Skills -->
-  <div class="resume-block">
-    <div class="resume-block-title">Technical Skills</div>
-    <div class="skills-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-
-      <div>
-        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Languages</div>
-        <div style="font-size:0.9rem; color:var(--text);">Python, SQL, R, Java, C, HTML, CSS</div>
-      </div>
-
-      <div>
-        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Data Engineering</div>
-        <div style="font-size:0.9rem; color:var(--text);">ETL pipeline design, dbt Core, DuckDB, Snowflake, Azure Data Factory, Azure Data Lake, Azure Kusto, Apache Spark, Azure Databricks, SSAS Tabular</div>
-      </div>
-
-      <div>
-        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Analytics &amp; Visualization</div>
-        <div style="font-size:0.9rem; color:var(--text);">Tableau, Power BI, Pandas, NumPy, Matplotlib, Seaborn, statistical modeling, A/B analysis</div>
-      </div>
-
-      <div>
-        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Infrastructure &amp; Tools</div>
-        <div style="font-size:0.9rem; color:var(--text);">Git, Azure cloud suite, .NET / ASP.NET, REST APIs, Cloudflare, GitHub Pages</div>
-      </div>
-
-      <div style="grid-column:1/-1">
-        <div class="skills-category-label" style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem;">Data Science</div>
-        <div style="font-size:0.9rem; color:var(--text);">Machine learning, regression and classification modeling, NLP, recurrent neural networks, signal processing, experimental design</div>
-      </div>
-
-    </div>
-  </div>
-
-</div><!-- /resume-section -->
-
-<footer class="footer">
-
-  <span>© 2026 Mohammad Haider</span>
-  <div class="footer-links">
-    <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
-    <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
-  </div>
-</footer>
-
-<script>
-  document.querySelector('.nav-burger').addEventListener('click', function() {
-    document.querySelector('.nav-links').classList.toggle('open');
-  });
-</script>
-
-  <script src="main.js?v=1" defer></script>
+  <nav class="nav"><a href="index.html" class="nav-logo">MH</a><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="notes.html" class="nav-notes">Working Notes</a></li><li><a href="resume.html" class="nav-cta-outline active">Resume</a></li><li><a href="available.html" class="nav-cta">Available</a></li><li><a href="work-with-me.html">Work With Me</a></li><li><a href="contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav>
+  <div class="page-hero"><p class="section-eyebrow">Credentials</p><h1>Resume</h1><p>One professional history, with four role-specific versions ready to download.</p></div>
+  <main class="resume-section">
+    <section class="resume-downloads" aria-labelledby="download-title"><div class="resume-block-title" id="download-title">Choose a role-specific resume</div><div class="resume-download-grid"><a href="resumes/Mohammad_Haider_Analytics_Engineer_Resume.pdf" class="resume-download-card" download><strong>Analytics Engineer</strong><span>SQL-backed reporting, dashboards, and analytical systems.</span><em>Download PDF ↓</em></a><a href="resumes/Mohammad_Haider_Data_Platform_Resume.pdf" class="resume-download-card" download><strong>Data Platform Engineer</strong><span>Correctness-sensitive data systems, migrations, and operations.</span><em>Download PDF ↓</em></a><a href="resumes/Mohammad_Haider_Backend_SWE_Resume.pdf" class="resume-download-card" download><strong>Backend Software Engineer</strong><span>Production systems, analytics infrastructure, and operational support.</span><em>Download PDF ↓</em></a><a href="resumes/Mohammad_Haider_Full_Stack_SWE_Resume.pdf" class="resume-download-card" download><strong>Full Stack Software Engineer</strong><span>Production applications, integrations, and delivery end to end.</span><em>Download PDF ↓</em></a></div></section>
+    <div class="print-header"><h1>Mohammad Haider</h1><div class="print-contact"><span>hi@mhaider.dev</span><span>mhaider.dev</span><span>linkedin.com/in/haidmoham</span><span>github.com/haidmoham</span></div></div>
+    <section class="resume-block"><div class="resume-block-title">Summary</div><p class="resume-summary">Data and software engineer with four years of experience building correctness-sensitive production systems, reporting infrastructure, reproducible data pipelines, and decision-support dashboards. Experienced taking ambiguous requirements through implementation, validation, deployment, performance optimization, and operational support.</p></section>
+    <section class="resume-block"><div class="resume-block-title">Experience</div>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>Data Analyst</h4><div class="co">University of Virginia</div></div><div class="resume-dates">May 2025 – Mar 2026</div></div><ul class="resume-bullets"><li>Owned Tableau analytics products for institutional stakeholders from discovery through implementation, deployment, and ongoing support.</li><li>Translated ambiguous operational questions into SQL-backed metric definitions and decision-support dashboards.</li><li>Collaborated on telemetry-informed optimization that improved organization-wide dashboard load times by approximately 20%.</li></ul></article>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>Software Engineer — Data &amp; Analytics</h4><div class="co">Microsoft</div></div><div class="resume-dates">Jul 2021 – Jul 2024</div></div><ul class="resume-bullets"><li>Migrated an internal financial reporting platform from SSAS Multidimensional to Tabular with zero downtime, owning implementation, telemetry, production validation, and operational support.</li><li>Extended automated reconciliation between legacy and replacement systems, preserving correctness through the migration and improving data quality.</li><li>Reduced representative filtering latency by up to 200x and user-visible Excel loading time by approximately 4x, measured through production telemetry and user reports.</li><li>Built and maintained Azure-based financial reporting pipelines supporting planning and financial close operations.</li></ul></article>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>Software Engineering Intern</h4><div class="co">Microsoft</div></div><div class="resume-dates">Summers 2017, 2018</div></div><ul class="resume-bullets"><li>Built internal engineering tools supporting reporting infrastructure and developer workflows across multiple engineering teams.</li></ul></article>
+    </section>
+    <section class="resume-block"><div class="resume-block-title">Selected Projects</div>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>Indigo Circuit</h4><div class="co">DuckDB, dbt, Flask</div></div></div><ul class="resume-bullets"><li>Built a nightly platform that ingests API and scraped tournament data, recomputes Glicko-2 ratings, rebuilds dbt marts, and validates a shadow DuckDB database before atomically promoting it to production.</li><li>Built a Bayesian EV model that shrinks sparse card effects toward archetype baselines and reports 90% credible intervals.</li></ul></article>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>Social Vulnerability &amp; Health Outcomes in America</h4><div class="co">Python, statistical analysis</div></div></div><ul class="resume-bullets"><li>Designed and executed analysis of 16 CDC vulnerability indicators and 36 health outcomes across approximately 73,000 tracts.</li><li>Produced correlations, state rankings, scatterplots, and a national choropleth with literature-grounded causal caveats.</li></ul></article>
+      <article class="resume-entry"><div class="resume-entry-header"><div><h4>RareDex</h4><div class="co">Flask, PostgreSQL, OpenCV</div></div></div><ul class="resume-bullets"><li>Built a card-scanning system with SQLAlchemy/Alembic and a layered identification pipeline that escalates across image preprocessing, collector-number OCR, and a 19,601-entry perceptual-hash fallback.</li></ul></article>
+    </section>
+    <section class="resume-block"><div class="resume-block-title">Education</div><article class="resume-entry"><div class="resume-entry-header"><div><h4>B.S. Statistics</h4><div class="co">Virginia Tech</div></div><div class="resume-dates">2015 – 2021</div></div></article></section>
+    <section class="resume-block"><div class="resume-block-title">Technical Skills</div><div class="skills-grid resume-skills"><div><div class="skills-category-label">Languages</div><div class="skills-category-value">SQL, Python, R, C#, Java</div></div><div><div class="skills-category-label">Data platforms</div><div class="skills-category-value">DuckDB, dbt, Azure Data Factory, Azure Data Lake, SSAS Tabular</div></div><div><div class="skills-category-label">Analytics</div><div class="skills-category-value">Tableau, Power BI, Pandas, NumPy, statistical analysis</div></div><div><div class="skills-category-label">Engineering</div><div class="skills-category-value">Flask, PostgreSQL, SQLAlchemy, REST APIs, Git, Azure, monitoring</div></div></div></section>
+  </main>
+  <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://linkedin.com/in/haidmoham" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer><script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open');});</script><script src="main.js?v=1" defer></script>
 </body>
 </html>

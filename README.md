@@ -1,6 +1,6 @@
 # mhaider.dev
 
-Personal portfolio site for Mohammad Haider — Data &amp; Analytics Engineer.
+Personal portfolio site for Mohammad Haider — Data &amp; Software Engineer.
 
 🌐 **Live at:** [mhaider.dev](https://mhaider.dev)
 
@@ -17,8 +17,11 @@ Personal portfolio site for Mohammad Haider — Data &amp; Analytics Engineer.
 ├── index.html      # Home
 ├── about.html      # About me
 ├── projects.html   # Project showcase
-├── skills.html     # Skills & tools
 ├── resume.html     # Resume
+├── resumes/        # Role-specific resume downloads
+├── available.html  # Current role search
+├── work-with-me.html # Consulting
+├── notes.html      # Working Notes index
 ├── contact.html    # Contact form
 ├── style.css       # Shared stylesheet
 └── CNAME           # Custom domain config
@@ -26,6 +29,6 @@ Personal portfolio site for Mohammad Haider — Data &amp; Analytics Engineer.
 
 ## Contact
 
-- Email: haidmoham@gmail.com
+- Email: hi@mhaider.dev
 - LinkedIn: [/in/haidmoham](https://linkedin.com/in/haidmoham)
 - GitHub: [/haidmoham](https://github.com/haidmoham)

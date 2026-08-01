@@ -29,7 +29,7 @@ Global identity/background context is in `~/.claude/CLAUDE.md`. This file covers
 
 **Audience:** dual — recruiters (job search) and potential consulting clients. Thread both; don't collapse one.
 
-**Project cards:** each card in `projects.html` gets a "Worth noting:" callout at the bottom. Tone is matter-of-fact observation about the work — not a sales pitch, not "if you need X I can do Y." Example: *"Raw data in a warehouse doesn't help anyone. These pipelines turned hundreds of petabytes of noise into something the accounting team could actually use."*
+**Project cards:** each card in `projects.html` gets a "Worth noting:" callout at the bottom. Tone is matter-of-fact observation about the work — not a sales pitch, not "if you need X I can do Y." It should identify the engineering or analytical judgment that makes the project credible.
 
 **Voice:** direct, confident, low-hype. Reads like a senior engineer talking to a peer, not a recruiter-optimized resume.
 
@@ -57,6 +57,8 @@ no-op quietly.
 ## Current Project Status
 
 **Indigo Circuit** — primary career artifact: production dbt/DuckDB data system plus Glicko-2 and Bayesian matchup modeling
-**Social Vulnerability + Health Outcomes** — secondary career artifact: Phase 1 published, linked to notebook + GitHub
+**Social Vulnerability + Health Outcomes** — secondary career artifact: statistical analysis of CDC vulnerability indicators and health outcomes, linked to the public analysis
 **Career-facing exclusion:** Minesweeper is a fun collaboration with a friend, not a durable career artifact; do not add it back to the portfolio or resume
 **Interim rule:** lead with Indigo Circuit and SVI until stronger authored research/ML-signal artifacts replace them
+
+**Career-source rule (August 2026):** the four current resume PDFs in `resumes/` are the source of truth for professional history, education, metrics, skills, and resume-listed project claims. The site uses the unified identity “Data & Software Engineer.” Seekho remains an explicit secondary exception as full-stack product evidence; it should not be framed as the primary AI/ML credential. Contact and availability details are site-owned operational facts.
