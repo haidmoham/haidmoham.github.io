@@ -16,7 +16,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=19" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
@@ -39,25 +39,24 @@
         <div class="hero-actions"><a href="projects.html" class="btn btn-primary">View Projects</a><a href="resume.html" class="btn btn-ghost">View Resume</a></div>
       </div>
       <div class="hero-visual fade-in">
-        <div class="chart-card">
-          <div class="chart-label">Production impact · Microsoft &amp; UVA</div>
-          <div style="padding:1.25rem 1rem 0.75rem;">
-            <div style="display:grid;grid-template-columns:140px 1fr;align-items:center;gap:0.75rem;margin-bottom:1.1rem;"><span style="font-size:1.6rem;font-weight:700;color:var(--gold);white-space:nowrap;">200x</span><span style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">faster representative filtering<br/>after an SSAS migration</span></div>
-            <div style="display:grid;grid-template-columns:140px 1fr;align-items:center;gap:0.75rem;margin-bottom:1.25rem;"><span style="font-size:1.6rem;font-weight:700;color:var(--gold);white-space:nowrap;">20% faster</span><span style="font-size:0.85rem;color:var(--text-muted);line-height:1.4;">Tableau dashboard load times<br/>across the organization</span></div>
-            <div style="padding-top:1rem;border-top:1px solid var(--border);font-size:0.78rem;color:var(--text-muted);letter-spacing:0.04em;">Azure · SQL · SSAS · Tableau</div>
-          </div>
-          <div class="chart-trend">Microsoft and University of Virginia</div>
-        </div>
+        <section class="hero-proof-card" aria-labelledby="hero-proof-title">
+          <p class="hero-proof-kicker">System ownership</p>
+          <h2 id="hero-proof-title">From question to <em>operation.</em></h2>
+          <p class="hero-proof-intro">Requirements, implementation, validation, deployment, and support across financial reporting systems and institutional analytics.</p>
+          <ol class="hero-proof-steps">
+            <li><span class="hero-proof-number">01</span><div><strong>Define the decision</strong><p>Turn ambiguous operational questions into SQL-backed metric definitions and dashboards.</p></div></li>
+            <li><span class="hero-proof-number">02</span><div><strong>Build and deploy safely</strong><p>Deliver pipelines and reporting-system migrations with zero downtime and reconciliation.</p></div></li>
+            <li><span class="hero-proof-number">03</span><div><strong>Validate and support</strong><p>Use telemetry, production validation, and operational support to keep the result dependable.</p></div></li>
+          </ol>
+          <p class="hero-proof-footer">Microsoft · University of Virginia</p>
+        </section>
       </div>
     </section>
   </div>
 
-  <section class="stats"><div class="stat"><span class="stat-num">4</span><span class="stat-label">Years Experience</span></div><div class="stat"><span class="stat-num">200x</span><span class="stat-label">Filtering Improvement</span></div><div class="stat"><span class="stat-num">20%</span><span class="stat-label">Faster Tableau Loads</span></div></section>
-
-  <section class="what-i-do"><div class="what-i-do-inner"><div class="section-header"><p class="section-eyebrow">Capabilities</p><h2>What I Do</h2></div><div class="what-i-do-grid">
-    <div class="what-i-do-card"><div class="what-i-do-accent gold">Data Systems</div><p>Build and maintain SQL-backed reporting pipelines, semantic models, and migrations with validation and operational support built into the work.</p></div>
-    <div class="what-i-do-card"><div class="what-i-do-accent teal">Analytics Delivery</div><p>Turn ambiguous operational questions into metric definitions and Tableau dashboards that stakeholders can use to make decisions.</p></div>
-    <div class="what-i-do-card"><div class="what-i-do-accent gold">Full-Stack Products</div><p>Ship focused web applications end to end: application logic, data storage, external integrations, authentication, billing, and deployment.</p></div>
+  <section class="professional-record" id="professional-record"><div class="professional-record-inner"><div class="section-header"><p class="section-eyebrow">Professional experience</p><h2>Production ownership in practice.</h2></div><div class="professional-record-grid">
+    <article class="professional-record-card"><div class="professional-record-meta">Microsoft · Software Engineer — Data &amp; Analytics · 2021–2024</div><h3>Financial reporting infrastructure</h3><p>Migrated an internal reporting platform from SSAS Multidimensional to Tabular with zero downtime, while extending automated reconciliation and maintaining Azure-based reporting pipelines.</p><ul class="professional-record-evidence"><li><strong>200x</strong><span>faster representative filtering</span></li><li><strong>~4x</strong><span>faster user-visible Excel loading</span></li></ul></article>
+    <article class="professional-record-card"><div class="professional-record-meta">University of Virginia · Data Analyst · 2025–2026</div><h3>Institutional decision support</h3><p>Owned Tableau analytics products from discovery through implementation, deployment, and support—turning ambiguous operational questions into SQL-backed definitions and dashboards.</p><ul class="professional-record-evidence"><li><strong>20%</strong><span>faster organization-wide dashboard loads</span></li><li><strong>End to end</strong><span>discovery, delivery, and ongoing support</span></li></ul></article>
   </div></div></section>
 
   <section class="featured"><div class="section-header"><p class="section-eyebrow">Selected Work</p><h2>Featured Projects</h2></div><div class="project-grid">
