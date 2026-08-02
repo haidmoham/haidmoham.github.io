@@ -373,58 +373,14 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 /* PROJECT DATE */
 .project-date { font-size: 0.75rem; color: var(--text-muted); margin: 0.3rem 0 0.5rem; letter-spacing: 0.02em; }
 
-/* CLIENT VALUE */
-.client-value {
+/* ENGINEERING NOTE */
+.engineering-note {
   margin-top: 1rem; padding: 0.85rem 1rem;
   background: rgba(61,139,255,0.06); border-left: 3px solid var(--gold);
   border-radius: 0 6px 6px 0;
   font-size: 0.86rem; color: var(--text-muted); line-height: 1.6;
 }
-.client-value strong { color: var(--gold-light); }
-
-/* WORK WITH ME PAGE */
-.wwm-layout { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem 5rem; }
-.wwm-layout section { margin-bottom: 5rem; }
-.wwm-layout h2 { margin-bottom: 2rem; }
-
-.wwm-services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-.wwm-service-card {
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 2rem;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.wwm-service-card:hover { border-color: rgba(61,139,255,0.35); transform: translateY(-2px); }
-.wwm-service-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
-.wwm-service-card h3 { color: #fff; margin-bottom: 0.75rem; font-size: 1rem; font-weight: 600; }
-.wwm-service-card > p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.1rem; }
-
-.wwm-intro { font-size: 1rem; color: var(--text-muted); max-width: 680px; margin-bottom: 2rem; }
-.wwm-fit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-.wwm-fit-item {
-  display: flex; gap: 0.75rem; align-items: flex-start;
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 1.25rem 1.5rem;
-}
-.wwm-fit-check { color: var(--teal); font-weight: 700; font-size: 1rem; flex-shrink: 0; margin-top: 0.15rem; }
-.wwm-fit-item p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
-
-.wwm-steps { display: flex; flex-direction: column; gap: 1.5rem; max-width: 700px; }
-.wwm-step { display: flex; gap: 1.5rem; align-items: flex-start; }
-.wwm-step-num {
-  font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700;
-  color: var(--gold); line-height: 1; flex-shrink: 0; width: 2.5rem;
-}
-.wwm-step h3 { color: #fff; font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
-.wwm-step p { font-size: 0.9rem; color: var(--text-muted); }
-
-.wwm-cta-section { text-align: center; }
-.wwm-cta-card {
-  background: var(--navy-mid); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 3.5rem 2.5rem;
-  max-width: 640px; margin: 0 auto;
-}
-.wwm-cta-card h2 { color: #fff; margin-bottom: 1rem; }
-.wwm-cta-card > p { color: var(--text-muted); max-width: 480px; margin: 0 auto; }
+.engineering-note strong { color: var(--gold-light); }
 
 /* ANIM */
 @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
@@ -437,9 +393,6 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .reveal-on .project-card,
 .reveal-on .project-card-full,
 .reveal-on .skill-card,
-.reveal-on .wwm-service-card,
-.reveal-on .wwm-step,
-.reveal-on .wwm-fit-item,
 .reveal-on .resume-block,
 .reveal-on .timeline-item,
 .reveal-on .cta-strip,
@@ -463,8 +416,6 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(14,17,23,0.97); backdrop-filter: blur(16px); padding: 1rem 1.5rem 1.5rem; gap: 1rem; border-bottom: 1px solid var(--border); }
   .nav-burger { display: block; }
   .professional-record-grid { grid-template-columns: 1fr; }
-  .wwm-services-grid { grid-template-columns: 1fr; }
-  .wwm-fit-grid { grid-template-columns: 1fr; }
   .notes-post-card { grid-template-columns: 1fr; gap: 0.65rem; }
   .notes-entry-link-label { justify-self: start; }
   .notes-principles-list { grid-template-columns: 1fr; gap: 1rem; }

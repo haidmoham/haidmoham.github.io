@@ -20,7 +20,6 @@ Personal portfolio site for Mohammad Haider — Data &amp; Software Engineer.
 ├── resume.html     # Resume
 ├── resumes/        # Role-specific resume downloads
 ├── available.html  # Current role search
-├── work-with-me.html # Consulting
 ├── notes.html      # Working Notes index
 ├── contact.html    # Contact form
 ├── style.css       # Shared stylesheet

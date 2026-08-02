@@ -16,18 +16,18 @@ Global identity/background context is in `~/.claude/CLAUDE.md`. This file covers
 
 ## Page Structure
 
-- `index.html` — hero, availability tagline, stats, "What I Do" (3-col services), featured projects
-- `about.html` — bio threading job-search + consulting audiences, experience, education
+- `index.html` — hero, availability tagline, professional record, featured projects
+- `about.html` — engineering bio, experience, education
 - `projects.html` — full grid; most recent work first (AI pipeline card is currently #1)
 - `resume.html` — full work history + skills
-- `work-with-me.html` — consulting services, fit checklist, 3-step process, CTA
+- `available.html` — full-time engineering role search
 - `contact.html` — contact form
 
 ---
 
 ## Copy Conventions
 
-**Audience:** dual — recruiters (job search) and potential consulting clients. Thread both; don't collapse one.
+**Audience:** engineering hiring teams, technical peers, and collaborators. Position Mohammad solely as an engineer seeking full-time roles; that positioning is a hard constraint.
 
 **Project cards:** each card in `projects.html` gets a "Worth noting:" callout at the bottom. Tone is matter-of-fact observation about the work — not a sales pitch, not "if you need X I can do Y." It should identify the engineering or analytical judgment that makes the project credible.
 
