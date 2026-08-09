@@ -186,6 +186,17 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .notes-pinned .notes-post-card h2 { font-family: 'Fraunces', serif; font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1.22; }
 .notes-pinned .notes-post-card div > p { font-size: 0.96rem; }
 .notes-robotics { margin-top: 1.1rem; }
+.notes-robotics .notes-post-status { color: #2f69ad; }
+.notes-robotics .notes-post-card {
+  background-color: #e9edf2;
+  background-image: linear-gradient(rgba(77, 127, 189, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(77, 127, 189, .045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border-color: rgba(77, 127, 189, .28);
+}
+.notes-robotics .notes-post-card:hover { background-color: #e3e8ee; border-color: #2f69ad; }
+.notes-robotics .notes-post-card h2 { color: #214b78; font-family: 'JetBrains Mono', monospace; font-weight: 600; letter-spacing: -.035em; }
+.notes-robotics .notes-post-card div > p { color: #4d6884; }
+.notes-robotics .notes-entry-link-label { color: #2f69ad; }
 .notes-chronological { margin-top: 1.5rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
 .notes-chronological h2 {
   font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
@@ -538,3 +549,59 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .avail-ask { background: #0E1C32; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem 2.25rem; margin-bottom: 2.75rem; }
 .avail-ask p { font-size: .97rem; color: var(--text-muted); line-height: 1.7; margin: 0; }
 .avail-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+/* ROBOTICS TEST BENCH · PAPER SURFACE */
+.robotics-page {
+  --bench-ink: #214b78;
+  --bench-blue: #2f69ad;
+  --bench-muted: #4d6884;
+  --bench-line: rgba(47, 105, 173, .24);
+  background-color: #e8ecf1;
+  background-image: linear-gradient(rgba(77, 127, 189, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(77, 127, 189, .055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--bench-ink);
+}
+.robotics-page .nav { background: rgba(232, 236, 241, .92); border-bottom-color: var(--bench-line); }
+.robotics-page .nav-logo, .robotics-page .nav-links a.nav-notes { color: var(--bench-ink); }
+.robotics-page .nav-links a { color: var(--bench-muted); }
+.robotics-page .nav-links a:hover, .robotics-page .nav-links a.active { color: var(--bench-ink); }
+.robotics-page .nav-links a.nav-notes { border-color: var(--bench-line); }
+.robotics-page .nav-links a.nav-notes:hover, .robotics-page .nav-links a.nav-notes.active { color: var(--bench-ink); border-color: var(--bench-blue); }
+.robotics-page .nav-links a.nav-cta { background: var(--bench-blue); color: #fff; }
+.robotics-page .nav-links a.nav-cta-outline { border-color: var(--bench-blue); color: var(--bench-blue); }
+.robotics-page .nav-burger { color: var(--bench-ink); }
+.robotics-page h1, .robotics-page h2, .robotics-page h3 { font-family: 'JetBrains Mono', monospace; font-weight: 600; letter-spacing: -.045em; }
+.robotics-page .robotics-hero { background-image: none; }
+.robotics-page .robotics-hero h1, .robotics-page .experiment-hero h1, .robotics-page .experiment-layout h2, .robotics-page .experiment-card h3 { color: var(--bench-ink); }
+.robotics-page .robotics-hero > p:not(.section-eyebrow), .robotics-page .experiment-hero > p:not(.section-eyebrow), .robotics-page .experiment-layout p, .robotics-page .experiment-card p, .robotics-page .robotics-source span { color: var(--bench-muted); }
+.robotics-page .section-eyebrow, .robotics-page .step-label { color: var(--bench-blue) !important; }
+.robotics-page .bench-loop { border-color: var(--bench-line); }
+.robotics-page .bench-loop li { color: var(--bench-blue); }
+.robotics-page .bench-loop li:not(:last-child)::after { color: var(--bench-muted); }
+.robotics-page .experiment-card { background: rgba(242, 245, 248, .62); border-color: var(--bench-line); }
+.robotics-page .experiment-card:hover { border-color: var(--bench-blue); }
+.robotics-page .experiment-card-meta, .robotics-page .status-resolved { color: var(--bench-blue); }
+.robotics-page .experiment-card .experiment-question { color: var(--bench-ink); }
+.robotics-page .experiment-card a, .robotics-page .robotics-source a, .robotics-page .source-section a, .robotics-page .experiment-back, .robotics-page .data-provenance a { color: var(--bench-blue); }
+.robotics-page .experiment-card a:hover, .robotics-page .robotics-source a:hover, .robotics-page .source-section a:hover, .robotics-page .experiment-back:hover { color: var(--bench-ink); }
+.robotics-page .robotics-source { border-left-color: var(--bench-blue); }
+.robotics-page .experiment-layout > section { border-top-color: var(--bench-line); }
+.robotics-page .experiment-layout code { color: var(--bench-blue); }
+.robotics-page .evidence-callout { background: rgba(35, 103, 173, .08); border-left-color: var(--bench-blue); }
+.robotics-page .trajectory-explorer { background: rgba(242, 245, 248, .7); border-color: var(--bench-line); }
+.robotics-page .visual-toolbar, .robotics-page .timeline-controls, .robotics-page .state-readout { border-color: var(--bench-line); }
+.robotics-page .visual-toggle, .robotics-page .timeline-controls label, .robotics-page .timeline-controls p, .robotics-page .data-provenance, .robotics-page .explorer-stage text { color: var(--bench-muted); }
+.robotics-page .visual-toggle:hover, .robotics-page .visual-toggle:focus-visible, .robotics-page .visual-toggle.is-active { border-color: var(--bench-blue); color: var(--bench-ink); }
+.robotics-page .visual-caption { background: rgba(35, 103, 173, .06); }
+.robotics-page .visual-caption strong, .robotics-page .timeline-controls output, .robotics-page .state-readout dd { color: var(--bench-ink); }
+.robotics-page .play-toggle { border-color: var(--bench-blue); color: var(--bench-ink); }
+.robotics-page .play-toggle:hover, .robotics-page .play-toggle:focus-visible { border-color: var(--bench-ink); }
+.robotics-page .state-readout div { border-color: var(--bench-line); }
+.robotics-page .state-readout dt { color: var(--bench-blue); }
+.robotics-page .arm-link { stroke: var(--bench-blue); }
+.robotics-page .arm-joint { fill: #fff; stroke: var(--bench-ink); }
+.robotics-page .arm-tip { fill: var(--bench-blue); }
+.robotics-page .arm-trace { stroke: rgba(35, 103, 173, .5); }
+.robotics-page .footer { border-top-color: var(--bench-line); color: var(--bench-muted); background: rgba(232, 236, 241, .72); }
+.robotics-page .footer-links a:hover { color: var(--bench-blue); }
+@media (max-width: 760px) { .robotics-page .nav-links.open { background: rgba(232, 236, 241, .98); border-bottom-color: var(--bench-line); } }

@@ -60,6 +60,14 @@ For Robotics Test Bench pages, the durable public structure is:
 
 Add a stop boundary when the canonical experiment records that further optimization would no longer produce useful learning.
 
+Use the Robotics Test Bench visual system for every current and future test-bench page:
+
+- Use a muted light blue-gray paper surface with a low-contrast graph-paper grid.
+- Use dark blue text and links with clear reading contrast.
+- Use JetBrains Mono for test-bench headings and experiment titles.
+- Use the same light treatment for the Robotics entry in Working Notes so it previews the destination.
+- Keep this system scoped to test-bench work. Do not apply it to the rest of the portfolio.
+
 ## Source integrity
 
 - Public technical claims must remain traceable to their canonical project or experiment repository.
