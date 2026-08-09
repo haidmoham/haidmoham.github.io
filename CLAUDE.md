@@ -46,7 +46,7 @@ Global identity/background context is in `~/.claude/CLAUDE.md`. This file covers
 
 ## Robotics Test Bench publishing convention
 
-The public `/robotics/` area is a distilled projection of `haidmoham/robotics-test-bench`, not a second reasoning store. Each experiment page follows: Question → Prediction → Experiment → What happened → Model update → optional stop boundary → Source. Link the canonical issue and experiment directory, label observations separately from interpretation, and keep full logs and implementation history in the source repository.
+The public `/robotics/` area is a distilled projection of `haidmoham/robotics-test-bench`, not a second reasoning store. Each experiment page follows: Question → Prediction → Experiment → What happened → Model update → optional stop boundary → Source. Link the canonical issue and experiment directory, label observations separately from interpretation, and keep full logs and implementation history in the source repository. When a meaningful variable was tested, prefer an explorable comparison driven by precomputed canonical simulator data over a passive capture; the browser may render recorded states but must not present invented physics as simulator output.
 
 ## End-of-task knowledge promotion
 

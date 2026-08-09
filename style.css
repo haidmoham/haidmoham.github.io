@@ -282,6 +282,23 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .coupling-visual[data-state="hold"] .arm-trace { stroke-dasharray: none; stroke: rgba(125,174,255,.7); }
 .coupling-visual[data-state="gravity"] .arm-link { stroke: #9ed7b0; }
 .coupling-visual[data-state="gravity"] .arm-tip { fill: #9ed7b0; }
+.trajectory-explorer { margin-top: 1.5rem; border: 1px solid rgba(125,174,255,.35); border-radius: var(--radius); overflow: hidden; background: #101722; }
+.explorer-stage svg { display: block; width: 100%; height: auto; }
+.explorer-stage text { fill: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.timeline-controls { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; padding: 1rem; border-top: 1px solid var(--border); }
+.timeline-controls label { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
+.timeline-controls output { color: #fff; }
+.timeline-controls input { grid-column: 1 / -1; width: 100%; accent-color: var(--gold); cursor: pointer; }
+.timeline-controls p { grid-column: 1 / -1; color: var(--text-muted); font-size: .72rem; line-height: 1.5; }
+.play-toggle { padding: .42rem .7rem; border: 1px solid rgba(125,174,255,.65); background: transparent; color: #fff; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: .68rem; }
+.play-toggle:hover, .play-toggle:focus-visible { border-color: #fff; outline: none; }
+.state-readout { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--border); }
+.state-readout div { padding: .75rem 1rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.state-readout dt { color: var(--gold-light); font-family: 'JetBrains Mono', monospace; font-size: .68rem; font-weight: 600; letter-spacing: .1em; }
+.state-readout dd { color: #fff; font-family: 'JetBrains Mono', monospace; font-size: .72rem; margin: .18rem 0 0; }
+.data-provenance { padding: .85rem 1rem; color: var(--text-muted); font-size: .74rem !important; line-height: 1.6 !important; }
+.data-provenance a { color: var(--gold); }
+.explorer-error { padding: 1rem; color: var(--text-muted); }
 @media (prefers-reduced-motion: reduce) { .arm-link, .arm-joint, .arm-tip { transition: none; } }
 
 /* ABOUT */
