@@ -31,6 +31,17 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Distinguish physical effects from controller-imposed behavior.
 - Use `Question → Prediction → Experiment → Observation → Model update` for Robotics Test Bench pages. Add a stop boundary when the experiment records one.
 
+## Robotics Test Bench publication order
+
+- Keep source issue identity separate from public experiment order.
+- A source issue number is provenance only. It must not reserve or determine a public experiment number.
+- Assign public experiment numbers contiguously from eligible experiment completion chronology. Prefer the commit that records the resolved boundary; use the dated experiment record as the fallback.
+- If two experiments resolve on the same date, compare their completion commits. Unresolved or skipped issues create no public gap.
+- Show the source issue separately in each page's provenance.
+- For new pages, use the public experiment number in the visible label and filename prefix.
+- Once a public URL exists, preserve it. If an old URL encoded the wrong public number, create the corrected URL and retain the old URL as a compatibility redirect.
+- The index, page label, and canonical URL must agree on the public experiment number.
+
 ## Robotics Test Bench visual system
 
 - Use a muted light blue-gray paper surface with a low-contrast graph-paper grid.
