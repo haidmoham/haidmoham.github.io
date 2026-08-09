@@ -721,3 +721,16 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .spider-page.robotics-page .engineering-note { background: rgba(35,103,173,.08); border-left-color: var(--bench-blue); color: var(--bench-muted); }
 .spider-page.robotics-page .engineering-note strong { color: var(--bench-ink); }
 @media (max-width: 560px) { .spider-page.robotics-page .spider-hud { right: .5rem; width: calc(100% - 1rem); } .spider-page.robotics-page .spider-glyph figcaption { font-size: .48rem; } }
+
+/* SPIDER · PORTFOLIO PROJECTIONS */
+.spider-project-card, .spider-project-card-full, .spider-avail-item { background-color: #e8ecf1; background-image: linear-gradient(rgba(77,127,189,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(77,127,189,.08) 1px, transparent 1px); background-size: 28px 28px; border-color: rgba(47,105,173,.42); }
+.spider-project-card:hover, .spider-project-card-full:hover { border-color: #2f69ad; }
+.spider-project-card h3, .spider-project-card-full h3, .spider-project-card-full .engineering-note strong { color: #214b78; }
+.spider-project-card p, .spider-project-card-full p, .spider-project-card-full .project-bullets li, .spider-project-card-full .engineering-note { color: #4d6884; }
+.spider-project-card .project-tag, .spider-project-card .project-meta span, .spider-project-card-full .project-tag, .spider-project-card-full .project-meta span { color: #214b78; background: rgba(47,105,173,.09); border: 1px solid rgba(47,105,173,.24); }
+.spider-project-card-full .project-link, .spider-inline-link, .spider-avail-item .avail-item-body strong a { color: #2f69ad; border-bottom-color: currentColor; }
+.spider-project-card-full .engineering-note, .spider-avail-item .avail-detail { background: rgba(47,105,173,.08); border-left-color: #2f69ad; }
+.avail-items li.spider-avail-item { gap: .85rem; padding: 1rem; color: #4d6884; }
+.avail-items li.spider-avail-item::before { color: #2f69ad; }
+.spider-avail-item .avail-item-body strong { color: #214b78; }
+.spider-avail-item .avail-item-body span { color: #4d6884; }
