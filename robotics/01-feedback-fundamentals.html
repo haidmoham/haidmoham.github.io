@@ -1,1 +1,142 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Feedback fundamentals — Robotics Test Bench</title><meta name="description" content="A one-joint feedback-control experiment from the Robotics Test Bench."><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css?v=21"></head><body class="robotics-page"><nav class="nav"><a href="../index.html" class="nav-logo">MH</a><ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../notes.html" class="nav-notes active">Working Notes</a></li><li><a href="../resume.html" class="nav-cta-outline">Resume</a></li><li><a href="../available.html" class="nav-cta">Available</a></li><li><a href="../contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav><main><header class="experiment-hero"><a href="index.html" class="experiment-back">← Robotics Test Bench</a><p class="section-eyebrow">Experiment #01 · Resolved</p><h1>Feedback fundamentals</h1><p>One joint, one motor, and a small comparison between position-only and position-plus-velocity feedback.</p></header><article class="experiment-layout"><section><p class="step-label">01 · Question</p><h2>What does closing the loop change?</h2><p>How should a one-joint pendulum behave when its controller knows only position error versus both position error and velocity?</p></section><section><p class="step-label">02 · Prediction</p><h2>Position correction should need damping.</h2><p>P-only control should push on position error and tend to overshoot or oscillate. Adding derivative feedback should damp motion and settle more cleanly.</p></section><section><p class="step-label">03 · Experiment</p><h2>Keep the mechanism small.</h2><p>A MuJoCo pendulum used one rigid link, one hinge, gravity, and one motor. The same script exposed constant, P, and PD control through direct state and control values: <code>qpos</code>, <code>qvel</code>, and <code>ctrl</code>.</p></section><section><p class="step-label">04 · What happened</p><h2>The prediction matched the run.</h2><p>P-only behavior overshot or oscillated more. PD behavior was visibly more damped and settled more cleanly.</p></section><section><p class="step-label">05 · Model update</p><h2>Position error and velocity answer different questions.</h2><p>P answers “how far from target?” D adds “how fast am I moving?” That was enough evidence to move on rather than polish this controller.</p></section><section class="source-section"><p class="step-label">Source</p><h2>Canonical evidence</h2><ul><li><a href="https://github.com/haidmoham/robotics-test-bench/issues/1" target="_blank" rel="noreferrer">GitHub issue #1 ↗</a></li><li><a href="https://github.com/haidmoham/robotics-test-bench/tree/main/experiments/2026-08-08-pendulum-control" target="_blank" rel="noreferrer">Experiment directory ↗</a></li></ul></section></article></main><footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer><script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback fundamentals — Robotics Test Bench</title>
+  <meta name="description" content="A one-joint feedback-control experiment from the Robotics Test Bench.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css?v=21">
+</head>
+<body class="robotics-page">
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">MH</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../notes.html" class="nav-notes active">Working Notes</a></li>
+      <li><a href="../resume.html" class="nav-cta-outline">Resume</a></li>
+      <li><a href="../available.html" class="nav-cta">Available</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Open navigation">☰</button>
+  </nav>
+
+  <main>
+    <header class="experiment-hero">
+      <a href="index.html" class="experiment-back">← Robotics Test Bench</a>
+      <p class="section-eyebrow">Experiment #01 · Resolved</p>
+      <h1>Feedback fundamentals</h1>
+      <p>One joint, one motor, and a small comparison between position-only and position-plus-velocity feedback.</p>
+    </header>
+
+    <article class="experiment-layout">
+      <section>
+        <p class="step-label">01 · Question</p>
+        <h2>What does closing the loop change?</h2>
+        <p>How should a one-joint pendulum behave when its controller knows only position error versus both position error and velocity?</p>
+      </section>
+
+      <section>
+        <p class="step-label">02 · Prediction</p>
+        <h2>Position correction should need damping.</h2>
+        <p>P-only control should push on position error and tend to overshoot or oscillate. Adding derivative feedback should damp motion and settle more cleanly.</p>
+
+        <figure class="model-control-figure feedback-schematic" aria-labelledby="feedback-figure-title feedback-figure-caption">
+          <div class="model-control-figure-head">
+            <p class="step-label">Controller structure · conceptual</p>
+            <h3 id="feedback-figure-title">Derivative feedback changes what the controller can notice.</h3>
+            <p>The two rows summarize the control laws used in the comparison. This is a controller schematic, not a replay of recorded simulator data.</p>
+          </div>
+          <svg class="feedback-schematic-svg" viewBox="0 0 860 300" role="img" aria-labelledby="feedback-svg-title feedback-svg-desc">
+            <title id="feedback-svg-title">Position-only and position-plus-velocity feedback paths</title>
+            <desc id="feedback-svg-desc">The P-only path turns position error into torque. The PD path combines position error with measured velocity before producing torque, which adds damping.</desc>
+            <defs>
+              <marker id="feedback-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#2f69ad"></path>
+              </marker>
+            </defs>
+
+            <rect class="feedback-lane" x="1" y="1" width="858" height="132" rx="6"></rect>
+            <text class="feedback-lane-label" x="22" y="28">P-only</text>
+            <text class="feedback-note" x="22" y="51">position error only</text>
+            <rect class="feedback-box" x="22" y="67" width="145" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="94.5" y="86" text-anchor="middle">target − qpos</text>
+            <text class="feedback-box-detail" x="94.5" y="101" text-anchor="middle">error e</text>
+            <line class="feedback-arrow" x1="167" y1="89" x2="231" y2="89" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-box" x="231" y="67" width="132" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="297" y="86" text-anchor="middle">Kp · e</text>
+            <text class="feedback-box-detail" x="297" y="101" text-anchor="middle">position correction</text>
+            <line class="feedback-arrow" x1="363" y1="89" x2="427" y2="89" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-box" x="427" y="67" width="132" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="493" y="86" text-anchor="middle">torque τ</text>
+            <text class="feedback-box-detail" x="493" y="101" text-anchor="middle">motor command</text>
+            <line class="feedback-arrow" x1="559" y1="89" x2="623" y2="89" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-plant" x="623" y="67" width="215" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="730.5" y="86" text-anchor="middle">pendulum</text>
+            <text class="feedback-box-detail" x="730.5" y="101" text-anchor="middle">more overshoot / oscillation</text>
+
+            <rect class="feedback-lane feedback-lane-pd" x="1" y="151" width="858" height="148" rx="6"></rect>
+            <text class="feedback-lane-label" x="22" y="178">PD</text>
+            <text class="feedback-note" x="22" y="201">position error + measured velocity</text>
+            <rect class="feedback-box" x="22" y="217" width="145" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="94.5" y="236" text-anchor="middle">target − qpos</text>
+            <text class="feedback-box-detail" x="94.5" y="251" text-anchor="middle">error e</text>
+            <line class="feedback-arrow" x1="167" y1="239" x2="231" y2="239" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-box feedback-law" x="231" y="217" width="174" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="318" y="236" text-anchor="middle">Kp · e − Kd · qvel</text>
+            <text class="feedback-box-detail" x="318" y="251" text-anchor="middle">correction + damping</text>
+            <line class="feedback-arrow" x1="405" y1="239" x2="469" y2="239" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-box" x="469" y="217" width="132" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="535" y="236" text-anchor="middle">torque τ</text>
+            <text class="feedback-box-detail" x="535" y="251" text-anchor="middle">motor command</text>
+            <line class="feedback-arrow" x1="601" y1="239" x2="665" y2="239" marker-end="url(#feedback-arrow)"></line>
+            <rect class="feedback-plant feedback-plant-pd" x="665" y="217" width="173" height="44" rx="5"></rect>
+            <text class="feedback-box-title" x="751.5" y="236" text-anchor="middle">pendulum</text>
+            <text class="feedback-box-detail" x="751.5" y="251" text-anchor="middle">more damping / cleaner settling</text>
+            <path class="feedback-velocity" d="M183 280 C260 280, 297 270, 350 261" marker-end="url(#feedback-arrow)"></path>
+            <text class="feedback-velocity-label" x="22" y="286">qvel enters the PD law</text>
+          </svg>
+          <figcaption id="feedback-figure-caption">The source experiment supports this qualitative distinction: P reacts to “how far from target?”; D adds “how fast am I moving?”</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <p class="step-label">03 · Experiment</p>
+        <h2>Keep the mechanism small.</h2>
+        <p>A MuJoCo pendulum used one rigid link, one hinge, gravity, and one motor. The same script exposed constant, P, and PD control through direct state and control values: <code>qpos</code>, <code>qvel</code>, and <code>ctrl</code>.</p>
+      </section>
+
+      <section>
+        <p class="step-label">04 · What happened</p>
+        <h2>The prediction matched the run.</h2>
+        <p>P-only behavior overshot or oscillated more. PD behavior was visibly more damped and settled more cleanly.</p>
+      </section>
+
+      <section>
+        <p class="step-label">05 · Model update</p>
+        <h2>Position error and velocity answer different questions.</h2>
+        <p>P answers “how far from target?” D adds “how fast am I moving?” That was enough evidence to move on rather than polish this controller.</p>
+      </section>
+
+      <section class="source-section">
+        <p class="step-label">Source</p>
+        <h2>Canonical evidence</h2>
+        <ul>
+          <li><a href="https://github.com/haidmoham/robotics-test-bench/issues/1" target="_blank" rel="noreferrer">GitHub issue #1 ↗</a></li>
+          <li><a href="https://github.com/haidmoham/robotics-test-bench/tree/main/experiments/2026-08-08-pendulum-control" target="_blank" rel="noreferrer">Experiment directory ↗</a></li>
+        </ul>
+      </section>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Mohammad Haider</span>
+    <div class="footer-links"><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div>
+  </footer>
+  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});</script>
+</body>
+</html>

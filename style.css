@@ -282,6 +282,19 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .model-control-figure-head p:not(.step-label) { font-size: .82rem; line-height: 1.65; }
 .model-control-figure svg { display: block; width: 100%; height: auto; margin-top: .75rem; }
 .model-control-figure figcaption { margin-top: .65rem; color: var(--text-muted); font-size: .72rem; line-height: 1.55; }
+.feedback-schematic-svg { overflow: visible; }
+.feedback-schematic .feedback-lane { fill: rgba(255,255,255,.35); stroke: var(--bench-line); stroke-width: 1; }
+.feedback-schematic .feedback-lane-pd { fill: rgba(47,105,173,.06); }
+.feedback-schematic .feedback-lane-label { fill: var(--bench-ink); font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; }
+.feedback-schematic .feedback-note, .feedback-schematic .feedback-velocity-label { fill: var(--bench-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.feedback-schematic .feedback-box, .feedback-schematic .feedback-plant { fill: rgba(255,255,255,.72); stroke: var(--bench-blue); stroke-width: 1.5; }
+.feedback-schematic .feedback-law { fill: rgba(47,105,173,.12); }
+.feedback-schematic .feedback-plant { fill: rgba(33,75,120,.1); }
+.feedback-schematic .feedback-plant-pd { fill: rgba(47,105,173,.16); }
+.feedback-schematic .feedback-box-title { fill: var(--bench-ink); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+.feedback-schematic .feedback-box-detail { fill: var(--bench-muted); font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+.feedback-schematic .feedback-arrow, .feedback-schematic .feedback-velocity { fill: none; stroke: var(--bench-blue); stroke-width: 1.8; }
+.feedback-schematic .feedback-velocity { stroke-dasharray: 4 4; stroke: rgba(47,105,173,.72); }
 .model-control-controls { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; margin-top: 1rem; padding-top: .85rem; border-top: 1px solid rgba(125,174,255,.25); }
 .model-control-controls label { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
 .model-control-controls output { color: var(--text); }
