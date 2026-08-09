@@ -634,3 +634,35 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .robotics-page .footer { border-top-color: var(--bench-line); color: var(--bench-muted); background: rgba(232, 236, 241, .72); }
 .robotics-page .footer-links a:hover { color: var(--bench-blue); }
 @media (max-width: 760px) { .robotics-page .nav-links.open { background: rgba(232, 236, 241, .98); border-bottom-color: var(--bench-line); } }
+
+/* SPIDER · LONGITUDINAL ROBOTICS PROJECT */
+.spider-hero, .spider-layout { max-width: 1060px; margin: 0 auto; }
+.spider-hero { padding: 8rem 2.5rem 3.5rem; background: radial-gradient(ellipse at 75% 10%, rgba(61,139,255,.18), transparent 42%); }
+.spider-hero h1 { color: #fff; margin-bottom: .85rem; }
+.spider-hero > p:not(.section-eyebrow) { color: var(--text-muted); max-width: 660px; font-size: 1.08rem; }
+.spider-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.5rem; }
+.spider-layout { padding: 0 2.5rem 5rem; }
+.spider-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.spider-summary > div { padding: 1.5rem; background: var(--navy-card); }
+.spider-summary h2, .spider-artifact h2, .spider-evidence h2 { color: #fff; font-size: 1.3rem; margin-bottom: .5rem; }
+.spider-summary p:not(.step-label), .spider-evidence > p { color: var(--text-muted); font-size: .9rem; line-height: 1.65; }
+.spider-artifact, .spider-evidence { margin-top: 1.5rem; padding: 1.75rem; background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.artifact-head { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.artifact-status { color: var(--gold-light); font: 600 .7rem 'JetBrains Mono', monospace; letter-spacing: .04em; text-align: right; }
+.artifact-intro, .data-provenance { color: var(--text-muted); font-size: .84rem; max-width: 720px; margin-top: .4rem; }
+.spider-stage { margin-top: 1.3rem; border: 1px solid rgba(125,174,255,.28); border-radius: var(--radius); overflow: hidden; background: #111926; }
+.spider-stage canvas { display: block; width: 100%; height: auto; }
+.spider-controls { display: grid; grid-template-columns: auto auto minmax(130px, 1fr); gap: .7rem .9rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.spider-controls label, .spider-controls p { color: var(--text-muted); font-size: .8rem; }
+.spider-controls output { color: #fff; font-family: 'JetBrains Mono', monospace; }
+.spider-controls input { min-width: 0; grid-column: 1 / -1; accent-color: var(--gold); }
+.spider-controls p { grid-column: 1 / -1; }
+.spider-readout { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-top: 1rem; }
+.spider-readout div { border: 1px solid var(--border); border-radius: 6px; padding: .7rem .8rem; }
+.spider-readout dt { color: var(--gold-light); font: 600 .66rem 'JetBrains Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
+.spider-readout dd { color: #fff; font: .78rem 'JetBrains Mono', monospace; margin-top: .2rem; }
+.spider-evidence { max-width: 760px; }
+.spider-evidence ul { margin: 1rem 0 1.25rem 1.2rem; color: var(--text-muted); font-size: .9rem; }
+.spider-evidence li + li { margin-top: .45rem; }
+.spider-evidence a, .data-provenance a { color: var(--gold-light); border-bottom: 1px solid rgba(125,174,255,.45); }
+@media (max-width: 760px) { .spider-hero { padding: 6.5rem 1.25rem 2.5rem; } .spider-layout { padding-left: 1.25rem; padding-right: 1.25rem; } .spider-summary, .spider-readout { grid-template-columns: 1fr; } .spider-artifact, .spider-evidence { padding: 1.25rem; } .artifact-head { display: block; } .artifact-status { text-align: left; margin-top: .5rem; } }

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "release": "v0.1",
+  "spider_commit": "4c0a62404082508c91ff31d85453c6fafe4fe31b",
+  "model": {
+    "path": "model/spider.xml",
+    "sha256": "9e9ee0eafbebce7687d48e3d9e324f7be2b58920de0c92d36f2bc8724ec94566"
+  },
+  "runtime": {
+    "package": "@mujoco/mujoco",
+    "version": "3.11.0",
+    "build": "single-threaded"
+  },
+  "source": "https://github.com/haidmoham/spider"
+}
