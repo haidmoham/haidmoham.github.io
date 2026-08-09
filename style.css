@@ -277,6 +277,16 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .experiment-layout code { color: var(--gold-light); font-family: 'JetBrains Mono', monospace; font-size: .86em; }
 .source-section ul { list-style: none; display: grid; gap: .45rem; }
 .evidence-callout { margin-top: 1.5rem; padding: 1.15rem 1.25rem; background: rgba(61,139,255,.07); border-left: 2px solid var(--gold); }
+.model-control-figure { margin: 1.5rem 0 0; padding: 1rem; border: 1px solid rgba(125,174,255,.35); border-radius: var(--radius); background: rgba(16,23,34,.04); overflow: hidden; }
+.model-control-figure-head h3 { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; line-height: 1.35; margin: .15rem 0 .5rem; }
+.model-control-figure-head p:not(.step-label) { font-size: .82rem; line-height: 1.65; }
+.model-control-figure svg { display: block; width: 100%; height: auto; margin-top: .75rem; }
+.model-control-figure figcaption { margin-top: .65rem; color: var(--text-muted); font-size: .72rem; line-height: 1.55; }
+.model-control-controls { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; margin-top: 1rem; padding-top: .85rem; border-top: 1px solid rgba(125,174,255,.25); }
+.model-control-controls label { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
+.model-control-controls output { color: var(--text); }
+.model-control-controls input { grid-column: 1 / -1; width: 100%; accent-color: var(--gold); cursor: pointer; }
+.model-control-controls p { grid-column: 1 / -1; color: var(--text-muted); font-size: .72rem; line-height: 1.5; }
 .coupling-visual { margin-top: 1.5rem; border: 1px solid rgba(125,174,255,.35); border-radius: var(--radius); overflow: hidden; background: #101722; }
 .visual-toolbar { display: flex; flex-wrap: wrap; gap: .45rem; padding: .7rem; border-bottom: 1px solid var(--border); }
 .visual-toggle { border: 1px solid transparent; padding: .42rem .6rem; background: transparent; color: var(--text-muted); cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: .68rem; }
@@ -588,6 +598,12 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .robotics-page .experiment-layout > section { border-top-color: var(--bench-line); }
 .robotics-page .experiment-layout code { color: var(--bench-blue); }
 .robotics-page .evidence-callout { background: rgba(35, 103, 173, .08); border-left-color: var(--bench-blue); }
+.robotics-page .model-control-figure { border-color: var(--bench-line); background: rgba(242, 245, 248, .7); }
+.robotics-page .model-control-figure-head h3 { color: var(--bench-ink); }
+.robotics-page .model-control-figure-head p:not(.step-label), .robotics-page .model-control-figure figcaption { color: var(--bench-muted); }
+.robotics-page .model-control-controls { border-top-color: var(--bench-line); }
+.robotics-page .model-control-controls label, .robotics-page .model-control-controls p { color: var(--bench-muted); }
+.robotics-page .model-control-controls output { color: var(--bench-ink); }
 .robotics-page .trajectory-explorer { background: rgba(242, 245, 248, .7); border-color: var(--bench-line); }
 .robotics-page .visual-toolbar, .robotics-page .timeline-controls, .robotics-page .state-readout { border-color: var(--bench-line); }
 .robotics-page .visual-toggle, .robotics-page .timeline-controls label, .robotics-page .timeline-controls p, .robotics-page .data-provenance, .robotics-page .explorer-stage text { color: var(--bench-muted); }

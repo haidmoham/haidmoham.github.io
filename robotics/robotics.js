@@ -24,3 +24,27 @@
   root.querySelectorAll('[data-condition]').forEach(function(button){button.addEventListener('click',function(){setCondition(button.dataset.condition);});}); root.querySelector('[data-scrubber]').addEventListener('input',function(){frame=Number(this.value);update();}); root.querySelector('[data-play]').addEventListener('click',play);
   var data; fetch('../assets/robotics/two-link-trajectories.json').then(function(response){return response.json();}).then(function(payload){data=payload; root.querySelector('[data-scrubber]').max=data.conditions.passive.frames.length-1; setCondition('passive'); if(!reduced) play();}).catch(function(){root.querySelector('.explorer-stage').innerHTML='<p class="explorer-error">The recorded trajectory data could not load. See the canonical experiment source below.</p>';});
 }());
+
+(function () {
+  var root = document.querySelector('[data-model-control-animation]');
+  if (!root) return;
+  var source = document.getElementById('model-control-keyframes');
+  if (!source) return;
+  var data = JSON.parse(source.textContent), names = ['pd', 'gravity-comp', 'computed-torque', 'computed-torque-wrong-mass'];
+  var position = 4, playing = false, raf, previous;
+  var slider = root.querySelector('[data-model-scrubber]'), output = root.querySelector('[data-model-time]'), playButton = root.querySelector('[data-model-play]');
+  slider.max = data.times.length - 1;
+  function point(q1, q2) { var base = [120, 105], l1 = 66, l2 = 52, elbow = [base[0] + l1 * Math.sin(q1), base[1] + l1 * Math.cos(q1)], tip = [elbow[0] + l2 * Math.sin(q1 + q2), elbow[1] + l2 * Math.cos(q1 + q2)]; return {base: base, elbow: elbow, tip: tip}; }
+  function path(p) { return 'M' + p.base[0].toFixed(1) + ' ' + p.base[1].toFixed(1) + ' L' + p.elbow[0].toFixed(1) + ' ' + p.elbow[1].toFixed(1) + ' L' + p.tip[0].toFixed(1) + ' ' + p.tip[1].toFixed(1); }
+  function sample(name, cursor) { var values = data[name], low = Math.floor(cursor), high = Math.min(low + 1, values.length - 1), mix = cursor - low, a = values[low], b = values[high]; return {time: data.times[low] + (data.times[high] - data.times[low]) * mix, q1: a[0] + (b[0] - a[0]) * mix, q2: a[1] + (b[1] - a[1]) * mix, fb: a[2] + (b[2] - a[2]) * mix, ff: a[3] + (b[3] - a[3]) * mix}; }
+  function setPoint(group, state, target) { var arm = group.querySelector('[data-model-arm]'), elbow = group.querySelector('[data-model-elbow]'), targetPath = group.querySelector('[data-model-target]'), targetPoint = point(.35 + .35 * Math.sin(.8 * target), -.70 + .45 * Math.sin(.8 * target)), p = point(state.q1, state.q2), clamp = function (v) { return Math.min(172, Math.max(0, 172 * Math.abs(v) / 18)); };
+    arm.setAttribute('d', path(p)); elbow.setAttribute('cx', p.elbow[0].toFixed(1)); elbow.setAttribute('cy', p.elbow[1].toFixed(1)); targetPath.setAttribute('d', path(targetPoint));
+    group.querySelector('[data-model-state]').textContent = 'q₁ ' + state.q1.toFixed(3) + ' · q₂ ' + state.q2.toFixed(3); group.querySelector('[data-model-fbbar]').setAttribute('width', clamp(state.fb).toFixed(1)); group.querySelector('[data-model-ffbar]').setAttribute('width', clamp(state.ff).toFixed(1)); group.querySelector('[data-model-fblabel]').textContent = 'τfb₁ ' + state.fb.toFixed(2) + ' N·m'; group.querySelector('[data-model-fflabel]').textContent = 'τff₁ ' + state.ff.toFixed(2) + ' N·m'; }
+  function render() { var target = sample('pd', position).time; names.forEach(function (name) { setPoint(root.querySelector('[data-model-controller="' + name + '"]'), sample(name, position), target); }); slider.value = Math.round(position); output.textContent = target.toFixed(2) + ' s'; }
+  function stop() { playing = false; previous = null; if (raf) cancelAnimationFrame(raf); playButton.textContent = 'Play'; playButton.setAttribute('aria-pressed', 'false'); }
+  function tick(now) { if (!playing) return; if (!previous) previous = now; position += (now - previous) / 1000 * 1.35; previous = now; if (position >= data.times.length - 1) { position = data.times.length - 1; render(); stop(); return; } render(); raf = requestAnimationFrame(tick); }
+  playButton.addEventListener('click', function () { if (playing) { stop(); return; } if (position >= data.times.length - 1) position = 0; playing = true; playButton.textContent = 'Pause'; playButton.setAttribute('aria-pressed', 'true'); raf = requestAnimationFrame(tick); });
+  slider.addEventListener('input', function () { stop(); position = Number(this.value); render(); });
+  render();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) playButton.click();
+}());
