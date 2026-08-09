@@ -11,5 +11,10 @@
     "version": "3.11.0",
     "build": "single-threaded"
   },
+  "renderer": {
+    "package": "three",
+    "version": "0.185.1",
+    "controls": "OrbitControls"
+  },
   "source": "https://github.com/haidmoham/spider"
 }

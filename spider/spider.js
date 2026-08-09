@@ -1,10 +1,14 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import loadMujoco from './vendor/mujoco/mujoco.js';
 
 const root = document.querySelector('[data-spider-artifact]');
+const stage = root.querySelector('[data-spider-stage]');
 const canvas = root.querySelector('[data-spider-canvas]');
-const context = canvas.getContext('2d');
 const playButton = root.querySelector('[data-play]');
 const resetButton = root.querySelector('[data-reset]');
+const cameraResetButton = root.querySelector('[data-camera-reset]');
+const cameraFollowButton = root.querySelector('[data-camera-follow]');
 const status = root.querySelector('[data-status]');
 const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -13,6 +17,9 @@ const TRIPOD_A = new Set([0, 3, 4]);
 const COLORS = ['#7daeff', '#3d8bff', '#92c7ff', '#4d82d0', '#b5d7ff', '#6aa5eb'];
 const STEP_SECONDS = 0.002;
 const MAX_FRAME_SECONDS = 0.05;
+const CAMERA_POSITION = new THREE.Vector3(1.1, -1.25, 0.92);
+const CAMERA_TARGET = new THREE.Vector3(0, 0, 0.22);
+const LOCAL_Y = new THREE.Vector3(0, 1, 0);
 
 let mujoco;
 let model;
@@ -27,6 +34,13 @@ let accumulator = 0;
 let phase = 0;
 let lastSimulationTime = 0;
 let running = false;
+let renderer;
+let scene;
+let camera;
+let controls;
+let resizeObserver;
+let robotVisual;
+let cameraFollow = false;
 
 function readout(name) {
   return root.querySelector(`[data-${name}]`);
@@ -118,59 +132,197 @@ function setStandingPose() {
   mujoco.mj_forward(model, data);
 }
 
-function point(position, camera) {
-  return {
-    x: 55 + (position[0] - camera.minX) / (camera.maxX - camera.minX) * (canvas.width - 110),
-    y: canvas.height - 55 - (position[2] - camera.minZ) / (camera.maxZ - camera.minZ) * (canvas.height - 110),
+function createSegment(color, radius) {
+  const material = new THREE.MeshStandardMaterial({ color, metalness: 0.22, roughness: 0.45 });
+  const segment = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 1, 12), material);
+  segment.castShadow = true;
+  segment.receiveShadow = true;
+  scene.add(segment);
+  return segment;
+}
+
+function createRobotVisual() {
+  const torso = new THREE.Group();
+  const torsoMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.44, 0.32, 0.14),
+    new THREE.MeshStandardMaterial({ color: 0xeef5ff, metalness: 0.18, roughness: 0.38 }),
+  );
+  const torsoEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(torsoMesh.geometry),
+    new THREE.LineBasicMaterial({ color: 0x3d8bff, transparent: true, opacity: 0.9 }),
+  );
+  torsoMesh.castShadow = true;
+  torsoMesh.receiveShadow = true;
+  torso.add(torsoMesh, torsoEdges);
+  scene.add(torso);
+
+  const legs = FOOT_NAMES.map((_, index) => {
+    const color = COLORS[index];
+    const foot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 18, 12),
+      new THREE.MeshStandardMaterial({ color, emissive: 0x000000, metalness: 0.1, roughness: 0.38 }),
+    );
+    foot.castShadow = true;
+    foot.receiveShadow = true;
+    scene.add(foot);
+    return { thigh: createSegment(color, 0.035), shin: createSegment(color, 0.029), foot };
+  });
+
+  robotVisual = {
+    torso,
+    legs,
+    matrix: new THREE.Matrix4(),
+    start: new THREE.Vector3(),
+    end: new THREE.Vector3(),
+    direction: new THREE.Vector3(),
   };
 }
 
-function drawLine(a, b, color, width) {
-  context.strokeStyle = color;
-  context.lineWidth = width;
-  context.beginPath();
-  context.moveTo(a.x, a.y);
-  context.lineTo(b.x, b.y);
-  context.stroke();
+function positionFrom(accessor, target) {
+  return target.set(accessor.xpos[0], accessor.xpos[1], accessor.xpos[2]);
 }
 
-function draw(contacts) {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = '#111926';
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.strokeStyle = 'rgba(125,174,255,.12)';
-  context.lineWidth = 1;
-  for (let x = 0; x < canvas.width; x += 45) drawLine({ x, y: 0 }, { x, y: canvas.height }, 'rgba(125,174,255,.12)', 1);
-  for (let y = 0; y < canvas.height; y += 45) drawLine({ x: 0, y }, { x: canvas.width, y }, 'rgba(125,174,255,.12)', 1);
+function setMuJoCoRotation(object, matrixValues) {
+  robotVisual.matrix.set(
+    matrixValues[0], matrixValues[1], matrixValues[2], 0,
+    matrixValues[3], matrixValues[4], matrixValues[5], 0,
+    matrixValues[6], matrixValues[7], matrixValues[8], 0,
+    0, 0, 0, 1,
+  );
+  object.quaternion.setFromRotationMatrix(robotVisual.matrix);
+}
 
-  const torso = bodyAccessors.torso.xpos;
-  const camera = { minX: torso[0] - 0.55, maxX: torso[0] + 0.55, minZ: 0, maxZ: 0.74 };
-  const ground = point([0, 0, 0], camera).y;
-  drawLine({ x: 0, y: ground }, { x: canvas.width, y: ground }, 'rgba(233,237,243,.35)', 2);
-  const torsoPoint = point(torso, camera);
+function setSegment(segment, start, end) {
+  const direction = robotVisual.direction.subVectors(end, start);
+  const length = direction.length();
+  segment.position.addVectors(start, end).multiplyScalar(0.5);
+  segment.scale.set(1, Math.max(length, 0.0001), 1);
+  segment.quaternion.setFromUnitVectors(LOCAL_Y, direction.multiplyScalar(1 / Math.max(length, 0.0001)));
+}
+
+function updateRobotVisual(contacts) {
+  const torso = bodyAccessors.torso;
+  positionFrom(torso, robotVisual.torso.position);
+  setMuJoCoRotation(robotVisual.torso, torso.xmat);
 
   FOOT_NAMES.forEach((name, index) => {
-    const hip = point(bodyAccessors[name].xpos, camera);
-    const knee = point(bodyAccessors[`${name}_shin`].xpos, camera);
-    const foot = point(footAccessors[name].xpos, camera);
-    drawLine(torsoPoint, hip, COLORS[index], 5);
-    drawLine(hip, knee, COLORS[index], 5);
-    drawLine(knee, foot, COLORS[index], 4);
-    context.fillStyle = contacts[index] ? '#f6d365' : COLORS[index];
-    context.beginPath();
-    context.arc(foot.x, foot.y, contacts[index] ? 7 : 5, 0, Math.PI * 2);
-    context.fill();
+    const visual = robotVisual.legs[index];
+    const hip = positionFrom(bodyAccessors[name], robotVisual.start);
+    const knee = positionFrom(bodyAccessors[`${name}_shin`], robotVisual.end);
+    setSegment(visual.thigh, hip, knee);
+    const foot = positionFrom(footAccessors[name], robotVisual.start);
+    setSegment(visual.shin, knee, foot);
+    visual.foot.position.copy(foot);
+    visual.foot.material.color.set(contacts[index] ? 0xf6d365 : COLORS[index]);
+    visual.foot.material.emissive.set(contacts[index] ? 0x3b2d06 : 0x000000);
   });
+}
 
-  context.fillStyle = '#eef5ff';
-  context.fillRect(torsoPoint.x - 28, torsoPoint.y - 15, 56, 30);
-  context.strokeStyle = '#3d8bff';
-  context.lineWidth = 3;
-  context.strokeRect(torsoPoint.x - 28, torsoPoint.y - 15, 56, 30);
-  context.fillStyle = '#9ba9bc';
-  context.font = '14px JetBrains Mono, monospace';
-  context.fillText('live MuJoCo WebAssembly', 20, 30);
-  context.fillText('yellow = physical contact', 20, 52);
+function renderScene() {
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
+
+function resizeRenderer() {
+  if (!renderer || !camera) return;
+  const { width, height } = stage.getBoundingClientRect();
+  if (!width || !height) return;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height, false);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderScene();
+}
+
+function resetCamera() {
+  setCameraFollow(false);
+  camera.position.copy(CAMERA_POSITION);
+  controls.target.copy(CAMERA_TARGET);
+  controls.update();
+  renderScene();
+}
+
+function setCameraFollow(enabled) {
+  cameraFollow = enabled;
+  cameraFollowButton.textContent = enabled ? 'Following Spider' : 'Follow Spider';
+  cameraFollowButton.setAttribute('aria-pressed', String(enabled));
+  if (!enabled || !bodyAccessors) return;
+
+  const target = positionFrom(bodyAccessors.torso, robotVisual.start);
+  target.z -= 0.25;
+  robotVisual.direction.subVectors(camera.position, controls.target);
+  controls.target.copy(target);
+  camera.position.copy(target).add(robotVisual.direction);
+  controls.update();
+  renderScene();
+}
+
+function updateFollowCamera() {
+  if (!cameraFollow) return;
+  const target = positionFrom(bodyAccessors.torso, robotVisual.start);
+  target.z -= 0.25;
+  robotVisual.direction.subVectors(target, controls.target);
+  camera.position.add(robotVisual.direction);
+  controls.target.copy(target);
+}
+
+function setupRenderer() {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111926);
+  scene.fog = new THREE.Fog(0x111926, 1.3, 4.7);
+  scene.up.set(0, 0, 1);
+
+  camera = new THREE.PerspectiveCamera(42, 1, 0.05, 25);
+  camera.up.set(0, 0, 1);
+  camera.position.copy(CAMERA_POSITION);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(CAMERA_TARGET);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.07;
+  controls.enablePan = true;
+  controls.minDistance = 0.45;
+  controls.maxDistance = 4.5;
+  controls.minPolarAngle = Math.PI * 0.1;
+  controls.maxPolarAngle = Math.PI * 0.49;
+  controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+  controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+  controls.addEventListener('change', renderScene);
+  controls.addEventListener('start', () => setCameraFollow(false));
+  controls.update();
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(6, 6),
+    new THREE.MeshStandardMaterial({ color: 0x17243a, metalness: 0.05, roughness: 0.82 }),
+  );
+  ground.position.z = -0.012;
+  ground.receiveShadow = true;
+  scene.add(ground);
+  const grid = new THREE.GridHelper(6, 30, 0x426080, 0x213248);
+  grid.rotation.x = Math.PI / 2;
+  grid.position.z = -0.005;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.42;
+  scene.add(grid);
+
+  scene.add(new THREE.HemisphereLight(0xa8cfff, 0x162033, 2.1));
+  const keyLight = new THREE.DirectionalLight(0xe8f2ff, 2.5);
+  keyLight.position.set(1.8, -1.2, 2.6);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(1024, 1024);
+  scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight(0x5d98ff, 0.8);
+  fillLight.position.set(-1.5, 1.2, 0.8);
+  scene.add(fillLight);
+
+  createRobotVisual();
+  resizeObserver = new ResizeObserver(resizeRenderer);
+  resizeObserver.observe(stage);
+  resizeRenderer();
 }
 
 function updateReadout(state) {
@@ -184,7 +336,10 @@ function updateReadout(state) {
 
 function render() {
   const state = applyGaitControl();
-  draw(state.contacts);
+  updateRobotVisual(state.contacts);
+  updateFollowCamera();
+  controls.update();
+  renderScene();
   updateReadout(state);
 }
 
@@ -251,8 +406,24 @@ function cacheAccessors() {
   });
 }
 
+function disposeRenderer() {
+  if (resizeObserver) resizeObserver.disconnect();
+  if (controls) controls.dispose();
+  if (scene) {
+    scene.traverse((object) => {
+      if (object.geometry) object.geometry.dispose();
+      if (object.material) {
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        materials.forEach((material) => material.dispose());
+      }
+    });
+  }
+  if (renderer) renderer.dispose();
+}
+
 async function initialise() {
   try {
+    setupRenderer();
     const [loadedMujoco, modelXml, manifest] = await Promise.all([
       loadMujoco(),
       fetch('./model/spider.xml').then((response) => {
@@ -276,16 +447,21 @@ async function initialise() {
       return id;
     });
     restart();
-    status.textContent = `Live · ${manifest.release} · MuJoCo ${mujoco.mj_versionString()} · ${manifest.spider_commit.slice(0, 8)}`;
+    status.textContent = `Live 3D · ${manifest.release} · MuJoCo ${mujoco.mj_versionString()} · ${manifest.spider_commit.slice(0, 8)}`;
     playButton.disabled = false;
     resetButton.disabled = false;
+    cameraResetButton.disabled = false;
+    cameraFollowButton.disabled = false;
     playButton.textContent = reducedMotion ? 'Start simulation' : 'Pause';
     playButton.addEventListener('click', toggle);
     resetButton.addEventListener('click', restart);
+    cameraResetButton.addEventListener('click', resetCamera);
+    cameraFollowButton.addEventListener('click', () => setCameraFollow(!cameraFollow));
     if (!reducedMotion) start();
   } catch (error) {
+    disposeRenderer();
     status.textContent = 'Live simulation unavailable';
-    root.querySelector('.spider-stage').innerHTML = `<p class="explorer-error">${error.message} See the canonical Spider repository for the native simulation.</p>`;
+    stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical Spider repository for the native simulation.</p>`;
   }
 }
 
@@ -294,6 +470,7 @@ window.addEventListener('pagehide', () => {
   if (data) data.delete();
   releaseAccessors();
   if (model) model.delete();
+  disposeRenderer();
 });
 
 initialise();
