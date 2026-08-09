@@ -654,8 +654,8 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .spider-release-picker select:focus-visible { border-color: #fff; outline: 1px solid #fff; outline-offset: 2px; }
 .artifact-status { color: var(--gold-light); font: 600 .7rem 'JetBrains Mono', monospace; letter-spacing: .04em; text-align: right; }
 .artifact-intro, .data-provenance { color: var(--text-muted); font-size: .84rem; max-width: 720px; margin-top: .4rem; }
-.spider-stage { height: clamp(330px, 56vw, 560px); margin-top: 1.3rem; border: 1px solid rgba(125,174,255,.28); border-radius: var(--radius); overflow: hidden; background: #111926; touch-action: none; }
-.spider-stage canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.spider-stage { height: clamp(330px, 56vw, 560px); margin-top: 1.3rem; border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius); overflow: hidden; background: radial-gradient(110% 84% at 50% 3%, rgba(255,255,255,.11), transparent 48%), linear-gradient(180deg, #1a1a1d 0%, #0a0a0c 70%); box-shadow: inset 0 1px 0 rgba(255,255,255,.09), inset 0 -70px 90px rgba(0,0,0,.2); touch-action: none; }
+.spider-stage canvas { display: block; width: 100%; height: 100%; cursor: grab; background: transparent; }
 .spider-stage canvas:active { cursor: grabbing; }
 .spider-controls { display: grid; grid-template-columns: repeat(4, max-content); gap: .7rem .9rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border); }
 .spider-controls .play-toggle { min-width: 0; }
@@ -667,8 +667,50 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .spider-readout div { border: 1px solid var(--border); border-radius: 6px; padding: .7rem .8rem; }
 .spider-readout dt { color: var(--gold-light); font: 600 .66rem 'JetBrains Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
 .spider-readout dd { color: #fff; font: .78rem 'JetBrains Mono', monospace; margin-top: .2rem; }
+.spider-telemetry { margin-top: 1.25rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+.spider-telemetry-head { display: flex; justify-content: space-between; gap: 1.5rem; align-items: end; }
+.spider-telemetry h3 { color: #fff; font-size: 1rem; }
+.spider-telemetry-head > p { max-width: 430px; color: var(--text-muted); font-size: .76rem; line-height: 1.55; text-align: right; }
+.spider-chart-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: .8rem; }
+.spider-chart { min-width: 0; padding: .7rem; border: 1px solid var(--border); border-radius: 6px; background: #11161f; }
+.spider-chart figcaption { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--text-muted); font: .65rem 'JetBrains Mono', monospace; line-height: 1.35; }
+.spider-chart figcaption strong { color: #fff; font-weight: 500; }
+.spider-chart figcaption span { display: inline-flex; align-items: center; justify-content: end; gap: .25rem; text-align: right; }
+.chart-line { display: inline-block; width: 10px; height: 2px; border-radius: 999px; vertical-align: middle; }
+.chart-line-blue { background: #7daeff; }
+.chart-line-slate { background: #c0ccd9; }
+.chart-line-red { background: #d90508; }
+.spider-chart canvas { display: block; width: 100%; height: 170px; margin-top: .5rem; }
 .spider-evidence { max-width: 760px; }
 .spider-evidence ul { margin: 1rem 0 1.25rem 1.2rem; color: var(--text-muted); font-size: .9rem; }
 .spider-evidence li + li { margin-top: .45rem; }
 .spider-evidence a, .data-provenance a { color: var(--gold-light); border-bottom: 1px solid rgba(125,174,255,.45); }
-@media (max-width: 760px) { .spider-hero { padding: 6.5rem 1.25rem 2.5rem; } .spider-layout { padding-left: 1.25rem; padding-right: 1.25rem; } .spider-summary, .spider-readout { grid-template-columns: 1fr; } .spider-artifact, .spider-evidence { padding: 1.25rem; } .artifact-head { display: block; } .spider-artifact-meta { justify-content: start; margin-top: .8rem; } .artifact-status { text-align: left; margin-top: .5rem; } .spider-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; } }
+@media (max-width: 760px) { .spider-hero { padding: 6.5rem 1.25rem 2.5rem; } .spider-layout { padding-left: 1.25rem; padding-right: 1.25rem; } .spider-summary, .spider-readout, .spider-chart-grid { grid-template-columns: 1fr; } .spider-artifact, .spider-evidence { padding: 1.25rem; } .artifact-head, .spider-telemetry-head { display: block; } .spider-artifact-meta { justify-content: start; margin-top: .8rem; } .artifact-status { text-align: left; margin-top: .5rem; } .spider-telemetry-head > p { margin-top: .5rem; text-align: left; } .spider-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; } }
+
+/* SPIDER · ROBOTICS STYLE
+   Shared paper-surface treatment for integrated robotics artifacts. */
+.spider-page.robotics-page .spider-hero { background: transparent; border-bottom: 1px solid var(--bench-line); }
+.spider-page.robotics-page .spider-hero h1, .spider-page.robotics-page .spider-summary h2, .spider-page.robotics-page .spider-artifact h2, .spider-page.robotics-page .spider-evidence h2, .spider-page.robotics-page .spider-telemetry h3 { color: var(--bench-ink); }
+.spider-page.robotics-page .spider-hero > p:not(.section-eyebrow), .spider-page.robotics-page .spider-summary p:not(.step-label), .spider-page.robotics-page .spider-evidence > p, .spider-page.robotics-page .spider-evidence ul, .spider-page.robotics-page .artifact-intro, .spider-page.robotics-page .data-provenance, .spider-page.robotics-page .spider-controls p, .spider-page.robotics-page .spider-telemetry-head > p { color: var(--bench-muted); }
+.spider-page.robotics-page .spider-actions .btn-primary { background: var(--bench-blue); color: #fff; }
+.spider-page.robotics-page .spider-actions .btn-primary:hover { background: var(--bench-ink); }
+.spider-page.robotics-page .spider-actions .btn-ghost { border-color: var(--bench-blue); color: var(--bench-blue); }
+.spider-page.robotics-page .spider-actions .btn-ghost:hover { border-color: var(--bench-ink); color: var(--bench-ink); }
+.spider-page.robotics-page .spider-summary, .spider-page.robotics-page .spider-summary > div, .spider-page.robotics-page .spider-artifact, .spider-page.robotics-page .spider-evidence { background: rgba(242,245,248,.72); border-color: var(--bench-line); }
+.spider-page.robotics-page .spider-summary { background: var(--bench-line); }
+.spider-page.robotics-page .artifact-status { color: var(--bench-blue); }
+.spider-page.robotics-page .spider-release-picker { color: var(--bench-muted); }
+.spider-page.robotics-page .spider-release-picker select { border-color: var(--bench-blue); background: #f2f5f8; color: var(--bench-ink); }
+.spider-page.robotics-page .spider-release-picker select:focus-visible { border-color: var(--bench-ink); outline-color: var(--bench-ink); }
+.spider-page.robotics-page .spider-stage { border-color: var(--bench-blue); background-color: #e8ecf1; background-image: linear-gradient(rgba(77,127,189,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(77,127,189,.1) 1px, transparent 1px); background-size: 28px 28px; box-shadow: none; }
+.spider-page.robotics-page .spider-controls, .spider-page.robotics-page .spider-telemetry { border-color: var(--bench-line); }
+.spider-page.robotics-page .spider-readout div, .spider-page.robotics-page .spider-chart { border-color: var(--bench-line); background: rgba(242,245,248,.78); }
+.spider-page.robotics-page .spider-readout dt, .spider-page.robotics-page .spider-telemetry .step-label { color: var(--bench-blue) !important; }
+.spider-page.robotics-page .spider-readout dd, .spider-page.robotics-page .spider-chart figcaption strong { color: var(--bench-ink); }
+.spider-page.robotics-page .spider-chart figcaption, .spider-page.robotics-page .spider-chart figcaption span { color: var(--bench-muted); }
+.spider-page.robotics-page .chart-line-blue { background: var(--bench-blue); }
+.spider-page.robotics-page .chart-line-slate { background: var(--bench-ink); }
+.spider-page.robotics-page .chart-line-red { background: #b5433f; }
+.spider-page.robotics-page .spider-evidence a, .spider-page.robotics-page .data-provenance a { color: var(--bench-blue); border-bottom-color: currentColor; }
+.spider-page.robotics-page .engineering-note { background: rgba(35,103,173,.08); border-left-color: var(--bench-blue); color: var(--bench-muted); }
+.spider-page.robotics-page .engineering-note strong { color: var(--bench-ink); }

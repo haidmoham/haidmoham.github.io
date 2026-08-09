@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "release": "v0.1",
-  "spider_commit": "4c0a62404082508c91ff31d85453c6fafe4fe31b",
+  "spider_commit": "4766490910bf81ed8c216d52a1fe2be0c976e208",
   "model": {
     "path": "model/spider.xml",
-    "sha256": "9e9ee0eafbebce7687d48e3d9e324f7be2b58920de0c92d36f2bc8724ec94566"
+    "sha256": "a0571f004b3974ac2c02d26560c9daaa0dc354195f88232a13756ce9b38a3e5c"
   },
   "runtime": {
     "package": "@mujoco/mujoco",

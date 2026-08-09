@@ -10,13 +10,24 @@ const resetButton = root.querySelector('[data-reset]');
 const cameraResetButton = root.querySelector('[data-camera-reset]');
 const cameraFollowButton = root.querySelector('[data-camera-follow]');
 const status = root.querySelector('[data-status]');
+const chartCanvases = Object.fromEntries([...root.querySelectorAll('[data-chart]')].map((chart) => [chart.dataset.chart, chart]));
 const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const FOOT_NAMES = ['front_left', 'front_right', 'middle_left', 'middle_right', 'rear_left', 'rear_right'];
 const TRIPOD_A = new Set([0, 3, 4]);
-const COLORS = ['#7daeff', '#3d8bff', '#92c7ff', '#4d82d0', '#b5d7ff', '#6aa5eb'];
+const COLORS = Array(6).fill('#030304');
+const FOOT_COLOR = '#d90508';
 const STEP_SECONDS = 0.002;
 const MAX_FRAME_SECONDS = 0.05;
+const TELEMETRY_WINDOW_SECONDS = 20;
+const TELEMETRY_SAMPLE_SECONDS = 0.05;
+const CHART_SURFACE = '#f2f5f8';
+const CHART_GRID = 'rgba(47,105,173,.16)';
+const CHART_AXIS = 'rgba(33,75,120,.38)';
+const CHART_TEXT = '#4d6884';
+const CHART_BLUE = '#2f69ad';
+const CHART_INK = '#214b78';
+const CHART_RED = '#b5433f';
 const CAMERA_POSITION = new THREE.Vector3(1.1, -1.25, 0.92);
 const CAMERA_TARGET = new THREE.Vector3(0, 0, 0.22);
 const LOCAL_Y = new THREE.Vector3(0, 1, 0);
@@ -41,6 +52,8 @@ let controls;
 let resizeObserver;
 let robotVisual;
 let cameraFollow = false;
+let telemetryHistory = [];
+let lastTelemetrySampleTime = -Infinity;
 
 function readout(name) {
   return root.querySelector(`[data-${name}]`);
@@ -145,11 +158,11 @@ function createRobotVisual() {
   const torso = new THREE.Group();
   const torsoMesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.44, 0.32, 0.14),
-    new THREE.MeshStandardMaterial({ color: 0xeef5ff, metalness: 0.18, roughness: 0.38 }),
+    new THREE.MeshStandardMaterial({ color: 0x030304, metalness: 0.38, roughness: 0.34 }),
   );
   const torsoEdges = new THREE.LineSegments(
     new THREE.EdgesGeometry(torsoMesh.geometry),
-    new THREE.LineBasicMaterial({ color: 0x3d8bff, transparent: true, opacity: 0.9 }),
+    new THREE.LineBasicMaterial({ color: 0x333337, transparent: true, opacity: 0.58 }),
   );
   torsoMesh.castShadow = true;
   torsoMesh.receiveShadow = true;
@@ -160,7 +173,7 @@ function createRobotVisual() {
     const color = COLORS[index];
     const foot = new THREE.Mesh(
       new THREE.SphereGeometry(0.045, 18, 12),
-      new THREE.MeshStandardMaterial({ color, emissive: 0x000000, metalness: 0.1, roughness: 0.38 }),
+      new THREE.MeshStandardMaterial({ color: FOOT_COLOR, emissive: 0x000000, metalness: 0.26, roughness: 0.34 }),
     );
     foot.castShadow = true;
     foot.receiveShadow = true;
@@ -213,8 +226,8 @@ function updateRobotVisual(contacts) {
     const foot = positionFrom(footAccessors[name], robotVisual.start);
     setSegment(visual.shin, knee, foot);
     visual.foot.position.copy(foot);
-    visual.foot.material.color.set(contacts[index] ? 0xf6d365 : COLORS[index]);
-    visual.foot.material.emissive.set(contacts[index] ? 0x3b2d06 : 0x000000);
+    visual.foot.material.color.set(FOOT_COLOR);
+    visual.foot.material.emissive.set(contacts[index] ? 0x260000 : 0x000000);
   });
 }
 
@@ -266,14 +279,15 @@ function updateFollowCamera() {
 }
 
 function setupRenderer() {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.setClearColor(0xe8ecf1, 1);
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x111926);
-  scene.fog = new THREE.Fog(0x111926, 1.3, 4.7);
+  scene.background = new THREE.Color(0xe8ecf1);
+  scene.fog = new THREE.Fog(0xe8ecf1, 5.5, 20);
   scene.up.set(0, 0, 1);
 
   camera = new THREE.PerspectiveCamera(42, 1, 0.05, 25);
@@ -296,28 +310,31 @@ function setupRenderer() {
   controls.update();
 
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(6, 6),
-    new THREE.MeshStandardMaterial({ color: 0x17243a, metalness: 0.05, roughness: 0.82 }),
+    new THREE.PlaneGeometry(24, 24),
+    new THREE.MeshStandardMaterial({ color: 0xe8ecf1, metalness: 0.02, roughness: 0.9 }),
   );
   ground.position.z = -0.012;
   ground.receiveShadow = true;
   scene.add(ground);
-  const grid = new THREE.GridHelper(6, 30, 0x426080, 0x213248);
+  const grid = new THREE.GridHelper(24, 48, 0x7fa5c7, 0xc8d6e3);
   grid.rotation.x = Math.PI / 2;
   grid.position.z = -0.005;
   grid.material.transparent = true;
-  grid.material.opacity = 0.42;
+  grid.material.opacity = 0.36;
   scene.add(grid);
 
-  scene.add(new THREE.HemisphereLight(0xa8cfff, 0x162033, 2.1));
-  const keyLight = new THREE.DirectionalLight(0xe8f2ff, 2.5);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xb7cbe0, 1.6));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2);
   keyLight.position.set(1.8, -1.2, 2.6);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x5d98ff, 0.8);
+  const fillLight = new THREE.DirectionalLight(0x7fa5c7, 0.42);
   fillLight.position.set(-1.5, 1.2, 0.8);
   scene.add(fillLight);
+  const rimLight = new THREE.DirectionalLight(0xffffff, 0.55);
+  rimLight.position.set(-1.8, -1.4, 1.7);
+  scene.add(rimLight);
 
   createRobotVisual();
   resizeObserver = new ResizeObserver(resizeRenderer);
@@ -334,6 +351,122 @@ function updateReadout(state) {
   readout('torque').textContent = `${data.qfrc_actuator[0].toFixed(3)} N·m`;
 }
 
+function recordTelemetry(state) {
+  if (telemetryHistory.length && data.time - lastTelemetrySampleTime < TELEMETRY_SAMPLE_SECONDS) return;
+  telemetryHistory.push({
+    time: data.time,
+    position: data.qpos[0],
+    height: data.qpos[2],
+    roll: state.roll,
+    pitch: state.pitch,
+  });
+  lastTelemetrySampleTime = data.time;
+  const firstVisibleTime = data.time - TELEMETRY_WINDOW_SECONDS;
+  while (telemetryHistory.length > 1 && telemetryHistory[0].time < firstVisibleTime) telemetryHistory.shift();
+  drawTelemetryCharts();
+}
+
+function chartBounds(keys, { includeZero = false, minimum, minimumSpan = 0.1 } = {}) {
+  const values = telemetryHistory.flatMap((sample) => keys.map((key) => sample[key]));
+  let lower = Math.min(...values);
+  let upper = Math.max(...values);
+  if (includeZero) {
+    lower = Math.min(lower, 0);
+    upper = Math.max(upper, 0);
+  }
+  if (minimum !== undefined) lower = Math.min(lower, minimum);
+  const span = Math.max(upper - lower, minimumSpan);
+  const padding = span * 0.13;
+  return { lower: minimum === undefined ? lower - padding : lower, upper: upper + padding };
+}
+
+function prepareChart(chartCanvas) {
+  const bounds = chartCanvas.getBoundingClientRect();
+  const width = Math.max(1, Math.round(bounds.width));
+  const height = Math.max(1, Math.round(bounds.height));
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+  if (chartCanvas.width !== width * pixelRatio || chartCanvas.height !== height * pixelRatio) {
+    chartCanvas.width = width * pixelRatio;
+    chartCanvas.height = height * pixelRatio;
+  }
+  const context = chartCanvas.getContext('2d');
+  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  context.clearRect(0, 0, width, height);
+  return { context, width, height };
+}
+
+function drawChart(chartName, series, bounds, unit, label) {
+  const chartCanvas = chartCanvases[chartName];
+  if (!chartCanvas || !telemetryHistory.length) return;
+  const { context, width, height } = prepareChart(chartCanvas);
+  const plot = { left: 40, top: 15, right: 10, bottom: 24 };
+  const plotWidth = width - plot.left - plot.right;
+  const plotHeight = height - plot.top - plot.bottom;
+  const startTime = telemetryHistory[0].time;
+  const endTime = Math.max(telemetryHistory.at(-1).time, startTime + 1);
+  const timeRange = endTime - startTime;
+  const valueRange = Math.max(bounds.upper - bounds.lower, 0.0001);
+  const x = (time) => plot.left + (time - startTime) / timeRange * plotWidth;
+  const y = (value) => plot.top + (1 - (value - bounds.lower) / valueRange) * plotHeight;
+
+  context.fillStyle = CHART_SURFACE;
+  context.fillRect(0, 0, width, height);
+  context.strokeStyle = CHART_GRID;
+  context.lineWidth = 1;
+  for (let index = 0; index <= 4; index += 1) {
+    const guideY = plot.top + plotHeight * index / 4;
+    context.beginPath();
+    context.moveTo(plot.left, guideY);
+    context.lineTo(width - plot.right, guideY);
+    context.stroke();
+  }
+  context.strokeStyle = CHART_AXIS;
+  context.beginPath();
+  context.moveTo(plot.left, plot.top);
+  context.lineTo(plot.left, height - plot.bottom);
+  context.lineTo(width - plot.right, height - plot.bottom);
+  context.stroke();
+
+  context.fillStyle = CHART_TEXT;
+  context.font = '10px JetBrains Mono, monospace';
+  context.textBaseline = 'middle';
+  context.fillText(`${bounds.upper.toFixed(2)} ${unit}`, 1, plot.top + 2);
+  context.fillText(`${bounds.lower.toFixed(2)} ${unit}`, 1, height - plot.bottom - 2);
+  context.textBaseline = 'alphabetic';
+  context.fillText(`${startTime.toFixed(1)} s`, plot.left, height - 5);
+  const endLabel = `${endTime.toFixed(1)} s`;
+  context.fillText(endLabel, width - plot.right - context.measureText(endLabel).width, height - 5);
+
+  context.save();
+  context.beginPath();
+  context.rect(plot.left, plot.top, plotWidth, plotHeight);
+  context.clip();
+  series.forEach(({ key, color }) => {
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    context.beginPath();
+    telemetryHistory.forEach((sample, index) => {
+      if (index === 0) context.moveTo(x(sample.time), y(sample[key]));
+      else context.lineTo(x(sample.time), y(sample[key]));
+    });
+    context.stroke();
+  });
+  context.restore();
+
+  const latest = telemetryHistory.at(-1);
+  const summary = series.map(({ key }) => `${key} ${latest[key].toFixed(3)} ${unit}`).join(', ');
+  chartCanvas.setAttribute('aria-label', `${label} over the current simulation run. Latest: ${summary}.`);
+}
+
+function drawTelemetryCharts() {
+  if (!telemetryHistory.length) return;
+  drawChart('position', [{ key: 'position', color: CHART_BLUE }], chartBounds(['position'], { includeZero: true, minimumSpan: 0.1 }), 'm', 'Torso x position');
+  drawChart('height', [{ key: 'height', color: CHART_INK }], chartBounds(['height'], { minimum: 0, minimumSpan: 0.25 }), 'm', 'Torso height');
+  drawChart('attitude', [{ key: 'roll', color: CHART_BLUE }, { key: 'pitch', color: CHART_RED }], chartBounds(['roll', 'pitch'], { includeZero: true, minimumSpan: 0.2 }), 'rad', 'Body roll and pitch');
+}
+
 function render() {
   const state = applyGaitControl();
   updateRobotVisual(state.contacts);
@@ -341,6 +474,7 @@ function render() {
   controls.update();
   renderScene();
   updateReadout(state);
+  recordTelemetry(state);
 }
 
 function restart() {
@@ -350,6 +484,8 @@ function restart() {
   phase = 0;
   lastSimulationTime = 0;
   accumulator = 0;
+  telemetryHistory = [];
+  lastTelemetrySampleTime = -Infinity;
   setStandingPose();
   cacheAccessors();
   render();
@@ -472,5 +608,7 @@ window.addEventListener('pagehide', () => {
   if (model) model.delete();
   disposeRenderer();
 });
+
+window.addEventListener('resize', drawTelemetryCharts);
 
 initialise();
