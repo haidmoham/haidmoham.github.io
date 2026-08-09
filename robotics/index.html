@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robotics Test Bench — Mohammad Haider</title>
+  <meta name="description" content="Small robotics simulation experiments, distilled as questions, evidence, and model updates.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css?v=21">
+</head>
+<body class="robotics-page">
+  <nav class="nav"><a href="../index.html" class="nav-logo">MH</a><ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../notes.html" class="nav-notes active">Working Notes</a></li><li><a href="../resume.html" class="nav-cta-outline">Resume</a></li><li><a href="../available.html" class="nav-cta">Available</a></li><li><a href="../contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav>
+  <main>
+    <header class="robotics-hero">
+      <p class="section-eyebrow">Working Notes · Robotics</p><h1>Robotics Test Bench</h1>
+      <p>Small simulation experiments for building physical intuition: make a prediction, run the smallest useful test, observe what resists the model, then update it.</p>
+      <ol class="bench-loop" aria-label="Experiment loop"><li>Question</li><li>Prediction</li><li>Experiment</li><li>Observation</li><li>Belief update</li></ol>
+    </header>
+    <section class="robotics-index" aria-labelledby="experiments-title">
+      <div class="section-header"><p class="section-eyebrow">Resolved evidence</p><h2 id="experiments-title">Experiments</h2></div>
+      <div class="experiment-grid">
+        <article class="experiment-card"><div class="experiment-card-meta"><span>#01</span><span class="status-resolved">Resolved</span></div><h3>Feedback fundamentals</h3><p class="experiment-question">What does closing the loop change in a one-joint pendulum?</p><p>P-only feedback overshot or oscillated more; adding velocity feedback made the response settle more cleanly.</p><a href="01-feedback-fundamentals.html">Inspect experiment →</a></article>
+        <article class="experiment-card"><div class="experiment-card-meta"><span>#02</span><span class="status-resolved">Resolved</span></div><h3>Multi-DOF dynamics: make coupling visible</h3><p class="experiment-question">What happens at one joint when only the other joint is driven?</p><p>A passive elbow moved with zero elbow command, replacing an independent-joint model with a full-mechanism view.</p><a href="02-multi-dof-coupling.html">Inspect experiment →</a></article>
+      </div>
+      <p class="robotics-source"><a href="https://github.com/haidmoham/robotics-test-bench" target="_blank" rel="noreferrer">View the canonical Robotics Test Bench repository ↗</a><span>Code, issue state, and full reasoning history remain there.</span></p>
+    </section>
+  </main>
+  <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://linkedin.com/in/haidmoham" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer>
+  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});</script>
+</body></html>

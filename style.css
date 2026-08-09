@@ -185,6 +185,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .notes-pinned .notes-post-card { padding: 1.9rem 2rem; border-left-width: 2px; }
 .notes-pinned .notes-post-card h2 { font-family: 'Fraunces', serif; font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1.22; }
 .notes-pinned .notes-post-card div > p { font-size: 0.96rem; }
+.notes-robotics { margin-top: 1.1rem; }
 .notes-chronological { margin-top: 1.5rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
 .notes-chronological h2 {
   font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
@@ -233,6 +234,55 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 .notes-principles-list h2 { font-family: 'Sora', sans-serif; font-size: 0.94rem; line-height: 1.4; color: #fff; margin-bottom: 0.45rem; }
 .notes-principles-list p { font-size: 0.82rem; line-height: 1.65; color: var(--text-muted); }
+
+/* ROBOTICS TEST BENCH */
+.robotics-hero, .experiment-hero { max-width: 960px; margin: 0 auto; padding: 8rem 2.5rem 3.5rem; }
+.robotics-hero { background-image: linear-gradient(rgba(125,174,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(125,174,255,.07) 1px, transparent 1px); background-size: 32px 32px; }
+.robotics-hero h1, .experiment-hero h1 { color: #fff; margin-bottom: .85rem; }
+.robotics-hero > p:not(.section-eyebrow), .experiment-hero > p:not(.section-eyebrow) { max-width: 680px; color: var(--text-muted); font-size: 1.05rem; }
+.bench-loop { display: flex; flex-wrap: wrap; list-style: none; margin-top: 2.25rem; border-top: 1px solid rgba(125,174,255,.35); border-bottom: 1px solid rgba(125,174,255,.35); }
+.bench-loop li { flex: 1 1 135px; padding: .75rem .8rem; color: var(--gold-light); font-family: 'JetBrains Mono', monospace; font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.bench-loop li:not(:last-child)::after { content: '→'; float: right; color: var(--text-muted); }
+.robotics-index { max-width: 960px; margin: 0 auto; padding: 1rem 2.5rem 5rem; }
+.experiment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.experiment-card { display: flex; flex-direction: column; padding: 1.6rem; background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.experiment-card:hover { border-color: rgba(125,174,255,.55); }
+.experiment-card-meta { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: .7rem; font-weight: 600; letter-spacing: .1em; }
+.status-resolved { color: #9ed7b0; }
+.experiment-card h3 { color: #fff; font-family: 'Fraunces', serif; font-size: 1.5rem; line-height: 1.2; margin-bottom: .8rem; }
+.experiment-card p { color: var(--text-muted); font-size: .88rem; line-height: 1.7; margin-bottom: .85rem; }
+.experiment-card .experiment-question { color: var(--text); }
+.experiment-card a, .robotics-source a, .source-section a { color: var(--gold); font-size: .84rem; font-weight: 600; margin-top: auto; }
+.experiment-card a:hover, .robotics-source a:hover, .source-section a:hover { color: var(--gold-light); }
+.robotics-source { display: grid; gap: .2rem; margin-top: 2.5rem; padding: 1rem 0 0 1rem; border-left: 1px solid rgba(125,174,255,.45); }
+.robotics-source span { color: var(--text-muted); font-size: .8rem; }
+.experiment-back { display: inline-block; margin-bottom: 1.75rem; color: var(--gold); font-size: .84rem; font-weight: 600; }
+.experiment-back:hover { color: var(--gold-light); }
+.experiment-layout { max-width: 760px; margin: 0 auto; padding: .5rem 2.5rem 5rem; }
+.experiment-layout > section { padding: 2rem 0; border-top: 1px solid var(--border); }
+.experiment-layout h2 { color: #fff; font-size: clamp(1.45rem, 3vw, 2rem); margin-bottom: .75rem; }
+.experiment-layout p { color: var(--text-muted); font-size: .98rem; line-height: 1.85; }
+.step-label { color: var(--gold) !important; font-family: 'JetBrains Mono', monospace; font-size: .7rem !important; font-weight: 600; letter-spacing: .11em; line-height: 1.5 !important; text-transform: uppercase; margin-bottom: .55rem; }
+.experiment-layout code { color: var(--gold-light); font-family: 'JetBrains Mono', monospace; font-size: .86em; }
+.source-section ul { list-style: none; display: grid; gap: .45rem; }
+.evidence-callout { margin-top: 1.5rem; padding: 1.15rem 1.25rem; background: rgba(61,139,255,.07); border-left: 2px solid var(--gold); }
+.coupling-visual { margin-top: 1.5rem; border: 1px solid rgba(125,174,255,.35); border-radius: var(--radius); overflow: hidden; background: #101722; }
+.visual-toolbar { display: flex; flex-wrap: wrap; gap: .45rem; padding: .7rem; border-bottom: 1px solid var(--border); }
+.visual-toggle { border: 1px solid transparent; padding: .42rem .6rem; background: transparent; color: var(--text-muted); cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: .68rem; }
+.visual-toggle:hover, .visual-toggle:focus-visible, .visual-toggle.is-active { border-color: rgba(125,174,255,.65); color: #fff; outline: none; }
+.arm-stage svg { display: block; width: 100%; height: auto; }
+.arm-stage text { fill: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.arm-link { stroke: var(--gold-light); stroke-linecap: round; stroke-width: 16; transition: all .45s ease; }
+.arm-joint { fill: var(--navy); stroke: #fff; stroke-width: 3; transition: all .45s ease; }
+.arm-tip { fill: var(--gold); transition: all .45s ease; }
+.arm-trace { fill: none; stroke: rgba(125,174,255,.45); stroke-dasharray: 5 7; stroke-width: 2; }
+.visual-caption { display: grid; gap: .2rem; padding: .8rem 1rem; background: rgba(0,0,0,.18); font-size: .8rem !important; line-height: 1.55 !important; }
+.visual-caption strong { color: #fff; font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; }
+.coupling-visual[data-state="hold"] .arm-link-two { transform: rotate(-12deg); transform-origin: 300px 130px; }
+.coupling-visual[data-state="hold"] .arm-trace { stroke-dasharray: none; stroke: rgba(125,174,255,.7); }
+.coupling-visual[data-state="gravity"] .arm-link { stroke: #9ed7b0; }
+.coupling-visual[data-state="gravity"] .arm-tip { fill: #9ed7b0; }
+@media (prefers-reduced-motion: reduce) { .arm-link, .arm-joint, .arm-tip { transition: none; } }
 
 /* ABOUT */
 .about-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 4rem; max-width: 1200px; margin: 0 auto; padding: 0 2.5rem 5rem; align-items: start; }
@@ -424,6 +474,11 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   .skills-grid { grid-template-columns: 1fr; }
   .nav { padding: 1rem 1.25rem; }
   .article-layout { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .robotics-hero, .experiment-hero { padding: 6.5rem 1.25rem 2.5rem; }
+  .robotics-index, .experiment-layout { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .experiment-grid { grid-template-columns: 1fr; }
+  .bench-loop li { flex-basis: 100%; }
+  .bench-loop li:not(:last-child)::after { content: '↓'; }
 }
 
 /* === GALAXY HERO BACKGROUND === */

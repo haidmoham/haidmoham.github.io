@@ -44,6 +44,10 @@ Global identity/background context is in `~/.claude/CLAUDE.md`. This file covers
 5. If significant enough, promote to featured grid on `index.html`
 6. Commit + push
 
+## Robotics Test Bench publishing convention
+
+The public `/robotics/` area is a distilled projection of `haidmoham/robotics-test-bench`, not a second reasoning store. Each experiment page follows: Question → Prediction → Experiment → What happened → Model update → optional stop boundary → Source. Link the canonical issue and experiment directory, label observations separately from interpretation, and keep full logs and implementation history in the source repository.
+
 ## End-of-task knowledge promotion
 
 After each substantive portfolio task, ask whether the work revealed a reusable
