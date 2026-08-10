@@ -23,6 +23,16 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Keep observations, interpretations, rejected explanations, and deferred tests distinct.
 - For notebooks, export with `jupyter nbconvert --to html --embed-images` into `notebooks/`.
 
+## C-1N
+
+- The public robot identity is **C-1N**. The old name Spider is legacy only.
+- The canonical portfolio route is `/c1n/`. Keep `/spider/` only as a compatibility redirect or asset namespace.
+- Existing `spider-*` CSS classes, JavaScript filenames, model paths, and the `haidmoham/spider` repository slug may remain as implementation compatibility identifiers. Do not expose them as the robot's public name except when provenance requires the literal repository or path.
+- Public checkpoints use `C-1N // NN · CODENAME`.
+- The current checkpoint is `C-1N // 01 · SHUFFLE`.
+- `C-1N // 02 · FRAME` and `C-1N // 03 · STRIDE` are reserved future boundaries. Do not present them as completed before the canonical evidence exists.
+- Preserve prior checkpoints in the browser artifact when possible so behavior, instrumentation, and control changes remain directly comparable over time.
+
 ## Experiment-driven pages
 
 - Use real simulator output when it is available. Do not present browser-rendered motion as physics simulation.
