@@ -7,6 +7,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Keep the site static HTML, CSS, and JavaScript. Do not add a framework or build step unless the user asks.
 - GitHub Pages deploys from `haidmoham/haidmoham.github.io`.
 - Commit and push only when the user authorizes publication.
+- Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
 
 ## Position and copy
 
