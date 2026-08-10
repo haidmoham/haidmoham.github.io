@@ -5,12 +5,27 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # MuJoCo compiles its first-party WebAssembly runtime in the browser.
+    # Keep this policy in the production server so a Railway deploy cannot
+    # silently fall back to a host policy that blocks WebAssembly.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
+
+    # The checkpoint page changes with the robot. Revalidate the HTML on each
+    # visit while allowing its large static Wasm asset to remain cacheable.
+    location = /c1n/ {
+        add_header Cache-Control "no-cache" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
+        try_files /c1n/index.html =404;
+    }
+
     location / {
         try_files $uri $uri/ =404;
     }
 
     location ~* \.wasm$ {
         default_type application/wasm;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
         try_files $uri =404;
     }
 }

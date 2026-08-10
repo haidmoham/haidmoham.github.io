@@ -5,7 +5,12 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 ## Site boundaries
 
 - Keep the site static HTML, CSS, and JavaScript. Do not add a framework or build step unless the user asks.
-- GitHub Pages deploys from `haidmoham/haidmoham.github.io`.
+- `main` in `haidmoham/haidmoham.github.io` is the only deployment source of truth.
+- Railway deploys `mhaider.dev` from `main` with `Dockerfile`, `railway.json`, and `railway-nginx.conf.template`. Preserve these files.
+- GitHub Pages also deploys from `main` as a static mirror. Do not treat the Pages deployment as the production authority for `mhaider.dev`.
+- A normal publish is one commit and one push to `main`. Do not copy site files between hosts or make host-only edits.
+- Keep the C-1N browser runtime, models, and vendored Wasm under `spider/`. Keep `/c1n/` as the public document route.
+- Run `python scripts/validate_site.py` before publication. This check protects the C-1N route, checkpoint models, Wasm MIME configuration, and Railway CSP support.
 - Commit and push only when the user authorizes publication.
 - Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
 
