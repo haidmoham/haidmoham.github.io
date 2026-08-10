@@ -1,43 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spider — Mohammad Haider</title>
-  <meta name="description" content="An evolving six-legged MuJoCo robot that runs live browser physics alongside inspectable controller signals and evidence for the next iteration.">
-  <link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css?v=23">
-  <script type="importmap">
-    { "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/" } }
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0; url=/c1n/">
+  <link rel="canonical" href="https://mhaider.dev/c1n/">
+  <title>C-1N — Mohammad Haider</title>
+  <script>window.location.replace('/c1n/');</script>
 </head>
-<body class="spider-page robotics-page">
-  <nav class="nav"><a href="../index.html" class="nav-logo">MH</a><ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li><li><a href="../projects.html" class="active">Projects</a></li><li><a href="../notes.html" class="nav-notes">Working Notes</a></li><li><a href="../resume.html" class="nav-cta-outline">Resume</a></li><li><a href="../available.html" class="nav-cta">Available</a></li><li><a href="../contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav>
-  <main>
-    <header class="spider-hero">
-      <p class="section-eyebrow">Longitudinal robotics project · v0.1</p>
-      <h1>Spider</h1>
-      <p>A six-legged MuJoCo robot that grows only when a small, evidence-backed experiment gives the next change a reason to exist.</p>
-      <div class="spider-actions"><a class="btn btn-primary" href="https://github.com/haidmoham/spider" target="_blank" rel="noreferrer">View canonical repository ↗</a><a class="btn btn-ghost" href="../robotics/">Inspect Robotics Test Bench →</a></div>
-    </header>
-
-    <article class="spider-layout">
-      <section class="spider-summary"><div><p class="step-label">Current capability</p><h2>Coordinated tripod targets</h2><p>Spider drives two position-controlled hinges per leg from a shared gait phase, torso-orientation feedback, and foot-contact checks.</p></div><div><p class="step-label">Observed boundary</p><h2>Forward motion is not sustained</h2><p>In this 12-second native rollout, the torso moves 6.7 cm forward but drops 30.0 cm. This is a baseline failure to explain, not a walking claim.</p></div><div><p class="step-label">Evidence route</p><h2>Learn mechanisms first</h2><p>Coupling, trajectory control, actuator limits, contact, mismatch, and identification experiments inform targeted changes. They are hooks, not a fixed roadmap.</p></div></section>
-
-      <section class="spider-artifact" data-spider-artifact>
-        <div class="artifact-head"><div><p class="step-label">Live browser simulation</p><h2>Run Spider in MuJoCo</h2></div><div class="spider-artifact-meta"><label class="spider-release-picker" for="spider-release"><span>Release</span><select id="spider-release" data-release-select aria-label="Spider release"><option value="v0.1" selected>v0.1 · Current</option></select></label><p class="artifact-status" data-status>Loading MuJoCo WebAssembly…</p></div></div>
-        <p class="artifact-intro">This page loads the v0.1 MJCF model and runs the phase-shared gait controller against live MuJoCo physics in your browser. Reset creates a fresh simulation state.</p>
-        <div class="spider-stage" data-spider-stage><canvas width="900" height="500" data-spider-canvas aria-label="Interactive 3D view of the live Spider MuJoCo simulation">Your browser does not support canvas. See the canonical Spider repository below.</canvas><section class="spider-hud" aria-label="Live telemetry traces. The horizontal axis is time."><p class="spider-hud-title">20 s history · time →</p><figure class="spider-glyph"><figcaption><span>Torso x</span><output data-glyph-value="position">—</output></figcaption><canvas data-glyph="position" role="img" aria-label="Live torso x position trace">Torso x position trace.</canvas></figure><figure class="spider-glyph"><figcaption><span>Forward v</span><output data-glyph-value="velocity">—</output></figcaption><canvas data-glyph="velocity" role="img" aria-label="Live forward velocity trace">Forward velocity trace.</canvas></figure><figure class="spider-glyph"><figcaption><span>Roll / pitch</span><output data-glyph-value="attitude">—</output></figcaption><canvas data-glyph="attitude" role="img" aria-label="Live body attitude trace">Body attitude trace.</canvas></figure></section></div>
-        <div class="spider-controls"><button class="play-toggle" type="button" data-play aria-pressed="false" disabled>Loading…</button><button class="play-toggle" type="button" data-reset disabled>Reset simulation</button><button class="play-toggle" type="button" data-camera-reset disabled>Reset camera</button><button class="play-toggle" type="button" data-camera-follow aria-pressed="false" disabled>Follow Spider</button><p>Drag to orbit. Right-drag or use two fingers to pan. Scroll or pinch to zoom. Follow Spider tracks the live torso until you move the camera yourself.</p></div>
-        <dl class="spider-readout"><div><dt>Simulation time</dt><dd data-time>—</dd></div><div><dt>Torso x</dt><dd data-x>—</dd></div><div><dt>Torso height</dt><dd data-z>—</dd></div><div><dt>Contacts</dt><dd data-contacts>—</dd></div><div><dt>Roll / pitch</dt><dd data-attitude>—</dd></div><div><dt>Representative torque</dt><dd data-torque>—</dd></div></dl>
-        <section class="spider-telemetry" aria-labelledby="telemetry-title"><div class="spider-telemetry-head"><div><p class="step-label">Live telemetry</p><h3 id="telemetry-title">Signals from the current run</h3></div><p>Each graph keeps the latest 20 seconds of MuJoCo state. The horizontal axis is time. Reset clears the sample history.</p></div><div class="spider-chart-grid"><figure class="spider-chart"><figcaption><strong>Torso x position</strong><span><i class="chart-line chart-line-blue"></i>meters</span></figcaption><canvas data-chart="position" role="img" aria-label="Live torso x position over time">Live torso x position graph.</canvas></figure><figure class="spider-chart"><figcaption><strong>Torso height</strong><span><i class="chart-line chart-line-slate"></i>meters</span></figcaption><canvas data-chart="height" role="img" aria-label="Live torso height over time">Live torso height graph.</canvas></figure><figure class="spider-chart"><figcaption><strong>Body attitude</strong><span><i class="chart-line chart-line-blue"></i>roll <i class="chart-line chart-line-red"></i>pitch · radians</span></figcaption><canvas data-chart="attitude" role="img" aria-label="Live roll and pitch over time">Live body attitude graph.</canvas></figure></div></section>
-        <p class="data-provenance">Runtime: the first-party <a href="https://github.com/google-deepmind/mujoco/tree/main/wasm" target="_blank" rel="noreferrer">MuJoCo JavaScript bindings ↗</a>, pinned to v3.11.0. Model and controller: the canonical <a href="https://github.com/haidmoham/spider" target="_blank" rel="noreferrer">Spider repository ↗</a>.</p>
-      </section>
-
-      <section class="spider-evidence"><p class="step-label">Why this exists</p><h2>A portfolio artifact should preserve the decision trail.</h2><p>Spider is the integration point. The Robotics Test Bench remains the place to isolate a physical question and update the model. The Spider repository remains the place to apply a justified change to a full robot.</p><ul><li><a href="../robotics/02-multi-dof-coupling.html">Multi-DOF coupling</a> establishes why leg joints cannot be reasoned about in isolation.</li><li><a href="../robotics/03-model-based-control.html">Model-based control</a> establishes what feedforward buys and how wrong dynamics leave a structured correction burden.</li><li>The next Spider change must cite the experiment or observed failure that motivates it.</li></ul><aside class="engineering-note"><strong>Worth noting:</strong> This is not a generic simulation showcase. The project makes its limits inspectable, so a viewer can separate a controller-imposed pattern from evidence about the mechanism.</aside></section>
-    </article>
-  </main>
-  <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer>
-  <script type="module" src="spider.js"></script><script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});</script>
+<body>
+  <p>Spider is now <a href="/c1n/">C-1N</a>.</p>
 </body>
 </html>
