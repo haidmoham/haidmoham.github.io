@@ -9,6 +9,8 @@ const playButton = root.querySelector('[data-play]');
 const resetButton = root.querySelector('[data-reset]');
 const cameraResetButton = root.querySelector('[data-camera-reset]');
 const cameraFollowButton = root.querySelector('[data-camera-follow]');
+const releaseSelect = root.querySelector('[data-release-select]');
+const releaseDescription = root.querySelector('[data-release-description]');
 const status = root.querySelector('[data-status]');
 const chartCanvases = Object.fromEntries([...root.querySelectorAll('[data-chart]')].map((chart) => [chart.dataset.chart, chart]));
 const glyphCanvases = Object.fromEntries([...root.querySelectorAll('[data-glyph]')].map((glyph) => [glyph.dataset.glyph, glyph]));
@@ -17,6 +19,10 @@ const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-m
 
 const FOOT_NAMES = ['front_left', 'front_right', 'middle_left', 'middle_right', 'rear_left', 'rear_right'];
 const TRIPOD_A = new Set([0, 3, 4]);
+const RELEASES = {
+  'v0.0': { label: 'v0.0 · SPAWN', model: './model/spider.xml', description: 'SPAWN restores the pre-change model, initial pose, and browser controller exactly as the site ran before today’s changes.' },
+  'v0.1': { label: 'v0.1 · SHUFFLE', model: './model/shuffle.xml', description: 'SHUFFLE loads today’s lower, stiffer model and runs a 5 Hz open-loop tripod command against live MuJoCo physics.' },
+};
 const COLORS = Array(6).fill('#030304');
 const FOOT_COLOR = '#d90508';
 const STEP_SECONDS = 0.002;
@@ -57,6 +63,7 @@ let robotVisual;
 let cameraFollow = false;
 let telemetryHistory = [];
 let lastTelemetrySampleTime = -Infinity;
+let currentRelease = 'v0.1';
 
 function readout(name) {
   return root.querySelector(`[data-${name}]`);
@@ -67,7 +74,7 @@ function smoothstep(value) {
   return bounded * bounded * (3 - 2 * bounded);
 }
 
-function gaitTarget(currentPhase, leg) {
+function spawnGaitTarget(currentPhase, leg) {
   const offset = TRIPOD_A.has(leg) ? 0 : 0.5;
   const cycle = (currentPhase + offset) % 1;
   if (cycle < 0.5) {
@@ -96,54 +103,59 @@ function contactStates() {
 }
 
 function bodyErrors() {
-  const w = data.qpos[3], x = data.qpos[4], y = data.qpos[5], z = data.qpos[6];
-  // MuJoCo's body-frame gravity is R^T * [0, 0, -9.81]. Only the
-  // third row of the body-to-world rotation contributes here.
+  const [w, x, y, z] = [data.qpos[3], data.qpos[4], data.qpos[5], data.qpos[6]];
   const r20 = 2 * (x * z - y * w);
   const r21 = 2 * (y * z + x * w);
   const r22 = 1 - 2 * (x * x + y * y);
-  const gravityX = -9.81 * r20;
-  const gravityY = -9.81 * r21;
-  const gravityZ = -9.81 * r22;
-  return [
-    Math.atan2(gravityY, -gravityZ),
-    Math.atan2(-gravityX, -gravityZ),
-    data.qvel[3],
-    data.qvel[4],
-  ];
+  return [Math.atan2(r21, -r22), Math.atan2(-r20, -r22), data.qvel[3], data.qvel[4]];
 }
 
 function applyGaitControl() {
   const contacts = contactStates();
-  const simulationTime = data.time;
-  const starting = simulationTime < 1.0;
-  const expectedStance = FOOT_NAMES.map((_, leg) => starting || ((phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1) < 0.5);
-  const deltaTime = Math.max(0, simulationTime - lastSimulationTime);
-  lastSimulationTime = simulationTime;
-  if (!starting) phase = (phase + 0.65 * deltaTime) % 1;
+  if (currentRelease === 'v0.0') {
+    const starting = data.time < 1.0;
+    const expectedStance = FOOT_NAMES.map((_, leg) => starting || ((phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1) < 0.5);
+    const deltaTime = Math.max(0, data.time - lastSimulationTime);
+    lastSimulationTime = data.time;
+    if (!starting) phase = (phase + 0.65 * deltaTime) % 1;
+    const [roll, pitch, rollRate, pitchRate] = bodyErrors();
+    for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
+      let [hip, knee] = starting ? [0, 0.8] : spawnGaitTarget(phase, leg);
+      const side = leg % 2 === 0 ? 1 : -1;
+      const foreAft = leg < 2 ? 1 : leg >= 4 ? -1 : 0;
+      hip += -0.10 * pitch - 0.01 * pitchRate * foreAft;
+      knee += 0.06 * (pitch * foreAft + roll * side);
+      if (expectedStance[leg] && !contacts[leg]) knee += 0.08;
+      if (!expectedStance[leg] && contacts[leg]) knee -= 0.08;
+      data.ctrl[2 * leg] = Math.max(-0.8, Math.min(0.8, hip));
+      data.ctrl[2 * leg + 1] = Math.max(-1.4, Math.min(1.4, knee));
+    }
+    return { contacts, roll, pitch };
+  }
 
-  const [roll, pitch, rollRate, pitchRate] = bodyErrors();
+  const [roll, pitch] = bodyErrors();
+  phase = (data.time * 5.0) % 1;
   for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
-    let [hip, knee] = starting ? [0, 0.8] : gaitTarget(phase, leg);
+    const cycle = (phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1;
+    const hipWave = -0.22 * Math.cos(2 * Math.PI * cycle);
+    const swingProgress = Math.max(0, 2 * cycle - 1);
+    const knee = -1.0 - 0.15 * Math.sin(Math.PI * swingProgress) ** 2;
     const side = leg % 2 === 0 ? 1 : -1;
     const foreAft = leg < 2 ? 1 : leg >= 4 ? -1 : 0;
-    hip += -0.10 * pitch - 0.01 * pitchRate * foreAft;
-    knee += 0.06 * (pitch * foreAft + roll * side);
-    if (expectedStance[leg] && !contacts[leg]) knee += 0.08;
-    if (!expectedStance[leg] && contacts[leg]) knee -= 0.08;
-    data.ctrl[2 * leg] = Math.max(-0.8, Math.min(0.8, hip));
-    data.ctrl[2 * leg + 1] = Math.max(-1.4, Math.min(1.4, knee));
+    data.ctrl[2 * leg] = -foreAft * hipWave + side * 0.06 * hipWave;
+    data.ctrl[2 * leg + 1] = knee;
   }
   return { contacts, roll, pitch };
 }
 
 function setStandingPose() {
-  data.qpos.set([0, 0, 0.5, 1, 0, 0, 0]);
+  const shuffle = currentRelease === 'v0.1';
+  data.qpos.set([0, 0, shuffle ? 0.245 : 0.5, shuffle ? 0 : 1, 0, 0, shuffle ? 1 : 0]);
   for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
     data.qpos[7 + 2 * leg] = 0;
-    data.qpos[7 + 2 * leg + 1] = 0.8;
+    data.qpos[7 + 2 * leg + 1] = shuffle ? -1.0 : 0.8;
     data.ctrl[2 * leg] = 0;
-    data.ctrl[2 * leg + 1] = 0.8;
+    data.ctrl[2 * leg + 1] = shuffle ? -1.0 : 0.8;
   }
   mujoco.mj_forward(model, data);
 }
@@ -535,7 +547,10 @@ function render() {
 
 function restart() {
   releaseAccessors();
-  if (data) data.delete();
+  if (data) {
+    data.delete();
+    data = undefined;
+  }
   data = new mujoco.MjData(model);
   phase = 0;
   lastSimulationTime = 0;
@@ -545,6 +560,41 @@ function restart() {
   setStandingPose();
   cacheAccessors();
   render();
+}
+
+async function loadRelease(release) {
+  const definition = RELEASES[release];
+  if (!definition) return;
+  stop();
+  status.textContent = `Loading ${definition.label}…`;
+  const modelXml = await fetch(definition.model).then((response) => {
+    if (!response.ok) throw new Error(`The ${definition.label} model could not load.`);
+    return response.text();
+  });
+  releaseAccessors();
+  if (data) {
+    data.delete();
+    data = undefined;
+  }
+  if (model) {
+    model.delete();
+    model = undefined;
+  }
+  currentRelease = release;
+  model = mujoco.MjModel.from_xml_string(modelXml);
+  const ground = model.geom('ground');
+  groundGeomId = ground.id;
+  ground.delete();
+  footGeomIds = FOOT_NAMES.map((name) => {
+    const geom = model.geom(`${name}_foot`);
+    const id = geom.id;
+    geom.delete();
+    return id;
+  });
+  releaseDescription.textContent = definition.description;
+  restart();
+  status.textContent = `Live 3D · ${definition.label} · MuJoCo ${mujoco.mj_versionString()}`;
+  if (!reducedMotion) start();
 }
 
 function stop() {
@@ -616,30 +666,14 @@ function disposeRenderer() {
 async function initialise() {
   try {
     setupRenderer();
-    const [loadedMujoco, modelXml, manifest] = await Promise.all([
+    const [loadedMujoco, manifest] = await Promise.all([
       loadMujoco(),
-      fetch('./model/spider.xml').then((response) => {
-        if (!response.ok) throw new Error('The Spider model could not load.');
-        return response.text();
-      }),
       fetch('./manifest.json').then((response) => {
         if (!response.ok) throw new Error('The Spider release manifest could not load.');
         return response.json();
       }),
     ]);
     mujoco = loadedMujoco;
-    model = mujoco.MjModel.from_xml_string(modelXml);
-    const ground = model.geom('ground');
-    groundGeomId = ground.id;
-    ground.delete();
-    footGeomIds = FOOT_NAMES.map((name) => {
-      const geom = model.geom(`${name}_foot`);
-      const id = geom.id;
-      geom.delete();
-      return id;
-    });
-    restart();
-    status.textContent = `Live 3D · ${manifest.release} · MuJoCo ${mujoco.mj_versionString()} · ${manifest.spider_commit.slice(0, 8)}`;
     playButton.disabled = false;
     resetButton.disabled = false;
     cameraResetButton.disabled = false;
@@ -647,9 +681,13 @@ async function initialise() {
     playButton.textContent = reducedMotion ? 'Start simulation' : 'Pause';
     playButton.addEventListener('click', toggle);
     resetButton.addEventListener('click', restart);
+    releaseSelect.addEventListener('change', () => loadRelease(releaseSelect.value).catch((error) => {
+      status.textContent = 'Live simulation unavailable';
+      stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical Spider repository for the native simulation.</p>`;
+    }));
     cameraResetButton.addEventListener('click', resetCamera);
     cameraFollowButton.addEventListener('click', () => setCameraFollow(!cameraFollow));
-    if (!reducedMotion) start();
+    await loadRelease(currentRelease);
   } catch (error) {
     disposeRenderer();
     status.textContent = 'Live simulation unavailable';
