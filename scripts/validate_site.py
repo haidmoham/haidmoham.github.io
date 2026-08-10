@@ -35,6 +35,7 @@ def main() -> int:
     require('value="v0.0"' in c1n and 'value="v0.1"' in c1n, "C-1N must expose SPAWN and SHUFFLE")
     require('"v0.0"' in manifest and '"v0.1"' in manifest, "manifest must preserve both checkpoints")
     require("application/wasm" in nginx, "Railway must serve Wasm with application/wasm")
+    require("'unsafe-eval'" in nginx, "Railway CSP must allow the generated MuJoCo JavaScript runtime")
     require("'wasm-unsafe-eval'" in nginx, "Railway CSP must allow WebAssembly compilation")
     require("location = /c1n/" in nginx and 'Cache-Control "no-cache"' in nginx, "C-1N HTML must revalidate")
 
