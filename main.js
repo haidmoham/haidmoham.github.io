@@ -2,7 +2,7 @@
   if (!('IntersectionObserver' in window)) return;
   if (!document.documentElement.classList.contains('reveal-on')) return;
 
-  var sel = '.section-header, .professional-record-card, .project-card, .project-card-full, .skill-card, .resume-block, .timeline-item, .cta-strip, .see-all';
+  var sel = '.section-header, .professional-record-card, .project-card, .project-card-full, .resume-block, .timeline-item, .see-all';
   var els = Array.prototype.slice.call(document.querySelectorAll(sel));
 
   els.forEach(function (el) {
