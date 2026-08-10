@@ -39,6 +39,18 @@
     </article>
   </main>
   <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer>
-  <script type="module" src="spider.js"></script><script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});</script>
+  <script type="module" src="spider.js"></script>
+  <script>
+    document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open')});
+    const c1nRelabel = () => {
+      const follow = document.querySelector('[data-camera-follow]');
+      if (follow && follow.textContent.includes('Spider')) follow.textContent = follow.textContent.replaceAll('Spider', 'C-1N');
+      document.querySelectorAll('.explorer-error').forEach((node) => {
+        if (node.textContent.includes('Spider')) node.textContent = node.textContent.replaceAll('Spider', 'C-1N');
+      });
+    };
+    new MutationObserver(c1nRelabel).observe(document.body, { subtree: true, childList: true, characterData: true });
+    c1nRelabel();
+  </script>
 </body>
 </html>
