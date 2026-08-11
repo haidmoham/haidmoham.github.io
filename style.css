@@ -754,6 +754,7 @@ body:not(.robotics-page)::before {
   pointer-events: none;
 }
 body:not(.robotics-page) > * { position: relative; z-index: 1; }
+body:not(.robotics-page) > .nav { z-index: 100; }
 .nav { background: rgba(241,244,246,.92); border-bottom-color: var(--border); }
 .nav-logo, .nav-links a.active, .nav-links a:hover, .nav-burger { color: var(--ink); }
 .nav-links a { color: var(--text-muted); }
@@ -898,7 +899,10 @@ body:not(.robotics-page) > * { position: relative; z-index: 1; }
   .current-study-pair, .independent-product-grid, .earlier-work-item { grid-template-columns: 1fr; }
   .independent-work-grid { grid-template-columns: 1fr; }
   .earlier-work-item { gap: .35rem; }
-  .nav-links.open { background: rgba(241,244,246,.98); }
+  .nav-links.open {
+    background: #f8fafb;
+    box-shadow: 0 14px 24px rgba(23,42,61,.16);
+  }
 }
 @media (max-width:600px) {
   .project-grid, .professional-record-grid, .projects-full-grid, .skills-grid,
