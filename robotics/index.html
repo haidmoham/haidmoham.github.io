@@ -6,10 +6,10 @@
   <meta name="description" content="Small robotics simulation experiments, distilled as questions, evidence, and model updates.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css?v=21">
+  <link rel="stylesheet" href="../style.css?v=24">
 </head>
 <body class="robotics-page">
-  <nav class="nav"><a href="../index.html" class="nav-logo">MH</a><ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../notes.html" class="nav-notes active">Working Notes</a></li><li><a href="../resume.html" class="nav-cta-outline">Resume</a></li><li><a href="../available.html" class="nav-cta">Available</a></li><li><a href="../contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav>
+  <nav class="nav"><a href="../index.html" class="nav-logo" aria-label="Home">MH</a><ul class="nav-links"><li><a href="../about.html">About</a></li><li><a href="../projects.html">Projects</a></li><li><a href="../robotics/" class="active" aria-current="page">Robotics Lab</a></li><li><a href="../notes.html" class="nav-notes">Working Notes</a></li><li><a href="../resume.html" class="nav-cta-outline">Resume</a></li><li><a href="../contact.html" class="nav-cta">Contact</a></li></ul><button class="nav-burger" aria-label="Open navigation">☰</button></nav>
   <main>
     <header class="robotics-hero">
       <p class="section-eyebrow">Working Notes · Robotics</p><h1>Robotics Test Bench</h1>
@@ -17,13 +17,13 @@
       <ol class="bench-loop" aria-label="Experiment loop"><li>Question</li><li>Prediction</li><li>Experiment</li><li>Observation</li><li>Belief update</li></ol>
     </header>
     <section class="robotics-index" aria-labelledby="experiments-title">
-      <div class="section-header"><p class="section-eyebrow">Resolved evidence</p><h2 id="experiments-title">Experiments</h2></div>
+      <div class="section-header"><p class="section-eyebrow">Experiment record</p><h2 id="experiments-title">Experiments</h2></div>
       <div class="experiment-grid">
         <article class="experiment-card"><div class="experiment-card-meta"><span>#01</span><span class="status-resolved">Resolved</span></div><h3>Feedback fundamentals</h3><p class="experiment-question">What does closing the loop change in a one-joint pendulum?</p><p>P-only feedback overshot or oscillated more; adding velocity feedback made the response settle more cleanly.</p><a href="01-feedback-fundamentals.html">Inspect experiment →</a></article>
         <article class="experiment-card"><div class="experiment-card-meta"><span>#02</span><span class="status-resolved">Resolved</span></div><h3>Multi-DOF dynamics: make coupling visible</h3><p class="experiment-question">What happens at one joint when only the other joint is driven?</p><p>A passive elbow moved with zero elbow command, replacing an independent-joint model with a full-mechanism view.</p><a href="02-multi-dof-coupling.html">Inspect experiment →</a></article>
         <article class="experiment-card"><div class="experiment-card-meta"><span>#03</span><span class="status-resolved">Resolved</span></div><h3>Model-based control: prepare torque from the model</h3><p class="experiment-question">What does dynamics knowledge buy, and what happens when it is wrong?</p><p>Accurate feedforward nearly removed the tracking residual. A controller-only mass error returned a structured feedback burden.</p><a href="03-model-based-control.html">Inspect experiment →</a></article>
         <article class="experiment-card"><div class="experiment-card-meta"><span>#04</span><span>Bounded stop</span></div><h3>Jacobians and task space</h3><p class="experiment-question">Why can the same joint command move a foot differently?</p><p>The pose-dependent Jacobian mapped joint velocity into task-space velocity; its transpose made the force-to-torque bridge concrete.</p><a href="04-jacobians-task-space.html">Inspect experiment →</a></article>
-        <article class="experiment-card"><div class="experiment-card-meta"><span>#05 · Part 1</span><span class="status-open">Open</span></div><h3>Static support: an honest pause</h3><p class="experiment-question">What makes a standing-looking pose actual support?</p><p>A valid baseline made support measurable; a suspended-ballast configuration failure paused the attached-ballast claim pending mechanics practice and a fresh prediction.</p><a href="05-static-support-stop-boundary.html">Read Part 1 →</a></article>
+        <article class="experiment-card"><div class="experiment-card-meta"><span>#05 · Part 1</span><span class="status-open">Open</span></div><h3>Static support: baseline and configuration stop</h3><p class="experiment-question">What makes a standing-looking pose actual support?</p><p>A valid baseline made support measurable; a suspended-ballast configuration failure paused the attached-ballast claim pending mechanics practice and a fresh prediction.</p><a href="05-static-support-stop-boundary.html">Read Part 1 →</a></article>
       </div>
       <p class="robotics-source"><a href="https://github.com/haidmoham/robotics-test-bench" target="_blank" rel="noreferrer">View the canonical Robotics Test Bench repository ↗</a><span>Code, issue state, and full reasoning history remain there.</span></p>
     </section>

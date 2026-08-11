@@ -20,22 +20,21 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=24" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
   <nav class="nav">
-    <a href="index.html" class="nav-logo">MH</a>
+    <a href="index.html" class="nav-logo" aria-label="Home">MH</a>
     <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="projects.html">Projects</a></li>
+      <li><a href="robotics/">Robotics Lab</a></li>
       <li><a href="notes.html" class="nav-notes active" aria-current="page">Working Notes</a></li>
       <li><a href="resume.html" class="nav-cta-outline">Resume</a></li>
-      <li><a href="available.html" class="nav-cta">Available</a></li>
       <li><a href="contact.html" class="nav-cta">Contact</a></li>
     </ul>
-    <button class="nav-burger">☰</button>
+    <button class="nav-burger" aria-label="Open navigation">☰</button>
   </nav>
 
   <header class="page-hero">
@@ -70,6 +69,17 @@
     <section class="notes-index" aria-labelledby="notes-index-title">
       <h2 id="notes-index-title" class="section-eyebrow">Notes index</h2>
 
+      <article class="notes-robotics">
+        <p class="notes-post-status">Ongoing lab · three resolved experiments · one bounded stop · one open experiment</p>
+        <a href="robotics/" class="notes-post-card notes-entry-link">
+          <div>
+            <h2>Robotics Test Bench</h2>
+            <p>An ongoing MuJoCo study built from predictions, small experiments, and inspectable evidence.</p>
+          </div>
+          <span class="notes-entry-link-label">Enter lab →</span>
+        </a>
+      </article>
+
       <article class="notes-pinned">
         <p class="notes-pinned-label">
           <svg class="notes-pin-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -85,25 +95,6 @@
           <span class="notes-entry-link-label">Read article →</span>
         </a>
       </article>
-
-      <article class="notes-robotics">
-        <p class="notes-post-status">Ongoing lab · three resolved experiments · one bounded stop · one open experiment</p>
-        <a href="robotics/" class="notes-post-card notes-entry-link">
-          <div>
-            <h2>Robotics Test Bench</h2>
-            <p>Small MuJoCo experiments: make a prediction, run the smallest useful test, and keep the evidence that changed the model.</p>
-          </div>
-          <span class="notes-entry-link-label">Enter lab →</span>
-        </a>
-      </article>
-
-      <section class="notes-chronological" aria-labelledby="latest-notes-title">
-        <h2 id="latest-notes-title">Latest notes</h2>
-        <ol class="notes-chronological-list">
-          <!-- Add non-pinned notes here in reverse chronological order. -->
-        </ol>
-        <p class="notes-empty">The next non-pinned note will appear here.</p>
-      </section>
     </section>
 
     <aside class="notes-practice notes-footnote" aria-label="What to expect in Working Notes">

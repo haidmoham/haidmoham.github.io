@@ -2,54 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mohammad Haider — Software &amp; Robotics Simulation Engineer</title>
-  <meta name="description" content="Software engineer building production systems and a focused simulation-robotics practice." />
-  <meta property="og:title" content="Mohammad Haider — Software &amp; Robotics Simulation Engineer" />
-  <meta property="og:description" content="Production systems experience and an evidence-led simulation-robotics practice." />
+  <title>Mohammad Haider — Data &amp; Software Engineer</title>
+  <meta name="description" content="Data and software engineer with four years building production reporting systems, data pipelines, dashboards, and web applications." />
+  <meta property="og:title" content="Mohammad Haider — Data &amp; Software Engineer" />
+  <meta property="og:description" content="Four years building production reporting systems, data pipelines, dashboards, and web applications." />
   <meta property="og:url" content="https://mhaider.dev" />
   <meta property="og:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" />
   <meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Mohammad Haider — Software &amp; Robotics Simulation Engineer" /><meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Mohammad Haider — Software &amp; Robotics Simulation Engineer" />
-  <meta name="twitter:description" content="Production software systems experience and an evidence-led simulation-robotics practice." />
-  <meta name="twitter:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" /><meta name="twitter:image:alt" content="Mohammad Haider — Software &amp; Robotics Simulation Engineer" />
+  <meta property="og:image:alt" content="Mohammad Haider — Data &amp; Software Engineer" /><meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Mohammad Haider — Data &amp; Software Engineer" />
+  <meta name="twitter:description" content="Four years building production reporting systems, data pipelines, dashboards, and web applications." />
+  <meta name="twitter:image" content="https://mhaider.dev/assets/og-portfolio-20260724.png" /><meta name="twitter:image:alt" content="Mohammad Haider — Data &amp; Software Engineer" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=24" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
   <nav class="nav">
-    <a href="index.html" class="nav-logo">MH</a>
+    <a href="index.html" class="nav-logo" aria-label="Home">MH</a>
     <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li><li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="notes.html" class="nav-notes">Working Notes</a></li><li><a href="resume.html" class="nav-cta-outline">Resume</a></li><li><a href="available.html" class="nav-cta">Available</a></li><li><a href="contact.html" class="nav-cta">Contact</a></li>
+      <li><a href="about.html">About</a></li><li><a href="projects.html">Projects</a></li><li><a href="robotics/">Robotics Lab</a></li><li><a href="notes.html" class="nav-notes">Working Notes</a></li><li><a href="resume.html" class="nav-cta-outline">Resume</a></li><li><a href="contact.html" class="nav-cta">Contact</a></li>
     </ul>
     <button class="nav-burger" aria-label="Open navigation">☰</button>
   </nav>
 
   <div class="hero-stage">
-    <canvas id="galaxy-canvas" aria-hidden="true"></canvas><div class="hero-scrim" aria-hidden="true"></div>
     <section class="hero">
       <div class="hero-content fade-in">
         <p class="hero-eyebrow">Mohammad Haider · Open to Work</p>
-        <h1 class="hero-title">Software &amp; robotics simulation <em>engineer.</em></h1>
-        <p class="hero-sub">B.S. Statistics · four years across Microsoft and UVA · I build dependable software systems and investigate robotics through simulation, controls, and measurable experiments.</p>
-        <p class="hero-availability">Available for full-time engineering roles.</p>
+        <h1 class="hero-title">Data &amp; software <em>engineer.</em></h1>
+        <p class="hero-sub">B.S. Statistics · four years across Microsoft and UVA · I build reporting systems, pipelines, dashboards, and web applications for people who have to operate them.</p>
+        <p class="hero-availability"><a href="available.html">Available for full-time engineering roles.</a></p>
         <div class="hero-actions"><a href="projects.html" class="btn btn-primary">View Projects</a><a href="resume.html" class="btn btn-ghost">View Resume</a></div>
       </div>
-      <div class="hero-visual fade-in">
-        <section class="hero-proof-card" aria-labelledby="hero-proof-title">
-          <p class="hero-proof-kicker">System ownership</p>
-          <h2 id="hero-proof-title">From question to <em>operation.</em></h2>
-          <p class="hero-proof-intro">I take work from requirements through implementation, validation, deployment, and support across financial reporting systems and institutional analytics.</p>
-          <ol class="hero-proof-steps">
-            <li><span class="hero-proof-number">01</span><div><strong>Define the decision</strong><p>Turn ambiguous operational questions into SQL-backed metric definitions and dashboards.</p></div></li>
-            <li><span class="hero-proof-number">02</span><div><strong>Build and deploy safely</strong><p>Deliver pipelines and reporting-system migrations with zero downtime and reconciliation.</p></div></li>
-            <li><span class="hero-proof-number">03</span><div><strong>Validate and support</strong><p>Use telemetry, production validation, and operational support to keep the result dependable.</p></div></li>
-          </ol>
-          <p class="hero-proof-footer">Microsoft · University of Virginia</p>
-        </section>
+      <div class="hero-visual hero-machine-visual fade-in" aria-hidden="true">
+        <canvas id="machine-glyph-canvas" class="machine-glyph-canvas"></canvas>
       </div>
     </section>
   </div>
@@ -59,14 +48,19 @@
     <article class="professional-record-card"><div class="professional-record-meta">University of Virginia · Data Analyst · 2025–2026</div><h3>Institutional decision support</h3><p>Owned Tableau analytics products from discovery through implementation, deployment, and support—turning ambiguous operational questions into SQL-backed definitions and dashboards.</p><ul class="professional-record-evidence"><li><strong>20%</strong><span>faster organization-wide dashboard loads</span></li><li><strong>End to end</strong><span>discovery, delivery, and ongoing support</span></li></ul></article>
   </div></div></section>
 
-  <section class="featured"><div class="section-header"><p class="section-eyebrow">Selected Work</p><h2>Featured Projects</h2></div><div class="project-grid">
-    <a href="https://indigocircuit.app" target="_blank" rel="noreferrer" class="project-card featured-card" style="order:-3"><div class="project-tag">Personal · Data Platform</div><div class="project-date">May 2026 – Present</div><h3>Indigo Circuit</h3><p>A production analytics platform that ingests tournament data, rebuilds dbt marts, computes Glicko-2 ratings, and publishes Bayesian EV estimates with 90% credible intervals.</p><div class="project-meta"><span>Python</span><span>DuckDB</span><span>dbt</span><span>Flask</span></div></a>
-    <a href="notebooks/social-impact-phase1.html" class="project-card" style="order:-2"><div class="project-tag">Independent Analysis · Health</div><div class="project-date">May 2026 – Present</div><h3>Social Vulnerability &amp; Health Outcomes</h3><p>Statistical analysis of 16 CDC vulnerability indicators and 36 health outcomes across approximately 73,000 census tracts.</p><div class="project-meta"><span>Python</span><span>Statistical analysis</span><span>pandas</span><span>geopandas</span></div></a>
+  <section class="featured"><div class="section-header"><p class="section-eyebrow">01 · Current engineering study</p><h2>Mechanics isolated, then integrated.</h2><p>One ongoing robotics study across two connected surfaces. Stable standing and sustained locomotion are not yet claimed.</p></div><div class="current-study-band">
+    <div class="current-study-pair">
+      <article class="project-card featured-card current-study-track"><div class="project-tag">Mechanism study</div><div class="project-date">August 2026 – Present</div><h3>Robotics Test Bench</h3><p>Controlled MuJoCo experiments isolate feedback, coupled dynamics, model-based control, and Jacobian mappings so each mechanism can be inspected on its own.</p><div class="project-meta"><span>Python</span><span>MuJoCo</span><span>Control</span></div><a href="/robotics/" class="project-link">Open the test bench →</a></article>
+      <article class="project-card featured-card current-study-track"><div class="project-tag">Integration study</div><div class="project-date">C-1N // 01 · SHUFFLE</div><h3>C-1N</h3><p>A reproducible six-legged MuJoCo simulation with one deterministic state-and-step core, measured telemetry, and a preserved failed locomotion baseline. Support findings have not transferred into the robot yet.</p><div class="project-meta"><span>Python</span><span>MuJoCo</span><span>WebAssembly</span></div><a href="/c1n/" class="project-link">Inspect C-1N →</a></article>
+    </div>
+  </div>
+  <div class="section-header broader-work-heading"><p class="section-eyebrow">02 · Independent work</p><h2>Products and analysis beyond the lab.</h2></div><div class="project-grid independent-work-grid">
+    <a href="https://indigocircuit.app" target="_blank" rel="noreferrer" class="project-card featured-card"><div class="project-tag">Personal · Data Platform</div><div class="project-date">May 2026 – Present</div><h3>Indigo Circuit</h3><p>A production analytics platform that ingests tournament data, rebuilds dbt marts, computes Glicko-2 ratings, and publishes Bayesian EV estimates with 90% credible intervals.</p><div class="project-meta"><span>Python</span><span>DuckDB</span><span>dbt</span><span>Flask</span></div></a>
     <a href="https://rare-dex.com" target="_blank" rel="noreferrer" class="project-card"><div class="project-tag">Personal · Full-Stack Web App</div><div class="project-date">May 2026 – Present</div><h3>RareDex</h3><p>A card-identification application with PostgreSQL persistence and a layered OpenCV, OCR, and perceptual-hash recognition pipeline.</p><div class="project-meta"><span>Flask</span><span>PostgreSQL</span><span>OpenCV</span><span>SQLAlchemy</span></div></a>
-    <a href="c1n/" class="project-card spider-project-card"><div class="project-tag">Personal · Robotics Simulation</div><div class="project-date">August 2026 – Present</div><h3>C-1N</h3><p>An evolving six-legged MuJoCo robot whose preserved checkpoints show the path from coordinated failure to understood mechanics and better locomotion. Current: C-1N // 01 · SHUFFLE.</p><div class="project-meta"><span>Python</span><span>MuJoCo</span><span>WebAssembly</span><span>Control</span></div></a>
+    <a href="notebooks/social-impact-phase1.html" class="project-card"><div class="project-tag">Independent Analysis · Health</div><div class="project-date">May 2026 – Present</div><h3>Social Vulnerability &amp; Health Outcomes</h3><p>Statistical analysis of 16 CDC vulnerability indicators and 36 health outcomes across approximately 73,000 census tracts.</p><div class="project-meta"><span>Python</span><span>Statistical analysis</span><span>pandas</span><span>geopandas</span></div></a>
   </div><div class="see-all"><a href="projects.html" class="btn btn-outline">See All Projects →</a></div></section>
 
   <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://linkedin.com/in/haidmoham" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer>
-  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open');});</script><script src="main.js?v=1" defer></script><script src="galaxy.js?v=1" defer></script>
+  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open');});</script><script src="main.js?v=1" defer></script><script src="galaxy.js?v=2" defer></script>
 </body>
 </html>
