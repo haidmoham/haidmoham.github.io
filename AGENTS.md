@@ -12,6 +12,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Keep the C-1N browser runtime, models, and vendored Wasm under `spider/`. Keep `/c1n/` as the public document route.
 - Run `python scripts/validate_site.py` before publication. This check protects the C-1N route, checkpoint models, Wasm MIME configuration, and Railway CSP support.
 - Commit and push only when the user authorizes publication.
+- For a vetted portfolio post, completed content and visual review is publication authorization: commit and push that post’s scoped change without asking for a separate confirmation, unless the user says to hold it.
 - Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
 
 ## Position and copy
