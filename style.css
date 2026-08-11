@@ -604,6 +604,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .robotics-page .experiment-card { background: rgba(242, 245, 248, .62); border-color: var(--bench-line); }
 .robotics-page .experiment-card:hover { border-color: var(--bench-blue); }
 .robotics-page .experiment-card-meta, .robotics-page .status-resolved { color: var(--bench-blue); }
+.robotics-page .status-open { color: #25834d; }
 .robotics-page .experiment-card .experiment-question { color: var(--bench-ink); }
 .robotics-page .experiment-card a, .robotics-page .robotics-source a, .robotics-page .source-section a, .robotics-page .experiment-back, .robotics-page .data-provenance a { color: var(--bench-blue); }
 .robotics-page .experiment-card a:hover, .robotics-page .robotics-source a:hover, .robotics-page .source-section a:hover, .robotics-page .experiment-back:hover { color: var(--bench-ink); }
