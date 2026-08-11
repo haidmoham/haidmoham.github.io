@@ -16,6 +16,44 @@
       <p>Small simulation experiments for building physical intuition: make a prediction, run the smallest useful test, observe the result, then update the model.</p>
       <ol class="bench-loop" aria-label="Experiment loop"><li>Question</li><li>Prediction</li><li>Experiment</li><li>Observation</li><li>Belief update</li></ol>
     </header>
+    <section class="robotics-index" aria-labelledby="research-direction-title">
+      <div class="section-header">
+        <p class="section-eyebrow">Research direction</p>
+        <h2 id="research-direction-title">Validated physical worlds, after the foundation.</h2>
+        <p>The long-range target is a reproducible simulation research system. The active work stays deliberately smaller until standing and learned-rollout evidence create a real need for platform scale.</p>
+      </div>
+      <div class="experiment-grid">
+        <article class="experiment-card">
+          <div class="experiment-card-meta"><span>Current frontier</span><span>Confidence · High</span></div>
+          <h3>Make standing measurable</h3>
+          <p class="experiment-question">Static support comes before whole-robot control.</p>
+          <p>The canonical route is #24 static support → #31 one-leg workspace → C-1N STAND → #25 learned locomotion. The order removes support, reachability, integration, and objective-design ambiguity one at a time.</p>
+          <a href="https://github.com/haidmoham/robotics-test-bench/issues/24" target="_blank" rel="noreferrer">Inspect the active gate ↗</a>
+        </article>
+        <article class="experiment-card">
+          <div class="experiment-card-meta"><span>Long-range system</span><span>Design only</span></div>
+          <h3>Typed, validated physical worlds</h3>
+          <p class="experiment-question">A world must remain inspectable before it becomes training data.</p>
+          <p>The intended flow is a declared world grammar → typed specification → deterministic validation → versioned manifest → reproducible rollout population → retained metrics, invalid cases, failures, and counterexamples.</p>
+          <a href="https://github.com/haidmoham/robotics-test-bench/blob/main/docs/research-platform.md" target="_blank" rel="noreferrer">Read the canonical direction ↗</a>
+        </article>
+        <article class="experiment-card">
+          <div class="experiment-card-meta"><span>Scientific boundary</span><span>Confidence · High</span></div>
+          <h3>Natural-language control without scientific shortcuts</h3>
+          <p class="experiment-question">The agent compiles goals. Deterministic contracts remain authoritative.</p>
+          <p>A control plane can produce typed hypotheses, interventions, controls, measurements, and operations. It cannot override validators, alter hidden parameters to rescue a failure, or convert one successful rollout into a conclusion.</p>
+          <a href="https://github.com/haidmoham/robotics-test-bench/blob/main/docs/research-platform.md#agent-control-plane" target="_blank" rel="noreferrer">Inspect the control-plane contract ↗</a>
+        </article>
+        <article class="experiment-card">
+          <div class="experiment-card-meta"><span>Public evidence</span><span>Confidence · High</span></div>
+          <h3>Claims advance only at evidence gates</h3>
+          <p class="experiment-question">Future checkpoints are names, not accomplishments.</p>
+          <p>Public pages preserve the question, prediction, experiment, observation, model update, stop boundary, and source provenance. C-1N remains at SHUFFLE until the canonical STAND contract passes.</p>
+          <a href="https://github.com/haidmoham/spider/issues/11" target="_blank" rel="noreferrer">Inspect the STAND gate ↗</a>
+        </article>
+      </div>
+      <p class="robotics-source"><a href="https://github.com/haidmoham/robotics-test-bench/blob/main/TODO.md" target="_blank" rel="noreferrer">Inspect the authoritative experiment queue ↗</a><span>Platform activation requires STAND, a learned rollout population, and a concrete scale, reproducibility, validation, or analysis need.</span></p>
+    </section>
     <section class="robotics-index" aria-labelledby="experiments-title">
       <div class="section-header"><p class="section-eyebrow">Experiment record</p><h2 id="experiments-title">Experiments</h2></div>
       <div class="experiment-grid">
