@@ -55,7 +55,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   padding: 0.28rem 0.48rem 0.26rem; border: 1px solid rgba(125,174,255,0.5);
 }
 .nav-links a.nav-notes:hover, .nav-links a.nav-notes.active {
-  color: #fff; border-color: var(--gold-light);
+  color: var(--text); border-color: var(--gold-light);
 }
 .nav-links a.nav-notes:focus-visible { outline: 1px solid var(--gold-light); outline-offset: 4px; }
 .nav-links a.nav-cta {
