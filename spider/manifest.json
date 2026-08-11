@@ -6,10 +6,20 @@
   "legacy_release": "v0.1",
   "canonical_repository": "https://github.com/haidmoham/spider",
   "canonical_repository_note": "Legacy repository slug; public robot identity is C-1N.",
-  "spider_commit": "4766490910bf81ed8c216d52a1fe2be0c976e208",
+  "spider_commit": "79033cd3166ee19f53c09b7e5999b53379ba55f8",
   "checkpoints": {
-    "v0.0": { "label": "C-1N // 00 · SPAWN", "model": "model/spider.xml" },
-    "v0.1": { "label": "C-1N // 01 · SHUFFLE", "model": "model/shuffle.xml" }
+    "v0.0": {
+      "label": "C-1N // 00 · SPAWN",
+      "model": "model/spider.xml",
+      "source_commit": "4766490910bf81ed8c216d52a1fe2be0c976e208",
+      "model_sha256": "a0571f004b3974ac2c02d26560c9daaa0dc354195f88232a13756ce9b38a3e5c"
+    },
+    "v0.1": {
+      "label": "C-1N // 01 · SHUFFLE",
+      "model": "model/shuffle.xml",
+      "source_commit": "79033cd3166ee19f53c09b7e5999b53379ba55f8",
+      "model_sha256": "3ca25536a199d52ea5e0324f9018d9be02af114eb1060a9f55b85a7a166ab083"
+    }
   },
   "runtime": {
     "package": "@mujoco/mujoco",

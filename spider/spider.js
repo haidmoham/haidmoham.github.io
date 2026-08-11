@@ -16,12 +16,21 @@ const chartCanvases = Object.fromEntries([...root.querySelectorAll('[data-chart]
 const glyphCanvases = Object.fromEntries([...root.querySelectorAll('[data-glyph]')].map((glyph) => [glyph.dataset.glyph, glyph]));
 const glyphValues = Object.fromEntries([...root.querySelectorAll('[data-glyph-value]')].map((value) => [value.dataset.glyphValue, value]));
 const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 const FOOT_NAMES = ['front_left', 'front_right', 'middle_left', 'middle_right', 'rear_left', 'rear_right'];
 const TRIPOD_A = new Set([0, 3, 4]);
 const RELEASES = {
-  'v0.0': { label: 'v0.0 · SPAWN', model: './model/spider.xml', description: 'SPAWN restores the pre-change model, initial pose, and browser controller exactly as the site ran before today’s changes.' },
-  'v0.1': { label: 'v0.1 · SHUFFLE', model: './model/shuffle.xml', description: 'SHUFFLE loads today’s lower, stiffer model and runs a 5 Hz open-loop tripod command against live MuJoCo physics.' },
+  'v0.0': {
+    label: 'C-1N // 00 · SPAWN',
+    model: './model/spider.xml',
+    source: '47664909',
+    description: 'Historical playback: the era’s locomotion controller runs against the SPAWN-era model. The checkpoint itself records only the deterministic spawn baseline.',
+  },
+  'v0.1': {
+    label: 'C-1N // 01 · SHUFFLE',
+    model: './model/shuffle.xml',
+    source: '79033cd',
+    description: 'Current playback: the canonical 0.65 Hz shared-phase gait runs from the deterministic neutral reset with orientation, contact, and measured-state telemetry. Motion remains uncontrolled.',
+  },
 };
 const COLORS = Array(6).fill('#030304');
 const FOOT_COLOR = '#d90508';
@@ -74,7 +83,7 @@ function smoothstep(value) {
   return bounded * bounded * (3 - 2 * bounded);
 }
 
-function spawnGaitTarget(currentPhase, leg) {
+function gaitTarget(currentPhase, leg) {
   const offset = TRIPOD_A.has(leg) ? 0 : 0.5;
   const cycle = (currentPhase + offset) % 1;
   if (cycle < 0.5) {
@@ -107,55 +116,47 @@ function bodyErrors() {
   const r20 = 2 * (x * z - y * w);
   const r21 = 2 * (y * z + x * w);
   const r22 = 1 - 2 * (x * x + y * y);
-  return [Math.atan2(r21, -r22), Math.atan2(-r20, -r22), data.qvel[3], data.qvel[4]];
+  const gravityX = -9.81 * r20;
+  const gravityY = -9.81 * r21;
+  const gravityZ = -9.81 * r22;
+  return [
+    Math.atan2(gravityY, -gravityZ),
+    Math.atan2(-gravityX, -gravityZ),
+    data.qvel[3],
+    data.qvel[4],
+  ];
 }
 
 function applyGaitControl() {
   const contacts = contactStates();
-  if (currentRelease === 'v0.0') {
-    const starting = data.time < 1.0;
-    const expectedStance = FOOT_NAMES.map((_, leg) => starting || ((phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1) < 0.5);
-    const deltaTime = Math.max(0, data.time - lastSimulationTime);
-    lastSimulationTime = data.time;
-    if (!starting) phase = (phase + 0.65 * deltaTime) % 1;
-    const [roll, pitch, rollRate, pitchRate] = bodyErrors();
-    for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
-      let [hip, knee] = starting ? [0, 0.8] : spawnGaitTarget(phase, leg);
-      const side = leg % 2 === 0 ? 1 : -1;
-      const foreAft = leg < 2 ? 1 : leg >= 4 ? -1 : 0;
-      hip += -0.10 * pitch - 0.01 * pitchRate * foreAft;
-      knee += 0.06 * (pitch * foreAft + roll * side);
-      if (expectedStance[leg] && !contacts[leg]) knee += 0.08;
-      if (!expectedStance[leg] && contacts[leg]) knee -= 0.08;
-      data.ctrl[2 * leg] = Math.max(-0.8, Math.min(0.8, hip));
-      data.ctrl[2 * leg + 1] = Math.max(-1.4, Math.min(1.4, knee));
-    }
-    return { contacts, roll, pitch };
-  }
-
-  const [roll, pitch] = bodyErrors();
-  phase = (data.time * 5.0) % 1;
+  const starting = data.time < 1.0;
+  const expectedStance = FOOT_NAMES.map((_, leg) => starting || ((phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1) < 0.5);
+  const deltaTime = Math.max(0, data.time - lastSimulationTime);
+  lastSimulationTime = data.time;
+  if (!starting) phase = (phase + 0.65 * deltaTime) % 1;
+  const [roll, pitch, rollRate, pitchRate] = bodyErrors();
   for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
-    const cycle = (phase + (TRIPOD_A.has(leg) ? 0 : 0.5)) % 1;
-    const hipWave = -0.22 * Math.cos(2 * Math.PI * cycle);
-    const swingProgress = Math.max(0, 2 * cycle - 1);
-    const knee = -1.0 - 0.15 * Math.sin(Math.PI * swingProgress) ** 2;
+    let [hip, knee] = starting ? [0, 0.8] : gaitTarget(phase, leg);
+    if (!starting && currentRelease === 'v0.1') hip = -hip;
     const side = leg % 2 === 0 ? 1 : -1;
     const foreAft = leg < 2 ? 1 : leg >= 4 ? -1 : 0;
-    data.ctrl[2 * leg] = -foreAft * hipWave + side * 0.06 * hipWave;
-    data.ctrl[2 * leg + 1] = knee;
+    hip += -0.10 * pitch - 0.01 * pitchRate * foreAft;
+    knee += 0.06 * (pitch * foreAft + roll * side);
+    if (expectedStance[leg] && !contacts[leg]) knee += 0.08;
+    if (!expectedStance[leg] && contacts[leg]) knee -= 0.08;
+    data.ctrl[2 * leg] = Math.max(-0.8, Math.min(0.8, hip));
+    data.ctrl[2 * leg + 1] = Math.max(-1.4, Math.min(1.4, knee));
   }
   return { contacts, roll, pitch };
 }
 
 function setStandingPose() {
-  const shuffle = currentRelease === 'v0.1';
-  data.qpos.set([0, 0, shuffle ? 0.245 : 0.5, shuffle ? 0 : 1, 0, 0, shuffle ? 1 : 0]);
+  data.qpos.set([0, 0, 0.5, 1, 0, 0, 0]);
   for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
     data.qpos[7 + 2 * leg] = 0;
-    data.qpos[7 + 2 * leg + 1] = shuffle ? -1.0 : 0.8;
+    data.qpos[7 + 2 * leg + 1] = 0.8;
     data.ctrl[2 * leg] = 0;
-    data.ctrl[2 * leg + 1] = shuffle ? -1.0 : 0.8;
+    data.ctrl[2 * leg + 1] = 0.8;
   }
   mujoco.mj_forward(model, data);
 }
@@ -358,12 +359,19 @@ function setupRenderer() {
 }
 
 function updateReadout(state) {
+  const jointVelocities = Array.from(data.qvel).slice(6);
+  const actuatorForces = data.actuator_force
+    ? Array.from(data.actuator_force)
+    : Array.from(data.qfrc_actuator).slice(6);
+  const rms = (values) => Math.sqrt(values.reduce((sum, value) => sum + value * value, 0) / Math.max(values.length, 1));
   readout('time').textContent = `${data.time.toFixed(2)} s`;
   readout('x').textContent = `${data.qpos[0].toFixed(3)} m`;
+  readout('y').textContent = `${data.qpos[1].toFixed(3)} m`;
   readout('z').textContent = `${data.qpos[2].toFixed(3)} m`;
   readout('contacts').textContent = `${state.contacts.filter(Boolean).length} / 6`;
   readout('attitude').textContent = `${state.roll.toFixed(3)} / ${state.pitch.toFixed(3)} rad`;
-  readout('torque').textContent = `${data.qfrc_actuator[0].toFixed(3)} N·m`;
+  readout('joint-speed').textContent = `${rms(jointVelocities).toFixed(3)} rad/s`;
+  readout('actuator-force').textContent = `${rms(actuatorForces).toFixed(3)} N·m`;
 }
 
 function recordTelemetry(state) {
@@ -371,6 +379,7 @@ function recordTelemetry(state) {
   telemetryHistory.push({
     time: data.time,
     position: data.qpos[0],
+    lateral: data.qpos[1],
     height: data.qpos[2],
     velocity: data.qvel[0],
     roll: state.roll,
@@ -479,7 +488,7 @@ function drawChart(chartName, series, bounds, unit, label) {
 
 function drawTelemetryCharts() {
   if (!telemetryHistory.length) return;
-  drawChart('position', [{ key: 'position', color: CHART_BLUE }], chartBounds(['position'], { includeZero: true, minimumSpan: 0.1 }), 'm', 'Torso x position');
+  drawChart('position', [{ key: 'position', color: CHART_BLUE }, { key: 'lateral', color: CHART_RED }], chartBounds(['position', 'lateral'], { includeZero: true, minimumSpan: 0.1 }), 'm', 'Torso ground-plane position');
   drawChart('height', [{ key: 'height', color: CHART_INK }], chartBounds(['height'], { minimum: 0, minimumSpan: 0.25 }), 'm', 'Torso height');
   drawChart('attitude', [{ key: 'roll', color: CHART_BLUE }, { key: 'pitch', color: CHART_RED }], chartBounds(['roll', 'pitch'], { includeZero: true, minimumSpan: 0.2 }), 'rad', 'Body roll and pitch');
 }
@@ -593,7 +602,7 @@ async function loadRelease(release) {
   });
   releaseDescription.textContent = definition.description;
   restart();
-  status.textContent = `Live 3D · ${definition.label} · MuJoCo ${mujoco.mj_versionString()}`;
+  status.textContent = `Live 3D · ${definition.label} · MuJoCo ${mujoco.mj_versionString()} · ${definition.source}`;
   if (!reducedMotion) start();
 }
 
