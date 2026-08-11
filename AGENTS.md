@@ -35,8 +35,10 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - The canonical portfolio route is `/c1n/`. Keep `/spider/` only as a compatibility redirect or asset namespace.
 - Existing `spider-*` CSS classes, JavaScript filenames, model paths, and the `haidmoham/spider` repository slug may remain as implementation compatibility identifiers. Do not expose them as the robot's public name except when provenance requires the literal repository or path.
 - Public checkpoints use `C-1N // NN · CODENAME`.
+- `C-1N // 00 · SPAWN` is the historical deterministic six-foot spawn baseline.
 - The current checkpoint is `C-1N // 01 · SHUFFLE`.
-- `C-1N // 02 · FRAME` and `C-1N // 03 · STRIDE` are reserved future boundaries. Do not present them as completed before the canonical evidence exists.
+- `C-1N // 02 · STAND` and `C-1N // 03 · STRIDE` are reserved future boundaries. Do not present them as completed before the canonical evidence exists.
+- Task-space instrumentation may integrate between checkpoints; `FRAME` is not a checkpoint name.
 - Preserve prior checkpoints in the browser artifact when possible so behavior, instrumentation, and control changes remain directly comparable over time.
 
 ## Experiment-driven pages
