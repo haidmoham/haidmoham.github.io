@@ -29,7 +29,7 @@ jobs:
             curl --fail --silent http://127.0.0.1:18080/ >/dev/null && break
             sleep 0.25
           done
-          curl --fail --silent http://127.0.0.1:18080/c1n/ | grep --quiet '01 · SHUFFLE · Current'
+          curl --fail --silent http://127.0.0.1:18080/c1n/ | grep --quiet '02 · STAND · Current'
           curl --fail --silent --head http://127.0.0.1:18080/c1n/ | grep --ignore-case --quiet "'unsafe-eval'"
           curl --fail --silent --head http://127.0.0.1:18080/c1n/ | grep --ignore-case --quiet "wasm-unsafe-eval"
           curl --fail --silent --head http://127.0.0.1:18080/spider/vendor/mujoco/mujoco.wasm | grep --ignore-case --quiet 'content-type: application/wasm'
