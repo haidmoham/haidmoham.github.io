@@ -856,13 +856,12 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .independent-feature { display: block; width: 100%; margin-top: 1.5rem; }
 
 /* Working Notes: a linked editorial feature and a distinct lab surface. */
-.notes-index { margin-top: 0; }
+.notes-index { margin-top: clamp(3rem,6vw,4.5rem); }
 .notes-index-heading {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem;
-  margin-bottom: 1rem; padding-bottom: .8rem; border-bottom: 1px solid var(--border);
+  display: block; margin-bottom: 1.35rem; padding-bottom: .9rem; border-bottom: 1px solid var(--border);
 }
 .notes-index-heading .section-eyebrow { margin-bottom: 0; }
-.notes-index-heading > p { max-width: 29rem; font-size: .84rem; line-height: 1.55; color: var(--text-muted); }
+.notes-index-heading > p { max-width: 40rem; margin-top: .6rem; font-size: .88rem; line-height: 1.55; color: var(--text-muted); }
 .notes-entry-marker {
   display: flex; align-items: center; gap: .45rem; margin: 0 0 .8rem;
   color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: .67rem;
@@ -989,8 +988,6 @@ body:not(.robotics-page) > .nav { z-index: 100; }
     background: #f8fafb;
     box-shadow: 0 14px 24px rgba(23,42,61,.16);
   }
-  .notes-index-heading { display: block; }
-  .notes-index-heading > p { margin-top: .55rem; }
   .notes-featured-essay .notes-post-card, .notes-lab-section .notes-robotics .notes-post-card { min-height: 0; }
   .robotics-c1n-bridge { grid-template-columns: 1fr; gap: .6rem; }
   .robotics-c1n-bridge-content { display: block; }
