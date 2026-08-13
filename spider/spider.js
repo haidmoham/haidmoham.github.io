@@ -45,7 +45,7 @@ const RELEASES = {
     label: 'C-1N // 02 · STAND',
     model: './model/stand.xml',
     source: 'ccc115d',
-    description: 'Current playback: this simplified visual controller uses torso attitude and all-six-foot contact to make bounded stance corrections that help C-1N remain vertical. It illustrates a closed loop; it does not reproduce the native controller or recover a lost contact or a 1 mg shove.',
+    description: 'Current playback: this simplified visual controller uses torso attitude and declared six-foot contact to make bounded stance corrections that help C-1N remain vertical. It illustrates closed-loop stance control; it does not reproduce the native controller or recover a lost contact or a 1 mg force pulse.',
   },
 };
 const STAND_TARGETS = Array.from({ length: 6 }, () => [0, -0.2, 1.1]).flat();
@@ -218,7 +218,7 @@ function applyStandControl() {
     // Simplified visual controller: measured attitude adjusts bounded targets
     // only while every foot remains declared in contact. It illustrates the
     // closed-loop idea; it does not reproduce the native controller or recover
-    // a lost contact or shove.
+    // a lost contact or force pulse.
     data.ctrl[base] = clamp(0.07 * (roll * side + 0.12 * rollRate * side), -0.8, 0.8);
     data.ctrl[base + 1] = clamp(-0.2 - 0.12 * (pitch * foreAft + 0.12 * pitchRate * foreAft), -0.8, 0.8);
     data.ctrl[base + 2] = clamp(1.1 + 0.07 * (pitch * foreAft + roll * side), -1.4, 1.4);
@@ -330,20 +330,20 @@ function renderPerturbationGrid() {
   const visible = currentRelease === 'v0.2';
   perturbationSection.hidden = !visible;
   if (!visible) {
-    if (perturbationForceReadout) perturbationForceReadout.textContent = 'Current shove: STAND perturbation suite is unavailable in this checkpoint.';
+    if (perturbationForceReadout) perturbationForceReadout.textContent = 'Current force pulse: the STAND perturbation suite is unavailable in this checkpoint.';
     return;
   }
   setupPerturbationControls();
   const active = currentPerturbationCase();
   const runLabel = standRunMode === 'suite' ? 'STAND suite' : standRunMode === 'selected' ? 'selected case' : 'viewing case';
   const forceReadout = active.magnitude
-    ? ` · current force ${perturbationForceNewtons(active).toFixed(3)} N · bearing ${String(active.angle).padStart(3, '0')}° · shove fires at reset for 200 ms · 1 s observation`
-    : ' · current force 0.000 N · control, no shove';
+    ? ` · force ${perturbationForceNewtons(active).toFixed(3)} N · bearing ${String(active.angle).padStart(3, '0')}° · 200 ms force pulse at reset · 1 s observation`
+    : ' · force 0.000 N · control, no external force applied';
   perturbationCurrent.textContent = `${runLabel} · case ${currentPerturbationIndex + 1} / ${PERTURBATION_CASES.length}: ${active.label}${forceReadout}${active.state === 'frontier-failure' ? ' · current failure frontier' : ''}`;
   if (perturbationForceReadout) {
     perturbationForceReadout.textContent = active.magnitude
-      ? `Current shove: ${perturbationForceNewtons(active).toFixed(3)} N = ${active.magnitude} × ${totalRobotMassKg().toFixed(3)} kg × ${currentGravityMagnitude().toFixed(3)} m/s²`
-      : 'Current shove: 0.000 N = control case (no applied force)';
+      ? `Current force pulse: ${perturbationForceNewtons(active).toFixed(3)} N = ${active.magnitude} × ${totalRobotMassKg().toFixed(3)} kg × ${currentGravityMagnitude().toFixed(3)} m/s²`
+      : 'Current force pulse: 0.000 N = control case (no applied force)';
   }
   if (perturbationMagnitude) perturbationMagnitude.value = String(active.magnitude);
   if (perturbationDirection) {
@@ -581,7 +581,7 @@ function resetCamera() {
 
 function setCameraFollow(enabled) {
   cameraFollow = enabled;
-  cameraFollowButton.textContent = enabled ? 'Following Spider' : 'Follow Spider';
+  cameraFollowButton.textContent = enabled ? 'Following C-1N' : 'Follow C-1N';
   cameraFollowButton.setAttribute('aria-pressed', String(enabled));
   if (!enabled || !bodyAccessors) return;
 
@@ -1023,7 +1023,7 @@ async function initialise() {
     const [loadedMujoco, manifest] = await Promise.all([
       loadMujoco(),
       fetch('./manifest.json').then((response) => {
-        if (!response.ok) throw new Error('The Spider release manifest could not load.');
+        if (!response.ok) throw new Error('The C-1N release manifest could not load.');
         return response.json();
       }),
     ]);
@@ -1037,7 +1037,7 @@ async function initialise() {
     resetButton.addEventListener('click', restart);
     releaseSelect.addEventListener('change', () => loadRelease(releaseSelect.value).catch((error) => {
       status.textContent = 'Live simulation unavailable';
-      stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical Spider repository for the native simulation.</p>`;
+      stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical C-1N repository for the native simulation.</p>`;
     }));
     cameraResetButton.addEventListener('click', resetCamera);
     cameraFollowButton.addEventListener('click', () => setCameraFollow(!cameraFollow));
@@ -1045,7 +1045,7 @@ async function initialise() {
   } catch (error) {
     disposeRenderer();
     status.textContent = 'Live simulation unavailable';
-    stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical Spider repository for the native simulation.</p>`;
+    stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical C-1N repository for the native simulation.</p>`;
   }
 }
 
