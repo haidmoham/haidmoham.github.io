@@ -14,6 +14,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Commit and push only when the user authorizes publication.
 - For a vetted portfolio post, completed content and visual review is publication authorization: commit and push that post’s scoped change without asking for a separate confirmation, unless the user says to hold it.
 - Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
+- If a required skill or policy tool is unavailable, resolve that dependency from its canonical source before the gated action when authorization allows; then run the required check. Do not silently substitute for a publish or semantic-review gate.
 
 ## Position and copy
 
