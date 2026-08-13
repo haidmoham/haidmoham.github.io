@@ -1,6 +1,6 @@
 # mhaider.dev
 
-Personal portfolio site for Mohammad Haider — Data &amp; Software Engineer.
+Personal portfolio site for Mohammad Haider — Software Engineer working in simulation, robotics, scientific computing, and experimental systems.
 
 🌐 **Live at:** [mhaider.dev](https://mhaider.dev)
 
