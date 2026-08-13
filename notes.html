@@ -20,7 +20,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=24" />
+  <link rel="stylesheet" href="style.css?v=28" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
@@ -66,31 +66,43 @@
   </header>
 
   <main class="notes-section">
-    <section class="notes-index" aria-labelledby="notes-index-title">
-      <h2 id="notes-index-title" class="section-eyebrow">Notes index</h2>
-
+    <section class="notes-lab-section" aria-labelledby="notes-lab-title">
+      <div class="notes-lab-heading">
+        <p class="section-eyebrow">Ongoing lab</p>
+        <h2 id="notes-lab-title">Robotics Test Bench</h2>
+        <p>A dedicated engineering workspace for controlled MuJoCo experiments, model updates, and inspectable simulation evidence.</p>
+      </div>
       <article class="notes-robotics">
-        <p class="notes-post-status">Ongoing lab</p>
         <a href="robotics/" class="notes-post-card notes-entry-link">
           <div>
-            <h2>Robotics Test Bench</h2>
-            <p>An ongoing MuJoCo study built from predictions, controlled experiments, and inspectable simulation evidence.</p>
+            <p class="notes-post-status">Experiment record</p>
+            <h3>Question → prediction → experiment → model update</h3>
+            <p>Follow the current studies, their evidence, and the boundaries each result establishes.</p>
           </div>
           <span class="notes-entry-link-label">Enter lab →</span>
         </a>
       </article>
+    </section>
 
-      <article class="notes-pinned">
-        <p class="notes-pinned-label">
-          <svg class="notes-pin-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M5.1 2.5h5.8M6.1 2.5v3.1l1.5 1.6v2.2l-2.3 1.5v.9h5.4v-.9L8.4 9.4V7.2l1.5-1.6V2.5M8 11.8V15" />
-          </svg>
-          <span class="notes-pinned-visually-hidden">Pinned</span>
-        </p>
+    <section class="notes-index" aria-labelledby="notes-index-title">
+      <div class="notes-index-heading">
+        <h2 id="notes-index-title" class="section-eyebrow">Featured writing</h2>
+        <p>One considered essay about retaining human judgment in a working loop.</p>
+      </div>
+
+      <article class="notes-pinned notes-featured-essay">
         <a href="notes/the-loop-must-terminate-in-reality.html" class="notes-post-card notes-entry-link">
-          <div>
-            <h2>The Loop Must Terminate in Reality</h2>
-            <p>Using AI as a Socratic Collaborator Without Outsourcing Judgment</p>
+          <div class="notes-featured-copy">
+            <p class="notes-entry-marker">
+              <svg class="notes-pin-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M5.1 2.5h5.8M6.1 2.5v3.1l1.5 1.6v2.2l-2.3 1.5v.9h5.4v-.9L8.4 9.4V7.2l1.5-1.6V2.5M8 11.8V15" />
+              </svg>
+              <span>Pinned essay</span>
+            </p>
+            <div>
+              <h2>The Loop Must Terminate in Reality</h2>
+              <p>Using AI as a Socratic Collaborator Without Outsourcing Judgment</p>
+            </div>
           </div>
           <span class="notes-entry-link-label">Read article →</span>
         </a>

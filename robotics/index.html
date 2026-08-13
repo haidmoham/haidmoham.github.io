@@ -15,6 +15,13 @@
       <p class="section-eyebrow">Working Notes · Robotics</p><h1>Robotics Test Bench</h1>
       <p>Small simulation experiments for building physical intuition: make a prediction, run the smallest useful test, observe the result, then update the model.</p>
       <ol class="bench-loop" aria-label="Experiment loop"><li>Question</li><li>Prediction</li><li>Experiment</li><li>Observation</li><li>Belief update</li></ol>
+      <aside class="robotics-c1n-bridge" aria-label="C-1N integration target">
+        <p class="robotics-c1n-bridge-label">Integration target</p>
+        <div class="robotics-c1n-bridge-content">
+          <p class="robotics-c1n-bridge-copy">C-1N carries these isolated findings into a six-legged, closed-loop standing simulation.</p>
+          <a class="robotics-c1n-bridge-link" href="/c1n/">Inspect the C-1N STAND checkpoint →</a>
+        </div>
+      </aside>
     </header>
     <section class="robotics-index" aria-labelledby="experiments-title">
       <div class="section-header"><p class="section-eyebrow">Experiment record</p><h2 id="experiments-title">Experiments</h2></div>
@@ -23,7 +30,8 @@
         <article class="experiment-card"><div class="experiment-card-meta"><span>#02</span><span class="status-resolved">Resolved</span></div><h3>Multi-DOF dynamics: make coupling visible</h3><p class="experiment-question">What happens at one joint when only the other joint is driven?</p><p>A passive elbow moved with zero elbow command, replacing an independent-joint model with a full-mechanism view.</p><a href="02-multi-dof-coupling.html">Inspect experiment →</a></article>
         <article class="experiment-card"><div class="experiment-card-meta"><span>#03</span><span class="status-resolved">Resolved</span></div><h3>Model-based control: prepare torque from the model</h3><p class="experiment-question">What does dynamics knowledge buy, and what happens when it is wrong?</p><p>Accurate feedforward nearly removed the tracking residual. A controller-only mass error returned a structured feedback burden.</p><a href="03-model-based-control.html">Inspect experiment →</a></article>
         <article class="experiment-card"><div class="experiment-card-meta"><span>#04</span><span>Bounded stop</span></div><h3>Jacobians and task space</h3><p class="experiment-question">Why can the same joint command move a foot differently?</p><p>The pose-dependent Jacobian mapped joint velocity into task-space velocity; its transpose made the force-to-joint-torque mapping concrete.</p><a href="04-jacobians-task-space.html">Inspect experiment →</a></article>
-        <article class="experiment-card"><div class="experiment-card-meta"><span>#05 · Parts 1–2</span><span class="status-open">Open</span></div><h3>Static support: pause, then measured boundary</h3><p class="experiment-question">What makes a tripod pose statically supported?</p><p>A configuration stop separated valid evidence from a broken ballast sweep. A later fixed-foot notebook bracketed the boundary between a nearly zero margin and rear-contact unloading.</p><a href="05-static-support-stop-boundary.html">Inspect experiment →</a></article>
+        <article class="experiment-card"><div class="experiment-card-meta"><span>#05 · Parts 1–2</span><span class="status-resolved">Resolved</span></div><h3>Static support: pause, then measured boundary</h3><p class="experiment-question">What makes a tripod pose statically supported?</p><p>A configuration stop separated valid evidence from a broken ballast sweep. A later fixed-foot notebook bracketed the boundary between a nearly zero margin and rear-contact unloading.</p><a href="05-static-support-stop-boundary.html">Inspect experiment →</a></article>
+        <article class="experiment-card"><div class="experiment-card-meta"><span>#06</span><span class="status-resolved">Resolved</span></div><h3>Leg workspace: reachability before torque</h3><p class="experiment-question">Can the current C-1N leg reach an outward-and-down support point?</p><p>The two-joint leg missed the target by 6.7 cm. A small experimental proximal-axis probe moved the foot outward and cut that distance to 3.28 cm.</p><a href="06-leg-workspace-reachability.html">Inspect experiment →</a></article>
       </div>
       <p class="robotics-source"><a href="https://github.com/haidmoham/robotics-test-bench" target="_blank" rel="noreferrer">View the canonical Robotics Test Bench repository ↗</a><span>Code, issue state, and full reasoning history remain there.</span></p>
     </section>

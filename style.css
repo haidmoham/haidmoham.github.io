@@ -855,6 +855,47 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .independent-product-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
 .independent-feature { display: block; width: 100%; margin-top: 1.5rem; }
 
+/* Working Notes: a linked editorial feature and a distinct lab surface. */
+.notes-index { margin-top: 0; }
+.notes-index-heading {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem;
+  margin-bottom: 1rem; padding-bottom: .8rem; border-bottom: 1px solid var(--border);
+}
+.notes-index-heading .section-eyebrow { margin-bottom: 0; }
+.notes-index-heading > p { max-width: 29rem; font-size: .84rem; line-height: 1.55; color: var(--text-muted); }
+.notes-entry-marker {
+  display: flex; align-items: center; gap: .45rem; margin: 0 0 .8rem;
+  color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: .67rem;
+  font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+}
+.notes-featured-essay .notes-pin-icon { width: 1rem; height: 1rem; }
+.notes-featured-essay .notes-post-card {
+  min-height: 11.25rem; padding: clamp(1.75rem,4vw,2.5rem); border-left: 3px solid var(--accent);
+  background: rgba(255,255,255,.94);
+}
+.notes-featured-essay .notes-post-card h2 { max-width: 42rem; }
+.notes-featured-essay .notes-entry-link-label { color: var(--accent); }
+.notes-lab-section {
+  margin-top: clamp(2.5rem,5vw,4rem); padding: clamp(1.5rem,4vw,2.5rem);
+  border: 1px solid rgba(40,106,168,.26); border-top: 3px solid #286aa8; border-radius: var(--radius-lg);
+  background: rgba(233,238,243,.72);
+}
+.notes-lab-heading { max-width: 46rem; margin-bottom: 1.5rem; }
+.notes-lab-heading .section-eyebrow { color: #286aa8; }
+.notes-lab-heading h2 {
+  margin-bottom: .5rem; color: #173d63; font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(1.3rem,2.5vw,1.8rem); font-weight: 600; letter-spacing: -.055em;
+}
+.notes-lab-heading > p:last-child { color: #4e6983; font-size: .92rem; line-height: 1.65; }
+.notes-lab-section .notes-robotics { margin-top: 0; }
+.notes-lab-section .notes-robotics .notes-post-card { min-height: 10rem; padding: clamp(1.35rem,3vw,2rem); }
+.notes-lab-section .notes-post-status { margin-bottom: .6rem; }
+.notes-lab-section .notes-post-card h3 {
+  max-width: 42rem; margin-bottom: .45rem; color: #173d63; font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(1rem,2vw,1.25rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.35;
+}
+.notes-lab-section .notes-entry-link-label { align-self: end; }
+
 /* Exact, fast feedback; lift only for precise pointing devices. */
 .btn, .nav-links a.nav-cta, .nav-links a.nav-cta-outline, .nav-links a.nav-notes,
 .play-toggle, .visual-toggle, .project-card, .project-card-full,
@@ -896,6 +937,25 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 }
 .robotics-page .status-resolved { color: #25834d; }
 .robotics-page .status-open { color: #a44727; }
+.robotics-c1n-bridge {
+  display: grid; grid-template-columns: minmax(8.5rem,.42fr) minmax(0,1fr); gap: 1rem;
+  align-items: center; margin-top: 1.35rem; padding: 1rem 1.15rem;
+  border: 1px solid rgba(40,106,168,.3); border-left: 3px solid #286aa8;
+  background-color: rgba(233,238,243,.82);
+  background-image: linear-gradient(rgba(40,106,168,.09) 1px,transparent 1px), linear-gradient(90deg,rgba(40,106,168,.09) 1px,transparent 1px);
+  background-size: 28px 28px;
+}
+.robotics-c1n-bridge-label {
+  color: #286aa8; font-family: 'JetBrains Mono', monospace; font-size: .67rem;
+  font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+}
+.robotics-c1n-bridge-content { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.robotics-c1n-bridge-copy { max-width: 35rem; color: #4e6983; font-size: .86rem; line-height: 1.55; }
+.robotics-c1n-bridge-link {
+  color: #286aa8; font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 600;
+  letter-spacing: .02em; white-space: nowrap;
+}
+.robotics-c1n-bridge-link:hover { color: #173d63; text-decoration: underline; text-underline-offset: .24em; }
 .spider-page.robotics-page .spider-stage, .notes-robotics .notes-post-card,
 .spider-project-card, .spider-project-card-full, .spider-avail-item {
   background-color: #e9eef3;
@@ -929,6 +989,12 @@ body:not(.robotics-page) > .nav { z-index: 100; }
     background: #f8fafb;
     box-shadow: 0 14px 24px rgba(23,42,61,.16);
   }
+  .notes-index-heading { display: block; }
+  .notes-index-heading > p { margin-top: .55rem; }
+  .notes-featured-essay .notes-post-card, .notes-lab-section .notes-robotics .notes-post-card { min-height: 0; }
+  .robotics-c1n-bridge { grid-template-columns: 1fr; gap: .6rem; }
+  .robotics-c1n-bridge-content { display: block; }
+  .robotics-c1n-bridge-link { display: inline-block; margin-top: .7rem; }
 }
 @media (max-width:600px) {
   .project-grid, .professional-record-grid, .projects-full-grid, .skills-grid,
