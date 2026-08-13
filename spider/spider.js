@@ -12,6 +12,16 @@ const cameraFollowButton = root.querySelector('[data-camera-follow]');
 const releaseSelect = root.querySelector('[data-release-select]');
 const releaseDescription = root.querySelector('[data-release-description]');
 const status = root.querySelector('[data-status]');
+const perturbationSection = root.querySelector('[data-perturbation-section]');
+const perturbationGrid = root.querySelector('[data-perturbation-grid]');
+const perturbationCurrent = root.querySelector('[data-perturbation-current]');
+const perturbationControls = root.querySelector('[data-perturbation-controls]');
+const perturbationMagnitude = root.querySelector('[data-perturbation-magnitude]');
+const perturbationDirection = root.querySelector('[data-perturbation-direction]');
+const perturbationRun = root.querySelector('[data-perturbation-run]');
+const modelMassReadout = root.querySelector('[data-model-mass]');
+const modelGravityReadout = root.querySelector('[data-model-gravity]');
+const perturbationForceReadout = root.querySelector('[data-perturbation-force]');
 const chartCanvases = Object.fromEntries([...root.querySelectorAll('[data-chart]')].map((chart) => [chart.dataset.chart, chart]));
 const glyphCanvases = Object.fromEntries([...root.querySelectorAll('[data-glyph]')].map((glyph) => [glyph.dataset.glyph, glyph]));
 const glyphValues = Object.fromEntries([...root.querySelectorAll('[data-glyph-value]')].map((value) => [value.dataset.glyphValue, value]));
@@ -29,9 +39,32 @@ const RELEASES = {
     label: 'C-1N // 01 · SHUFFLE',
     model: './model/shuffle.xml',
     source: '79033cd',
-    description: 'Current playback: the canonical 0.65 Hz shared-phase gait runs from the deterministic neutral reset with orientation, contact, and measured-state telemetry. Motion remains uncontrolled.',
+    description: 'Archived playback: the canonical 0.65 Hz shared-phase gait remains available only in this SHUFFLE checkpoint. Motion remains uncontrolled.',
+  },
+  'v0.2': {
+    label: 'C-1N // 02 · STAND',
+    model: './model/stand.xml',
+    source: 'ccc115d',
+    description: 'Current playback: this simplified visual controller uses torso attitude and all-six-foot contact to make bounded stance corrections that help C-1N remain vertical. It illustrates a closed loop; it does not reproduce the native controller or recover a lost contact or a 1 mg shove.',
   },
 };
+const STAND_TARGETS = Array.from({ length: 6 }, () => [0, -0.2, 1.1]).flat();
+const PULSE_SECONDS = 0.2;
+const OBSERVATION_SECONDS = 1;
+const PERTURBATION_CASE_SECONDS = PULSE_SECONDS + OBSERVATION_SECONDS;
+const PERTURBATION_CASES = [
+  { magnitude: 0, angle: 0, label: '0 mg · control', shortLabel: '0 mg', state: 'control' },
+  ...[0.25, 0.5, 0.75, 1].flatMap((magnitude) => Array.from({ length: 8 }, (_, index) => {
+    const angle = index * 45;
+    return {
+      magnitude,
+      angle,
+      label: `${magnitude} mg · ${String(angle).padStart(3, '0')}°`,
+      shortLabel: `${magnitude} mg · ${String(angle).padStart(3, '0')}°`,
+      state: magnitude === 1 ? 'frontier-failure' : 'treatment',
+    };
+  })),
+];
 const COLORS = Array(6).fill('#030304');
 const FOOT_COLOR = '#d90508';
 const STEP_SECONDS = 0.002;
@@ -57,6 +90,7 @@ let bodyAccessors;
 let footAccessors;
 let groundGeomId;
 let footGeomIds;
+let torsoBodyId;
 let animation;
 let previousWallTime;
 let accumulator = 0;
@@ -72,7 +106,11 @@ let robotVisual;
 let cameraFollow = false;
 let telemetryHistory = [];
 let lastTelemetrySampleTime = -Infinity;
-let currentRelease = 'v0.1';
+let currentRelease = 'v0.2';
+let currentPerturbationIndex = 0;
+let perturbationPulse = { force: [0, 0, 0], startsAt: Infinity, remainingSteps: 0 };
+let standRunMode = 'idle';
+let perturbationControlsBound = false;
 
 function readout(name) {
   return root.querySelector(`[data-${name}]`);
@@ -150,15 +188,197 @@ function applyGaitControl() {
   return { contacts, roll, pitch };
 }
 
-function setStandingPose() {
-  data.qpos.set([0, 0, 0.5, 1, 0, 0, 0]);
+function clamp(value, lower, upper) {
+  return Math.max(lower, Math.min(upper, value));
+}
+
+function applyStandControl() {
+  const contacts = contactStates();
+  const [roll, pitch, rollRate, pitchRate] = bodyErrors();
+  const supportReady = contacts.every(Boolean);
   for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
-    data.qpos[7 + 2 * leg] = 0;
-    data.qpos[7 + 2 * leg + 1] = 0.8;
-    data.ctrl[2 * leg] = 0;
-    data.ctrl[2 * leg + 1] = 0.8;
+    const base = 3 * leg;
+    const side = leg % 2 === 0 ? 1 : -1;
+    const foreAft = leg < 2 ? 1 : leg >= 4 ? -1 : 0;
+    if (!supportReady) {
+      data.ctrl[base] = STAND_TARGETS[base];
+      data.ctrl[base + 1] = STAND_TARGETS[base + 1];
+      data.ctrl[base + 2] = STAND_TARGETS[base + 2];
+      continue;
+    }
+    // Simplified visual controller: measured attitude adjusts bounded targets
+    // only while every foot remains declared in contact. It illustrates the
+    // closed-loop idea; it does not reproduce the native controller or recover
+    // a lost contact or shove.
+    data.ctrl[base] = clamp(0.07 * (roll * side + 0.12 * rollRate * side), -0.8, 0.8);
+    data.ctrl[base + 1] = clamp(-0.2 - 0.12 * (pitch * foreAft + 0.12 * pitchRate * foreAft), -0.8, 0.8);
+    data.ctrl[base + 2] = clamp(1.1 + 0.07 * (pitch * foreAft + roll * side), -1.4, 1.4);
+  }
+  return { contacts, roll, pitch };
+}
+
+function applyReleaseControl() {
+  if (currentRelease === 'v0.2') return applyStandControl();
+  if (currentRelease === 'v0.0') return { contacts: contactStates(), roll: 0, pitch: 0 };
+  return applyGaitControl();
+}
+
+function setReleasePose() {
+  const targets = currentRelease === 'v0.2' ? STAND_TARGETS : Array.from({ length: 6 }, () => [0, 0.8]).flat();
+  const jointCount = currentRelease === 'v0.2' ? 3 : 2;
+  data.qpos.set([0, 0, currentRelease === 'v0.2' ? 0.45 : 0.5, 1, 0, 0, 0]);
+  for (let leg = 0; leg < FOOT_NAMES.length; leg += 1) {
+    for (let joint = 0; joint < jointCount; joint += 1) {
+      const index = jointCount * leg + joint;
+      data.qpos[7 + index] = targets[index];
+      data.ctrl[index] = targets[index];
+    }
   }
   mujoco.mj_forward(model, data);
+}
+
+function currentPerturbationCase() {
+  return PERTURBATION_CASES[currentPerturbationIndex];
+}
+
+function clearPerturbationPulse() {
+  perturbationPulse = { force: [0, 0, 0], startsAt: Infinity, remainingSteps: 0 };
+  if (!data || torsoBodyId === undefined) return;
+  const offset = torsoBodyId * 6;
+  data.xfrc_applied[offset] = 0;
+  data.xfrc_applied[offset + 1] = 0;
+  data.xfrc_applied[offset + 2] = 0;
+}
+
+function schedulePerturbationPulse() {
+  clearPerturbationPulse();
+  if (currentRelease !== 'v0.2') return;
+  const perturbation = currentPerturbationCase();
+  if (!perturbation || perturbation.magnitude === 0) return;
+  const forceMagnitudeN = perturbationForceNewtons(perturbation);
+  const angleRadians = perturbation.angle * Math.PI / 180;
+  perturbationPulse = {
+    force: [forceMagnitudeN * Math.cos(angleRadians), forceMagnitudeN * Math.sin(angleRadians), 0],
+    startsAt: data.time,
+    remainingSteps: Math.max(1, Math.round(PULSE_SECONDS / model.opt.timestep)),
+  };
+}
+
+function perturbationForceNewtons(perturbation) {
+  if (!model || !perturbation || perturbation.magnitude === 0) return 0;
+  return perturbation.magnitude * totalRobotMassKg() * currentGravityMagnitude();
+}
+
+function totalRobotMassKg() {
+  if (!model) return 0;
+  return Array.from(model.body_mass).slice(1).reduce((sum, mass) => sum + mass, 0);
+}
+
+function currentGravityMagnitude() {
+  return model ? Math.abs(model.opt.gravity[2]) : 0;
+}
+
+function updateModelConstants() {
+  if (modelMassReadout) modelMassReadout.textContent = `${totalRobotMassKg().toFixed(3)} kg`;
+  if (modelGravityReadout) modelGravityReadout.textContent = `${currentGravityMagnitude().toFixed(3)} m/s²`;
+}
+
+function applyPerturbationPulse() {
+  if (torsoBodyId === undefined) return;
+  const offset = torsoBodyId * 6;
+  const force = perturbationPulse.remainingSteps && data.time >= perturbationPulse.startsAt ? perturbationPulse.force : [0, 0, 0];
+  data.xfrc_applied[offset] = force[0];
+  data.xfrc_applied[offset + 1] = force[1];
+  data.xfrc_applied[offset + 2] = force[2];
+}
+
+function completePerturbationStep() {
+  if (!perturbationPulse.remainingSteps || data.time < perturbationPulse.startsAt) return;
+  perturbationPulse.remainingSteps -= 1;
+  if (!perturbationPulse.remainingSteps) clearPerturbationPulse();
+}
+
+function perturbationIndexFor(magnitude, angle) {
+  if (magnitude === 0) return 0;
+  return 1 + [0.25, 0.5, 0.75, 1].indexOf(magnitude) * 8 + angle / 45;
+}
+
+function setupPerturbationControls() {
+  if (!perturbationControls || !perturbationMagnitude || !perturbationDirection || !perturbationRun) return;
+  perturbationMagnitude.disabled = false;
+  perturbationDirection.disabled = false;
+  perturbationRun.disabled = false;
+  if (perturbationControlsBound) return;
+  perturbationMagnitude.addEventListener('change', () => {
+    perturbationDirection.disabled = Number(perturbationMagnitude.value) === 0;
+  });
+  perturbationRun.addEventListener('click', runSelectedPerturbationCase);
+  perturbationControlsBound = true;
+}
+
+function renderPerturbationGrid() {
+  if (!perturbationSection || !perturbationGrid || !perturbationCurrent) return;
+  const visible = currentRelease === 'v0.2';
+  perturbationSection.hidden = !visible;
+  if (!visible) {
+    if (perturbationForceReadout) perturbationForceReadout.textContent = 'Current shove: STAND perturbation suite is unavailable in this checkpoint.';
+    return;
+  }
+  setupPerturbationControls();
+  const active = currentPerturbationCase();
+  const runLabel = standRunMode === 'suite' ? 'STAND suite' : standRunMode === 'selected' ? 'selected case' : 'viewing case';
+  const forceReadout = active.magnitude
+    ? ` · current force ${perturbationForceNewtons(active).toFixed(3)} N · bearing ${String(active.angle).padStart(3, '0')}° · shove fires at reset for 200 ms · 1 s observation`
+    : ' · current force 0.000 N · control, no shove';
+  perturbationCurrent.textContent = `${runLabel} · case ${currentPerturbationIndex + 1} / ${PERTURBATION_CASES.length}: ${active.label}${forceReadout}${active.state === 'frontier-failure' ? ' · current failure frontier' : ''}`;
+  if (perturbationForceReadout) {
+    perturbationForceReadout.textContent = active.magnitude
+      ? `Current shove: ${perturbationForceNewtons(active).toFixed(3)} N = ${active.magnitude} × ${totalRobotMassKg().toFixed(3)} kg × ${currentGravityMagnitude().toFixed(3)} m/s²`
+      : 'Current shove: 0.000 N = control case (no applied force)';
+  }
+  if (perturbationMagnitude) perturbationMagnitude.value = String(active.magnitude);
+  if (perturbationDirection) {
+    perturbationDirection.value = String(active.angle);
+    perturbationDirection.disabled = active.magnitude === 0;
+  }
+  perturbationGrid.replaceChildren(...PERTURBATION_CASES.map((perturbation, index) => {
+    const cell = document.createElement('span');
+    cell.className = `spider-perturbation-case${index === currentPerturbationIndex ? ' is-active' : ''}${perturbation.state === 'frontier-failure' ? ' is-frontier' : ''}`;
+    cell.textContent = perturbation.magnitude === 0 ? 'control' : `${perturbation.magnitude} mg\n${String(perturbation.angle).padStart(3, '0')}°`;
+    cell.style.cssText = 'cursor:default;pointer-events:none;white-space:pre-line';
+    cell.title = `${perturbation.label}${perturbation.state === 'frontier-failure' ? ' — current recovery failure frontier' : ''}`;
+    return cell;
+  }));
+  perturbationGrid.setAttribute('aria-label', `Non-interactive coverage map for all ${PERTURBATION_CASES.length} STAND perturbation cases. The highlighted case is ${active.label}.`);
+}
+
+function runSelectedPerturbationCase() {
+  if (currentRelease !== 'v0.2') return;
+  stop();
+  currentPerturbationIndex = perturbationIndexFor(Number(perturbationMagnitude.value), Number(perturbationDirection.value));
+  standRunMode = 'selected';
+  restart();
+  start();
+}
+
+function beginStandSuite() {
+  currentPerturbationIndex = 0;
+  standRunMode = 'suite';
+  restart();
+  start();
+}
+
+function advanceStandSuite() {
+  const caseDuration = currentPerturbationCase().magnitude ? PERTURBATION_CASE_SECONDS : OBSERVATION_SECONDS;
+  if (currentRelease !== 'v0.2' || !running || data.time < caseDuration) return;
+  if (standRunMode === 'suite' && currentPerturbationIndex < PERTURBATION_CASES.length - 1) {
+    currentPerturbationIndex += 1;
+    restart();
+    return;
+  }
+  standRunMode = 'idle';
+  stop();
+  renderPerturbationGrid();
 }
 
 function createSegment(color, radius) {
@@ -545,7 +765,7 @@ function drawTelemetryGlyphs() {
 }
 
 function render() {
-  const state = applyGaitControl();
+  const state = applyReleaseControl();
   updateRobotVisual(state.contacts);
   updateFollowCamera();
   controls.update();
@@ -566,9 +786,24 @@ function restart() {
   accumulator = 0;
   telemetryHistory = [];
   lastTelemetrySampleTime = -Infinity;
-  setStandingPose();
+  setReleasePose();
+  schedulePerturbationPulse();
   cacheAccessors();
+  renderPerturbationGrid();
   render();
+}
+
+function updatePlayButton() {
+  if (!playButton) return;
+  if (currentRelease === 'v0.2') {
+    if (running) playButton.textContent = standRunMode === 'selected' ? 'Pause selected case' : 'Pause STAND suite';
+    else if (standRunMode === 'selected') playButton.textContent = 'Resume selected case';
+    else if (standRunMode === 'suite') playButton.textContent = 'Resume STAND suite';
+    else playButton.textContent = 'Play STAND suite';
+  } else {
+    playButton.textContent = running ? 'Pause simulation' : 'Play simulation';
+  }
+  playButton.setAttribute('aria-pressed', String(running));
 }
 
 async function loadRelease(release) {
@@ -590,7 +825,12 @@ async function loadRelease(release) {
     model = undefined;
   }
   currentRelease = release;
+  standRunMode = 'idle';
   model = mujoco.MjModel.from_xml_string(modelXml);
+  updateModelConstants();
+  const torso = model.body('torso');
+  torsoBodyId = torso.id;
+  torso.delete();
   const ground = model.geom('ground');
   groundGeomId = ground.id;
   ground.delete();
@@ -601,15 +841,19 @@ async function loadRelease(release) {
     return id;
   });
   releaseDescription.textContent = definition.description;
-  restart();
   status.textContent = `Live 3D · ${definition.label} · MuJoCo ${mujoco.mj_versionString()} · ${definition.source}`;
-  if (!reducedMotion) start();
+  if (currentRelease === 'v0.2') beginStandSuite();
+  else {
+    restart();
+    updatePlayButton();
+  }
 }
 
 function stop() {
   running = false;
-  playButton.textContent = 'Resume';
-  playButton.setAttribute('aria-pressed', 'false');
+  if (animation) cancelAnimationFrame(animation);
+  animation = undefined;
+  updatePlayButton();
 }
 
 function frame(now) {
@@ -618,25 +862,36 @@ function frame(now) {
   previousWallTime = now;
   accumulator += elapsed;
   while (accumulator >= STEP_SECONDS) {
-    applyGaitControl();
+    applyReleaseControl();
+    applyPerturbationPulse();
     mujoco.mj_step(model, data);
+    completePerturbationStep();
+    advanceStandSuite();
     accumulator -= STEP_SECONDS;
+    if (!running) break;
   }
   render();
-  animation = requestAnimationFrame(frame);
+  if (running) animation = requestAnimationFrame(frame);
 }
 
 function start() {
   if (running) return;
   running = true;
   previousWallTime = performance.now();
-  playButton.textContent = 'Pause';
-  playButton.setAttribute('aria-pressed', 'true');
+  updatePlayButton();
   animation = requestAnimationFrame(frame);
 }
 
 function toggle() {
-  if (running) stop(); else start();
+  if (running) {
+    stop();
+    return;
+  }
+  if (currentRelease === 'v0.2' && standRunMode === 'idle') {
+    beginStandSuite();
+    return;
+  }
+  start();
 }
 
 function releaseAccessors() {
@@ -687,7 +942,7 @@ async function initialise() {
     resetButton.disabled = false;
     cameraResetButton.disabled = false;
     cameraFollowButton.disabled = false;
-    playButton.textContent = reducedMotion ? 'Start simulation' : 'Pause';
+    playButton.textContent = 'Play simulation';
     playButton.addEventListener('click', toggle);
     resetButton.addEventListener('click', restart);
     releaseSelect.addEventListener('change', () => loadRelease(releaseSelect.value).catch((error) => {
@@ -706,6 +961,7 @@ async function initialise() {
 
 window.addEventListener('pagehide', () => {
   if (animation) cancelAnimationFrame(animation);
+  clearPerturbationPulse();
   if (data) data.delete();
   releaseAccessors();
   if (model) model.delete();

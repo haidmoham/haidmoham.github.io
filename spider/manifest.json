@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "robot": "C-1N",
-  "release": "C-1N // 01 · SHUFFLE",
-  "checkpoint": "C-1N // 01 · SHUFFLE",
-  "legacy_release": "v0.1",
+  "release": "C-1N // 02 · STAND",
+  "checkpoint": "C-1N // 02 · STAND",
+  "legacy_release": "v0.2",
   "canonical_repository": "https://github.com/haidmoham/spider",
   "canonical_repository_note": "Legacy repository slug; public robot identity is C-1N.",
-  "spider_commit": "79033cd3166ee19f53c09b7e5999b53379ba55f8",
+  "spider_commit": "ccc115db5de7d836b67a27ed89d0c14241e78479",
   "checkpoints": {
     "v0.0": {
       "label": "C-1N // 00 · SPAWN",
@@ -19,6 +19,12 @@
       "model": "model/shuffle.xml",
       "source_commit": "79033cd3166ee19f53c09b7e5999b53379ba55f8",
       "model_sha256": "3ca25536a199d52ea5e0324f9018d9be02af114eb1060a9f55b85a7a166ab083"
+    },
+    "v0.2": {
+      "label": "C-1N // 02 · STAND",
+      "model": "model/stand.xml",
+      "source_commit": "ccc115db5de7d836b67a27ed89d0c14241e78479",
+      "model_sha256": "8a52f0be3279116437254f89c5cf60964712ed65b0160be6c9a4e1621130b296"
     }
   },
   "runtime": {
