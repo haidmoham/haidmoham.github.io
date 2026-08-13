@@ -19,6 +19,8 @@
   --ease-out:   cubic-bezier(.23, 1, .32, 1);
   --radius:     10px;
   --radius-lg:  10px;
+  --card-shadow: 0 1px 2px rgba(23,42,61,.06), 0 10px 24px rgba(23,42,61,.07);
+  --card-shadow-hover: 0 2px 4px rgba(23,42,61,.08), 0 14px 28px rgba(23,42,61,.11);
 }
 html { scroll-behavior: smooth; }
 body {
@@ -89,7 +91,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
 .hero-title { color: #fff; margin-bottom: 1.2rem; }
-.hero-title em { font-style: italic; color: var(--gold-light); }
+.hero-title em, .hero-title-accent { font-style: normal; color: var(--gold-light); }
 .hero-sub { font-size: 1.02rem; color: var(--text-muted); max-width: 480px; margin-bottom: 2rem; }
 .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
 
@@ -809,7 +811,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .cta-strip h2, .project-card h3, .project-card-full h3, .notes-post-card h2,
 .notes-principles-list h2, .about-avatar h3, .timeline-item h4, .skill-card h3,
 .resume-download-card strong, .resume-entry h4 { color: var(--ink); }
-.hero-title em, .hero-proof-card h2 em, .article-subtitle { color: var(--accent) !important; }
+.hero-title em, .hero-title-accent, .hero-proof-card h2 em, .article-subtitle { color: var(--accent) !important; }
 .page-hero { min-height: 25rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid var(--border); }
 .featured > .section-header,
 .professional-record .section-header,
@@ -821,7 +823,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .professional-record-card {
   background: var(--surface-raised);
   border-color: var(--border);
-  box-shadow: 0 14px 36px rgba(31,55,78,.05);
+  box-shadow: var(--card-shadow);
 }
 .featured-card { background: rgba(255,255,255,.96); }
 .project-tag, .project-meta span, .pill, .avail-tag {
@@ -843,23 +845,15 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   border-top: 3px solid var(--accent);
   border-radius: var(--radius-lg);
 }
-.current-study-pair {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px;
-  margin-top: 1.5rem; background: var(--border); border: 1px solid var(--border);
-  overflow: hidden;
-}
-.current-study-track { padding: 1.25rem 1.4rem; background: #f8fafb; }
+.current-study-band { margin-top: 1.5rem; }
+.current-study-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.25rem; }
+.current-study-track { padding: 1.75rem; background: var(--surface-raised); }
 .broader-work-heading { margin-top: clamp(4rem,8vw,6.5rem); }
 .independent-work-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 .project-group { margin-top: clamp(3.5rem,7vw,5.5rem); }
 .project-group-heading { margin-bottom: 1.5rem; padding-bottom: .8rem; border-bottom: 1px solid var(--border); }
 .independent-product-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
 .independent-feature { display: block; width: 100%; margin-top: 1.5rem; }
-.earlier-work-list { border-top: 1px solid var(--border); }
-.earlier-work-item {
-  display: grid; grid-template-columns: minmax(10rem,.7fr) minmax(0,1.5fr) auto;
-  gap: 1.25rem; align-items: baseline; padding: 1rem 0; border-bottom: 1px solid var(--border);
-}
 
 /* Exact, fast feedback; lift only for precise pointing devices. */
 .btn, .nav-links a.nav-cta, .nav-links a.nav-cta-outline, .nav-links a.nav-notes,
@@ -874,7 +868,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .professional-record-card:hover, .btn-primary:hover { transform: none; }
 @media (hover:hover) and (pointer:fine) {
   .project-card:hover, .project-card-full:hover, .resume-download-card:hover,
-  .professional-record-card:hover { transform: translateY(-2px); }
+  .professional-record-card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
   .btn-primary:hover { transform: translateY(-1px); }
 }
 
