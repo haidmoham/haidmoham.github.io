@@ -65,8 +65,16 @@ const PERTURBATION_CASES = [
     };
   })),
 ];
-const COLORS = Array(6).fill('#030304');
+const COLORS = Array(6).fill('#7a8280');
 const FOOT_COLOR = '#d90508';
+const EYE_RADIUS = 0.05;
+const PUPIL_RADIUS = 0.019;
+const PUPIL_LIMIT = 0.025;
+const PUPIL_RESTITUTION = 0.35;
+const PUPIL_CONFIG = [
+  { rest: new THREE.Vector2(-0.007, 0.003), stiffness: 68, damping: 6.5, splay: 1 },
+  { rest: new THREE.Vector2(0.007, -0.002), stiffness: 84, damping: 7.5, splay: -1 },
+];
 const STEP_SECONDS = 0.002;
 const MAX_FRAME_SECONDS = 0.05;
 const TELEMETRY_WINDOW_SECONDS = 20;
@@ -111,6 +119,7 @@ let currentPerturbationIndex = 0;
 let perturbationPulse = { force: [0, 0, 0], startsAt: Infinity, remainingSteps: 0 };
 let standRunMode = 'idle';
 let perturbationControlsBound = false;
+let pupilDynamics;
 
 function readout(name) {
   return root.querySelector(`[data-${name}]`);
@@ -394,7 +403,7 @@ function createRobotVisual() {
   const torso = new THREE.Group();
   const torsoMesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.44, 0.32, 0.14),
-    new THREE.MeshStandardMaterial({ color: 0x030304, metalness: 0.38, roughness: 0.34 }),
+    new THREE.MeshStandardMaterial({ color: 0xaeb5b0, metalness: 0.28, roughness: 0.38 }),
   );
   const torsoEdges = new THREE.LineSegments(
     new THREE.EdgesGeometry(torsoMesh.geometry),
@@ -402,7 +411,29 @@ function createRobotVisual() {
   );
   torsoMesh.castShadow = true;
   torsoMesh.receiveShadow = true;
-  torso.add(torsoMesh, torsoEdges);
+  const cowl = new THREE.Mesh(
+    new THREE.BoxGeometry(0.34, 0.25, 0.018),
+    new THREE.MeshStandardMaterial({ color: 0x0e1111, metalness: 0.22, roughness: 0.45 }),
+  );
+  cowl.position.z = 0.078;
+  const spine = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.008, 0.008, 0.07, 10),
+    new THREE.MeshStandardMaterial({ color: 0xebe0b8, metalness: 0.12, roughness: 0.5 }),
+  );
+  spine.rotation.y = Math.PI / 2;
+  spine.position.set(-0.125, 0, 0.091);
+  torso.add(torsoMesh, torsoEdges, cowl, spine);
+
+  const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0xf5f5e9, roughness: 0.28, metalness: 0.04 });
+  const pupilMaterial = new THREE.MeshStandardMaterial({ color: 0x050606, roughness: 0.24, metalness: 0.12 });
+  const eyePairs = PUPIL_CONFIG.map((config, index) => {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(EYE_RADIUS, 24, 16), eyeMaterial.clone());
+    eye.position.set(0.235, index === 0 ? 0.065 : -0.065, 0.012);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(PUPIL_RADIUS, 18, 12), pupilMaterial.clone());
+    eye.add(pupil);
+    torso.add(eye);
+    return { eye, pupil, config };
+  });
   scene.add(torso);
 
   const legs = FOOT_NAMES.map((_, index) => {
@@ -420,11 +451,68 @@ function createRobotVisual() {
   robotVisual = {
     torso,
     legs,
+    eyePairs,
     matrix: new THREE.Matrix4(),
     start: new THREE.Vector3(),
     end: new THREE.Vector3(),
     direction: new THREE.Vector3(),
   };
+  resetPupilDynamics();
+}
+
+function resetPupilDynamics() {
+  pupilDynamics = PUPIL_CONFIG.map((config) => ({
+    offset: config.rest.clone(),
+    velocity: new THREE.Vector2(),
+  }));
+  if (robotVisual) updatePupilPositions();
+}
+
+function updatePupilPositions() {
+  robotVisual.eyePairs.forEach(({ pupil }, index) => {
+    const offset = pupilDynamics[index].offset;
+    const forward = Math.sqrt(Math.max(0, (EYE_RADIUS - 0.006) ** 2 - offset.lengthSq()));
+    pupil.position.set(forward, offset.x, offset.y);
+  });
+}
+
+function updateResponsivePupils(deltaTime) {
+  if (!pupilDynamics || !data || !robotVisual) return;
+  const torso = bodyAccessors?.torso;
+  if (!torso) return;
+  const rotation = torso.xmat;
+  const gravity = new THREE.Vector3(0, 0, -9.81);
+  const gravityLocal = new THREE.Vector3(
+    rotation[0] * gravity.x + rotation[3] * gravity.y + rotation[6] * gravity.z,
+    rotation[1] * gravity.x + rotation[4] * gravity.y + rotation[7] * gravity.z,
+    rotation[2] * gravity.x + rotation[5] * gravity.y + rotation[8] * gravity.z,
+  );
+  const qacc = data.qacc || [];
+  const acceleration = new THREE.Vector3(qacc[0] || 0, qacc[1] || 0, qacc[2] || 0);
+  const accelerationLocal = new THREE.Vector3(
+    rotation[0] * acceleration.x + rotation[3] * acceleration.y + rotation[6] * acceleration.z,
+    rotation[1] * acceleration.x + rotation[4] * acceleration.y + rotation[7] * acceleration.z,
+    rotation[2] * acceleration.x + rotation[5] * acceleration.y + rotation[8] * acceleration.z,
+  );
+  const effective = gravityLocal.sub(accelerationLocal);
+  const inertial = new THREE.Vector2(effective.y, effective.z).multiplyScalar(PUPIL_LIMIT / 6.867);
+  inertial.x = Math.tanh(inertial.x / PUPIL_LIMIT) * PUPIL_LIMIT;
+  inertial.y = Math.tanh(inertial.y / PUPIL_LIMIT) * PUPIL_LIMIT;
+  const frontBack = 0.008 * Math.tanh(effective.x / 9.81);
+  const elapsed = Math.min(Math.max(deltaTime || STEP_SECONDS, STEP_SECONDS), 1 / 30);
+  pupilDynamics.forEach((state, index) => {
+    const config = PUPIL_CONFIG[index];
+    const target = config.rest.clone().add(inertial).add(new THREE.Vector2(config.splay * frontBack, 0));
+    target.clampLength(0, PUPIL_LIMIT);
+    const spring = target.sub(state.offset).multiplyScalar(config.stiffness).addScaledVector(state.velocity, -config.damping);
+    state.velocity.addScaledVector(spring, elapsed);
+    state.offset.addScaledVector(state.velocity, elapsed);
+    if (state.offset.length() > PUPIL_LIMIT) {
+      state.offset.setLength(PUPIL_LIMIT);
+      state.velocity.multiplyScalar(-PUPIL_RESTITUTION);
+    }
+  });
+  updatePupilPositions();
 }
 
 function positionFrom(accessor, target) {
@@ -465,6 +553,7 @@ function updateRobotVisual(contacts) {
     visual.foot.material.color.set(FOOT_COLOR);
     visual.foot.material.emissive.set(contacts[index] ? 0x260000 : 0x000000);
   });
+  updateResponsivePupils(STEP_SECONDS);
 }
 
 function renderScene() {
@@ -787,6 +876,7 @@ function restart() {
   telemetryHistory = [];
   lastTelemetrySampleTime = -Infinity;
   setReleasePose();
+  resetPupilDynamics();
   schedulePerturbationPulse();
   cacheAccessors();
   renderPerturbationGrid();
