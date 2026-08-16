@@ -139,6 +139,14 @@ def validate_field_layout_contract() -> None:
         ".contact-detail > span {" in stylesheet and ".contact-detail span {" not in stylesheet,
         "contact labels must use a direct-child selector so nested field glyph spans stay inline",
     )
+    require(
+        ".current-study-pair { grid-template-columns: minmax(0,1fr); }" in stylesheet,
+        "the single-column study grid must allow cards to shrink within touch viewports",
+    )
+    require(
+        ".project-meta > span" in stylesheet and ".project-meta span" not in stylesheet,
+        "project metadata pills must not restyle nested field glyph spans",
+    )
 
 
 def require(condition: bool, message: str) -> None:

@@ -137,7 +137,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .project-card h3 { margin-bottom: 0.6rem; color: #fff; }
 .project-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.1rem; }
 .project-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.project-meta span { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.2rem 0.6rem; border-radius: 4px; }
+.project-meta > span { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.2rem 0.6rem; border-radius: 4px; }
 .see-all { text-align: center; margin-top: 2.5rem; }
 
 /* CTA */
@@ -802,7 +802,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .spider-project-card:hover, .spider-project-card-full:hover { border-color: #2f69ad; }
 .spider-project-card h3, .spider-project-card-full h3, .spider-project-card-full .engineering-note strong { color: #214b78; }
 .spider-project-card p, .spider-project-card-full p, .spider-project-card-full .project-bullets li, .spider-project-card-full .engineering-note { color: #4d6884; }
-.spider-project-card .project-tag, .spider-project-card .project-meta span, .spider-project-card-full .project-tag, .spider-project-card-full .project-meta span { color: #214b78; background: rgba(47,105,173,.09); border: 1px solid rgba(47,105,173,.24); }
+.spider-project-card .project-tag, .spider-project-card .project-meta > span, .spider-project-card-full .project-tag, .spider-project-card-full .project-meta > span { color: #214b78; background: rgba(47,105,173,.09); border: 1px solid rgba(47,105,173,.24); }
 .spider-project-card-full .project-link, .spider-inline-link, .spider-avail-item .avail-item-body strong a { color: #2f69ad; border-bottom-color: currentColor; }
 .spider-project-card-full .engineering-note, .spider-avail-item .avail-detail { background: rgba(47,105,173,.08); border-left-color: #2f69ad; }
 .avail-items li.spider-avail-item { gap: .85rem; padding: 1rem; color: #4d6884; }
@@ -864,7 +864,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   box-shadow: var(--card-shadow);
 }
 .featured-card { background: rgba(255,255,255,.96); }
-.project-tag, .project-meta span, .pill, .avail-tag {
+.project-tag, .project-meta > span, .pill, .avail-tag {
   background: rgba(40,100,159,.06);
   border-color: rgba(40,100,159,.14);
 }
@@ -1020,6 +1020,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   .spider-evidence, .current-study-band, .current-study-group,
   .current-technical-study { padding: 1.25rem; }
   .current-study-pair, .independent-product-grid, .earlier-work-item { grid-template-columns: 1fr; }
+  .current-study-pair { grid-template-columns: minmax(0,1fr); }
   .independent-work-grid { grid-template-columns: 1fr; }
   .earlier-work-item { gap: .35rem; }
   .nav-links.open {
