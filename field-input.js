@@ -28,6 +28,18 @@ export function isDirectPointerType(pointerType) {
   return pointerType === 'touch' || pointerType === 'pen';
 }
 
+export function resolveFieldInputModality(pointerType, {
+  primaryFine = false,
+  primaryCoarse = false,
+} = {}) {
+  if (pointerType === 'mouse') return 'cursor';
+  if (pointerType === 'touch') return 'touch';
+  if (pointerType === 'pen') return 'pen';
+  if (primaryFine) return 'cursor';
+  if (primaryCoarse) return 'touch';
+  return 'pointer';
+}
+
 export function shouldStartDirectFieldGesture({
   pointerType,
   mode,

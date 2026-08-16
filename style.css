@@ -1208,7 +1208,7 @@ body:not(.robotics-page) > .field-cursor-artifact {
   }
 }
 
-/* FIELD TABLE · TOUCH-FIRST TYPOGRAPHY INSTRUMENT
+/* FIELD TABLE · POINTER-AWARE TYPOGRAPHY INSTRUMENT
    The current experience is bounded to the home hero. The page keeps native
    vertical scroll and pinch zoom while the stage owns the captured pointer. */
 [data-field-stage] {

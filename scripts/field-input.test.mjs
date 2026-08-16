@@ -11,6 +11,7 @@ const {
   POINTER_ACTIVE_MS,
   isDirectPointerType,
   pointerActivityDeadline,
+  resolveFieldInputModality,
   shouldStartDirectFieldGesture,
 } = await import(moduleUrl);
 
@@ -45,6 +46,17 @@ test('touch and pen are capability signals independent of viewport size', () => 
     }
   }
   assert.equal(isDirectPointerType('mouse'), false);
+});
+
+test('field presentation follows the primary capability until an actual pointer takes over', () => {
+  assert.equal(resolveFieldInputModality('', { primaryFine: true, primaryCoarse: false }), 'cursor');
+  assert.equal(resolveFieldInputModality('', { primaryFine: true, primaryCoarse: true }), 'cursor');
+  assert.equal(resolveFieldInputModality('', { primaryFine: false, primaryCoarse: true }), 'touch');
+  assert.equal(resolveFieldInputModality('', { primaryFine: false, primaryCoarse: false }), 'pointer');
+
+  assert.equal(resolveFieldInputModality('mouse', { primaryCoarse: true }), 'cursor');
+  assert.equal(resolveFieldInputModality('touch', { primaryFine: true }), 'touch');
+  assert.equal(resolveFieldInputModality('pen', { primaryFine: true }), 'pen');
 });
 
 test('direct gestures start only on authored non-interactive text in a moving mode', () => {
@@ -126,6 +138,21 @@ test('Field Table exposes explicit modes and keeps visual feedback decorative', 
   assert.match(controller, /probe\.setAttribute\(\s*(['"])aria-hidden\1\s*,\s*(['"])true\2\s*\)/);
   assert.match(stylesheet, /\.field-(?:color|table)-canvas[^{]*\{[^}]*pointer-events:\s*none\s*;/s);
   assert.match(stylesheet, /\.field-table-probe[^{]*\{[^}]*pointer-events:\s*none\s*;/s);
+});
+
+test('Field Table starts neutral and routes its instructions by pointer capability', async () => {
+  const [controller, page] = await Promise.all([
+    readFile(new URL('../field.js', import.meta.url), 'utf8'),
+    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  ]);
+
+  assert.match(page, /data-field-kicker[^>]*>Interactive field</);
+  assert.doesNotMatch(page, /data-field-kicker[^>]*>Touch field</);
+  assert.match(controller, /matchMedia\?\.\(\s*['"]\(pointer: fine\)['"]\s*\)/);
+  assert.match(controller, /matchMedia\?\.\(\s*['"]\(pointer: coarse\)['"]\s*\)/);
+  assert.match(controller, /resolveFieldInputModality\(\s*pointerType/);
+  assert.match(controller, /routeInputModality\(\s*event\.pointerType/);
+  assert.match(controller, /dataset\.fieldInput/);
 });
 
 test('Field Table controls retain touch sizing, safe areas, and fine-pointer hover', async () => {

@@ -11,10 +11,29 @@ import {
   DIRECT_VIEWPORT_GRACE_MS,
   isDirectPointerType,
   pointerActivityDeadline,
-} from './field-input.js?v=2';
+  resolveFieldInputModality,
+} from './field-input.js?v=3';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
+const INPUT_COPY = {
+  cursor: {
+    kicker: 'Cursor field',
+    idle: 'Sweep across the title. Speed shapes color and force.',
+  },
+  touch: {
+    kicker: 'Touch field',
+    idle: 'Drag through the title. Speed shapes color and force.',
+  },
+  pen: {
+    kicker: 'Pen field',
+    idle: 'Draw through the title. Speed shapes color and force.',
+  },
+  pointer: {
+    kicker: 'Interactive field',
+    idle: 'Move through the title. Speed shapes color and force.',
+  },
+};
 const ROOT = document.documentElement;
 const stage = document.querySelector('[data-field-stage]');
 
@@ -131,9 +150,10 @@ function mount() {
   const dock = stage.querySelector('[data-field-dock]');
   const modeButtons = [...stage.querySelectorAll('[data-field-mode]')];
   const resetButton = stage.querySelector('[data-field-reset]');
+  const kicker = stage.querySelector('[data-field-kicker]');
   const hint = stage.querySelector('[data-field-hint]');
   const status = stage.querySelector('[data-field-status]');
-  if (!targets.length || !dock || modeButtons.length !== FIELD_MODES.length || !resetButton) return null;
+  if (!targets.length || !dock || modeButtons.length !== FIELD_MODES.length || !resetButton || !kicker) return null;
 
   const canvas = document.createElement('canvas');
   canvas.className = 'field-table-canvas';
@@ -149,6 +169,8 @@ function mount() {
 
   const systemReducedMotion = reducedMotion();
   const storedMode = readModePreference();
+  const primaryFinePointer = window.matchMedia?.('(pointer: fine)');
+  const primaryCoarsePointer = window.matchMedia?.('(pointer: coarse)');
   const state = {
     mode: storedMode || (systemReducedMotion ? 'still' : 'color'),
     explicitMode: Boolean(storedMode),
@@ -160,6 +182,10 @@ function mount() {
     lastPointerSample: null,
     lastDirectInputAt: -Infinity,
     pointer: { x: 0, y: 0, vx: 0, vy: 0, chargeScale: 1, active: false },
+    inputModality: resolveFieldInputModality('', {
+      primaryFine: primaryFinePointer?.matches,
+      primaryCoarse: primaryCoarsePointer?.matches,
+    }),
     hasInteracted: false,
   };
 
@@ -278,12 +304,25 @@ function mount() {
       magnetic: 'Magnet field. Drag to push and pull the type.',
       still: 'Field motion is off.',
     };
+    const inputCopy = INPUT_COPY[state.inputModality] || INPUT_COPY.pointer;
+    stage.dataset.fieldInput = state.inputModality;
+    kicker.textContent = inputCopy.kicker;
     status.textContent = labels[state.mode];
     hint.textContent = state.mode === 'still'
       ? 'Motion is off. Choose Color or Magnet to explore.'
       : state.hasInteracted
         ? 'Move slowly for pull. Flick for a wider wake.'
-        : 'Drag through the title. Speed shapes color and force.';
+        : inputCopy.idle;
+  };
+
+  const routeInputModality = (pointerType = '') => {
+    const nextModality = resolveFieldInputModality(pointerType, {
+      primaryFine: primaryFinePointer?.matches,
+      primaryCoarse: primaryCoarsePointer?.matches,
+    });
+    if (nextModality === state.inputModality) return;
+    state.inputModality = nextModality;
+    announceMode();
   };
 
   const updateControls = () => {
@@ -337,6 +376,7 @@ function mount() {
   };
 
   const pointerDown = (event) => {
+    routeInputModality(event.pointerType);
     if (state.mode === 'still' || state.pointerId !== null || event.isPrimary === false || pointerIsInteractive(event.target)) return;
     state.pointerId = event.pointerId;
     state.pointerType = event.pointerType || 'mouse';
@@ -391,6 +431,10 @@ function mount() {
     if (!state.explicitMode) selectMode(event.matches ? 'still' : 'color', { explicit: false });
   };
 
+  const inputCapabilityChanged = () => routeInputModality('');
+  const pointerEntered = (event) => routeInputModality(event.pointerType);
+
+  stage.addEventListener('pointerover', pointerEntered, { passive: true });
   stage.addEventListener('pointerdown', pointerDown, { passive: true });
   stage.addEventListener('pointermove', pointerMove, { passive: true });
   stage.addEventListener('pointerup', pointerEnd, { passive: true });
@@ -398,6 +442,8 @@ function mount() {
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', visibilityChanged);
   media?.addEventListener?.('change', motionPreferenceChanged);
+  primaryFinePointer?.addEventListener?.('change', inputCapabilityChanged);
+  primaryCoarsePointer?.addEventListener?.('change', inputCapabilityChanged);
   modeButtons.forEach((button) => {
     button.addEventListener('click', () => selectMode(button.dataset.fieldMode));
     button.addEventListener('keydown', keyDown);
@@ -416,12 +462,15 @@ function mount() {
       settle({ clearColor: true });
       cancelAnimationFrame(resizeRaf);
       stage.removeEventListener('pointerdown', pointerDown);
+      stage.removeEventListener('pointerover', pointerEntered);
       stage.removeEventListener('pointermove', pointerMove);
       stage.removeEventListener('pointerup', pointerEnd);
       stage.removeEventListener('pointercancel', pointerEnd);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', visibilityChanged);
       media?.removeEventListener?.('change', motionPreferenceChanged);
+      primaryFinePointer?.removeEventListener?.('change', inputCapabilityChanged);
+      primaryCoarsePointer?.removeEventListener?.('change', inputCapabilityChanged);
       modeButtons.forEach((button) => button.removeEventListener('keydown', keyDown));
       resetButton.removeEventListener('click', resetField);
       color.destroy();
