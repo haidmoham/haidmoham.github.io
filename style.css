@@ -80,6 +80,10 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
 .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
 .btn-outline:hover { background: var(--gold); color: var(--navy); }
+.btn:focus-visible, .hero-actions a:focus-visible {
+  outline: 3px solid rgba(40, 100, 159, .42);
+  outline-offset: 3px;
+}
 
 /* HERO */
 .hero {
@@ -120,11 +124,12 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   background: var(--navy-card); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 1.75rem;
   transition: border-color 0.2s, transform 0.2s;
+  min-width: 0;
 }
 .project-card:hover { border-color: rgba(61,139,255,0.4); transform: translateY(-3px); }
 .featured-card { background: var(--navy-light); }
 .project-tag {
-  display: inline-block; white-space: nowrap; font-size: 0.7rem; font-weight: 600;
+  display: inline-block; max-width: 100%; white-space: normal; font-size: 0.7rem; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.1em;
   color: var(--text-muted); background: rgba(255,255,255,0.05);
   padding: 0.25rem 0.7rem; border-radius: 4px; margin-bottom: 0.9rem;
@@ -514,6 +519,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   .hero { grid-template-columns: 1fr; padding-top: 6rem; }
   .hero-visual { display: none; }
   .project-grid { grid-template-columns: 1fr; }
+  .independent-work-grid { grid-template-columns: 1fr; }
   .about-grid, .contact-layout { grid-template-columns: 1fr; }
   .about-avatar { position: static; }
   .skills-grid { grid-template-columns: repeat(2, 1fr); }
@@ -539,7 +545,37 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 
 /* === GALAXY HERO BACKGROUND === */
-.hero-stage { position: relative; }
+.hero-stage { position: relative; overflow: hidden; }
+.hero-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 9% 7%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 34% 50%, rgba(226,72,82,.24), transparent 47%),
+    radial-gradient(ellipse at 52% 58%, rgba(244,116,96,.18), transparent 42%),
+    radial-gradient(ellipse at 67% 36%, rgba(48,112,170,.055), transparent 40%);
+  mix-blend-mode: color;
+  filter: blur(28px);
+  opacity: 0;
+}
+.hero-stage > .hero { position: relative; z-index: 1; }
+.field-enabled.field-mode-color .hero-stage::after {
+  animation: field-color-breathe 7s ease-in-out infinite alternate;
+}
+.field-enabled.field-mode-magnetic .hero-stage::after,
+.field-enabled.field-mode-still .hero-stage::after {
+  animation: none;
+  opacity: 0;
+}
+@keyframes field-color-breathe {
+  from { opacity: .065; }
+  to { opacity: .15; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.field-mode-color):not(.field-mode-magnetic) .hero-stage::after { animation: none; opacity: 0; }
+}
 #galaxy-canvas {
   position: absolute; inset: 0; width: 100%; height: 100%;
   display: block; z-index: 0; pointer-events: none;
@@ -797,6 +833,8 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .nav-links a.nav-cta-outline { border-width: 1px; }
 
 .hero-stage { background: rgba(248,250,251,.74); border-bottom: 1px solid var(--border); }
+.hero-stage .btn-ghost { color: var(--ink); border-color: rgba(40,100,159,.48); }
+.hero-stage .btn-ghost:hover { color: var(--accent); border-color: var(--accent); }
 #galaxy-canvas, .hero-scrim { display: none; }
 .hero { min-height: min(100svh,880px); }
 .hero-machine-visual {
@@ -1007,11 +1045,19 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   width: 100%;
   height: 100%;
   pointer-events: none;
+  mix-blend-mode: color;
+  filter: saturate(1);
   opacity: 0;
-  transition: opacity 280ms ease;
+  transition: opacity 280ms ease, filter 320ms ease;
 }
-.field-enabled .field-color-canvas { opacity: 1; }
+.field-enabled.field-mode-color .field-color-canvas { opacity: 1; filter: saturate(1.75); }
+.field-enabled.field-mode-magnetic .field-color-canvas,
+.field-enabled.field-mode-still .field-color-canvas { opacity: 0; }
 .field-disabled .field-color-canvas { opacity: 0; }
+/* Preserve the custom cursor experiment behind an explicit opt-in. The field
+   itself keeps the browser cursor unless this class is deliberately mounted. */
+html.field-custom-cursor.field-enabled,
+html.field-custom-cursor.field-enabled * { cursor: none !important; }
 [data-field-target] {
   position: relative;
   z-index: 1;
@@ -1019,9 +1065,10 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .field-glyph {
   display: inline-block;
   white-space: pre;
-  transform: translate3d(var(--field-x, 0px), var(--field-y, 0px), 0);
-  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition: color 150ms ease;
 }
+.field-active .field-glyph { will-change: transform; }
 .field-word {
   display: inline-block;
   white-space: nowrap;
@@ -1031,47 +1078,107 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   right: 1rem;
   bottom: 1rem;
   z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .42rem;
+  width: 11.25rem;
+  min-height: 2.75rem;
   border: 1px solid rgba(29, 52, 72, .32);
   border-radius: 999px;
-  padding: .48rem .72rem;
-  background: rgba(248, 250, 251, .92);
+  padding: .62rem .72rem;
+  background: rgba(248, 250, 251, .94);
   color: var(--text, #1d3448);
   box-shadow: 0 5px 18px rgba(23, 42, 61, .12);
   font: 600 .63rem/1 'JetBrains Mono', monospace;
   letter-spacing: .08em;
+  white-space: nowrap;
   cursor: pointer;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease,
+    box-shadow 160ms ease, transform 120ms var(--ease-out);
 }
-.field-toggle:hover { border-color: var(--accent, #286aa8); }
+.field-toggle:hover {
+  border-color: var(--accent, #286aa8);
+  background: rgba(255, 255, 255, .98);
+}
+.field-toggle:active { transform: scale(.98); }
 .field-toggle:focus-visible { outline: 3px solid rgba(40, 106, 168, .42); outline-offset: 3px; }
-.field-cursor-artifact {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 19;
-  width: 8px;
-  height: 8px;
-  border: 1px solid rgba(217, 75, 96, .7);
+.field-mode-toggle::before {
+  content: "";
+  flex: 0 0 auto;
+  width: .48rem;
+  height: .48rem;
+  border: 1px solid rgba(40, 100, 159, .55);
   border-radius: 50%;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate3d(calc(var(--field-cursor-x, -20px) - 4px), calc(var(--field-cursor-y, -20px) - 4px), 0);
-  transition: opacity 240ms ease, transform 110ms linear;
+  background: rgba(40, 100, 159, .12);
 }
-.field-enabled .field-cursor-artifact { opacity: .72; }
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .field-cursor-artifact { opacity: 0; }
-  .field-glyph { will-change: auto; }
+.field-mode-color .field-mode-toggle::before {
+  border-color: rgba(40, 100, 159, .42);
+  background: linear-gradient(135deg, #2184c4 8%, #e02a5c 52%, #f4c41c 92%);
 }
+.field-mode-magnetic .field-mode-toggle::before { background: #28649f; }
+.field-mode-still .field-mode-toggle::before {
+  border-color: rgba(91, 109, 127, .58);
+  background: transparent;
+}
+.field-cursor-artifact {
+  position: fixed; left: 0; top: 0; z-index: 2147483646; width: 34px; height: 45px;
+  pointer-events: none; opacity: 0;
+  transform: translate3d(var(--field-cursor-x, -100px), var(--field-cursor-y, -100px), 0) scale(calc(.58 + var(--field-cursor-energy, 0) * .84));
+  transform-origin: 3px 2px; transition: opacity 180ms ease, transform 90ms cubic-bezier(.2,.9,.25,1);
+}
+.field-custom-cursor.field-enabled .field-cursor-artifact { opacity: .7; }
+.field-cursor-arrow { display: block; width: 100%; height: 100%; overflow: visible; }
+@media (pointer: coarse) { .field-cursor-artifact { opacity: 0 !important; } }
+/* STILL is the automatic system-safe default. COLOR and MAGNETIC are explicit
+   visitor choices, while the dormant custom cursor remains opt-in only. */
+.field-custom-cursor.field-enabled:not(.field-mode-still) .field-cursor-artifact { opacity: .7; }
+.field-mode-still .field-cursor-artifact { display: none !important; }
+.field-mode-still .field-color-canvas { opacity: 0 !important; }
+.field-mode-still .field-glyph {
+  transform: none !important;
+  will-change: auto;
+  transition: color 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-cursor-artifact { display: none !important; }
+  html:not(.field-mode-color):not(.field-mode-magnetic) .field-color-canvas { opacity: 0 !important; }
+  html:not(.field-mode-color):not(.field-mode-magnetic) .field-glyph {
+    transform: none !important;
+    will-change: auto;
+    transition: color 120ms ease;
+  }
+}
+
 @media (max-width: 600px) {
   .field-toggle { right: .75rem; bottom: .75rem; }
+  .field-mode-toggle {
+    width: 11.25rem;
+    padding-inline: .55rem;
+    font-size: .6rem;
+    letter-spacing: .055em;
+  }
 }
 
 /* Field nodes are direct body children; keep the site-wide body-child layer
    rule from converting their viewport positioning into document flow. */
 body:not(.robotics-page) > .field-color-canvas {
   position: fixed;
-  z-index: 1;
+  /* Sit above the editorial paper/surface layers so pigment keeps its
+     saturation, while the content selectors below remain readable above it. */
+  z-index: 2;
+}
+/* The body-child rule above intentionally creates one stacking context per
+   page section. Release those editorial wrappers so the field can sit between
+   their surfaces and their text; special routes keep their own stack. */
+html.field-enabled body:not(.robotics-page) > :not(.field-color-canvas):not(.field-toggle):not(.field-cursor-artifact):not(.field-diagnostics):not(.nav) {
+  z-index: auto;
+}
+html.field-enabled body:not(.robotics-page) :where(h1, h2, h3, h4, h5, h6, p, a, li, dt, dd, span, strong, em, label, button, input, textarea, select, output):not(.field-toggle):not(.field-cursor-artifact) {
+  position: relative;
+  z-index: 3;
 }
 body:not(.robotics-page) > .field-toggle {
   position: fixed;
@@ -1079,5 +1186,28 @@ body:not(.robotics-page) > .field-toggle {
 }
 body:not(.robotics-page) > .field-cursor-artifact {
   position: fixed;
-  z-index: 19;
+  z-index: 2147483646;
+}
+.field-diagnostics {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  max-width: min(19rem, calc(100vw - 2rem));
+  padding: .45rem .6rem;
+  border: 1px solid rgba(29, 52, 72, .22);
+  background: rgba(248, 250, 251, .88);
+  color: var(--text-muted);
+  font: 600 .58rem/1.45 'JetBrains Mono', monospace;
+  letter-spacing: .03em;
+  pointer-events: none;
+}
+@media (max-width: 600px) {
+  .field-diagnostics {
+    left: .75rem;
+    bottom: 4.1rem;
+    max-width: calc(100vw - 1.5rem);
+    padding: .35rem .45rem;
+    font-size: .54rem;
+  }
 }
