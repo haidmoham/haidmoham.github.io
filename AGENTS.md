@@ -39,8 +39,9 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Existing `spider-*` CSS classes, JavaScript filenames, model paths, and the `haidmoham/spider` repository slug may remain as implementation compatibility identifiers. Do not expose them as the robot's public name except when provenance requires the literal repository or path.
 - Public checkpoints use `C-1N // NN · CODENAME`.
 - `C-1N // 00 · SPAWN` is the historical deterministic six-foot spawn baseline.
-- The current checkpoint is `C-1N // 01 · SHUFFLE`.
-- `C-1N // 02 · STAND` and `C-1N // 03 · STRIDE` are reserved future boundaries. Do not present them as completed before the canonical evidence exists.
+- `C-1N // 01 · SHUFFLE` is the preserved locomotion-failure baseline.
+- The current checkpoint is `C-1N // 02 · STAND`.
+- `C-1N // 03 · STRIDE` is a reserved future boundary. Do not present it as completed before the canonical evidence exists.
 - Task-space instrumentation may integrate between checkpoints; `FRAME` is not a checkpoint name.
 - Preserve prior checkpoints in the browser artifact when possible so behavior, instrumentation, and control changes remain directly comparable over time.
 
