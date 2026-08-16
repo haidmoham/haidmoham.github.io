@@ -14,7 +14,6 @@ FIELD_PAGES = (
     Path("contact.html"),
     Path("index.html"),
     Path("notes.html"),
-    Path("notes/the-loop-must-terminate-in-reality.html"),
     Path("projects.html"),
     Path("resume.html"),
 )

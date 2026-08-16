@@ -171,14 +171,6 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   max-width: 640px; margin: 1.75rem 0 0; padding: 0.85rem 0 0;
   border-left: 0; border-top: 1px solid rgba(125,174,255,0.28);
 }
-.notes-index { margin-top: -0.75rem; }
-.notes-index > .section-eyebrow { margin-bottom: 0.85rem; }
-.notes-pinned-label {
-  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-  display: flex; align-items: center; height: 0.85rem; color: var(--gold-light); margin-bottom: 0.55rem;
-}
-.notes-pin-icon { width: 0.85rem; height: 0.85rem; fill: none; stroke: currentColor; stroke-linecap: square; stroke-linejoin: miter; stroke-width: 1.15; }
-.notes-pinned-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .notes-post-card {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem;
   align-items: start; padding: 1.35rem 1.5rem; background: var(--navy-card);
@@ -193,9 +185,6 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .notes-post-card h2 { font-family: 'Sora', sans-serif; font-size: 1.04rem; line-height: 1.4; color: #fff; margin-bottom: 0.4rem; }
 .notes-post-card div > p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; }
 .notes-entry-link-label { align-self: center; color: var(--gold); font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
-.notes-pinned .notes-post-card { padding: 1.9rem 2rem; border-left-width: 2px; }
-.notes-pinned .notes-post-card h2 { font-family: 'Fraunces', serif; font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1.22; }
-.notes-pinned .notes-post-card div > p { font-size: 0.96rem; }
 .notes-robotics { margin-top: 1.1rem; }
 .notes-robotics .notes-post-status { color: #2f69ad; }
 .notes-robotics .notes-post-card {
@@ -896,25 +885,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
 .independent-product-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
 .independent-feature { display: block; width: 100%; margin-top: 1.5rem; }
 
-/* Working Notes: a linked editorial feature and a distinct lab surface. */
-.notes-index { margin-top: clamp(3rem,6vw,4.5rem); }
-.notes-index-heading {
-  display: block; margin-bottom: 1.35rem; padding-bottom: .9rem; border-bottom: 1px solid var(--border);
-}
-.notes-index-heading .section-eyebrow { margin-bottom: 0; }
-.notes-index-heading > p { max-width: 40rem; margin-top: .6rem; font-size: .88rem; line-height: 1.55; color: var(--text-muted); }
-.notes-entry-marker {
-  display: flex; align-items: center; gap: .45rem; margin: 0 0 .8rem;
-  color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: .67rem;
-  font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
-}
-.notes-featured-essay .notes-pin-icon { width: 1rem; height: 1rem; }
-.notes-featured-essay .notes-post-card {
-  min-height: 11.25rem; padding: clamp(1.75rem,4vw,2.5rem); border-left: 3px solid var(--accent);
-  background: rgba(255,255,255,.94);
-}
-.notes-featured-essay .notes-post-card h2 { max-width: 42rem; }
-.notes-featured-essay .notes-entry-link-label { color: var(--accent); }
+/* Working Notes: a distinct lab surface. */
 .notes-lab-section {
   margin-top: clamp(2.5rem,5vw,4rem); padding: clamp(1.5rem,4vw,2.5rem);
   border: 1px solid rgba(40,106,168,.26); border-top: 3px solid #286aa8; border-radius: var(--radius-lg);
@@ -1030,7 +1001,7 @@ body:not(.robotics-page) > .nav { z-index: 100; }
     background: #f8fafb;
     box-shadow: 0 14px 24px rgba(23,42,61,.16);
   }
-  .notes-featured-essay .notes-post-card, .notes-lab-section .notes-robotics .notes-post-card { min-height: 0; }
+  .notes-lab-section .notes-robotics .notes-post-card { min-height: 0; }
   .robotics-c1n-bridge { grid-template-columns: 1fr; gap: .6rem; }
   .robotics-c1n-bridge-content { display: block; }
   .robotics-c1n-bridge-link { display: inline-block; margin-top: .7rem; }
