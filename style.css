@@ -433,7 +433,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .contact-layout { max-width: 900px; margin: 0 auto; padding: 0 2.5rem 5rem; display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem; align-items: start; }
 .contact-info-block h3 { font-size: 0.76rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); font-family: 'Sora', sans-serif; margin-bottom: 1.25rem; }
 .contact-detail { margin-bottom: 1.4rem; }
-.contact-detail span { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.2rem; }
+.contact-detail > span { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.2rem; }
 .contact-detail a { color: var(--text); font-weight: 500; }
 .contact-detail a:hover { color: var(--gold); }
 .contact-form-card { background: var(--navy-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; }

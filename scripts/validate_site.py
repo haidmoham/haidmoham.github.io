@@ -133,6 +133,14 @@ def validate_field_coverage() -> None:
         require("data-field-target" not in robotics_page.read_text(encoding="utf-8"), f"robotics page must not contain field targets: {robotics_page.relative_to(ROOT)}")
 
 
+def validate_field_layout_contract() -> None:
+    stylesheet = (ROOT / "style.css").read_text(encoding="utf-8")
+    require(
+        ".contact-detail > span {" in stylesheet and ".contact-detail span {" not in stylesheet,
+        "contact labels must use a direct-child selector so nested field glyph spans stay inline",
+    )
+
+
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
@@ -173,6 +181,7 @@ def main() -> int:
     require("location = /c1n/" in nginx and 'Cache-Control "no-cache"' in nginx, "C-1N HTML must revalidate")
 
     validate_field_coverage()
+    validate_field_layout_contract()
 
     print("site integrity: ok")
     return 0
