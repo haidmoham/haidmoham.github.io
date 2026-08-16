@@ -57,7 +57,7 @@
       <path d="M120,29 L182,101 M120,29 L64,113" fill="none" stroke="#3D8BFF" stroke-opacity="0.4" stroke-width="1.1" />
     </svg>
     <p class="hero-eyebrow">Error 404</p>
-    <h1 class="hero-title">Off the <em>map.</em></h1>
+    <h1 class="hero-title" data-field-target>Off the <em>map.</em></h1>
     <p class="hero-sub">That page doesn't exist, or it moved. Let's get you back home.</p>
     <div class="hero-actions">
       <a href="index.html" class="btn btn-primary">Head Home</a>
@@ -77,6 +77,6 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-  <script src="main.js?v=1" defer></script>
+  <script src="main.js?v=1" defer></script><script type="module" src="field.js"></script>
 </body>
 </html>

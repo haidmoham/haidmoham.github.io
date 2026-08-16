@@ -997,3 +997,87 @@ body:not(.robotics-page) > .nav { z-index: 100; }
   .project-grid, .professional-record-grid, .projects-full-grid, .skills-grid,
   .resume-skills, .resume-download-grid, .experiment-grid { grid-template-columns: 1fr; }
 }
+
+/* Issue 20 field: the canvas and cursor mark are deliberately decorative and
+   never participate in hit testing or document flow. */
+.field-color-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+.field-enabled .field-color-canvas { opacity: 1; }
+.field-disabled .field-color-canvas { opacity: 0; }
+[data-field-target] {
+  position: relative;
+  z-index: 1;
+}
+.field-glyph {
+  display: inline-block;
+  white-space: pre;
+  transform: translate3d(var(--field-x, 0px), var(--field-y, 0px), 0);
+  will-change: transform;
+}
+.field-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.field-toggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  border: 1px solid rgba(29, 52, 72, .32);
+  border-radius: 999px;
+  padding: .48rem .72rem;
+  background: rgba(248, 250, 251, .92);
+  color: var(--text, #1d3448);
+  box-shadow: 0 5px 18px rgba(23, 42, 61, .12);
+  font: 600 .63rem/1 'JetBrains Mono', monospace;
+  letter-spacing: .08em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.field-toggle:hover { border-color: var(--accent, #286aa8); }
+.field-toggle:focus-visible { outline: 3px solid rgba(40, 106, 168, .42); outline-offset: 3px; }
+.field-cursor-artifact {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 19;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(217, 75, 96, .7);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(calc(var(--field-cursor-x, -20px) - 4px), calc(var(--field-cursor-y, -20px) - 4px), 0);
+  transition: opacity 240ms ease, transform 110ms linear;
+}
+.field-enabled .field-cursor-artifact { opacity: .72; }
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .field-cursor-artifact { opacity: 0; }
+  .field-glyph { will-change: auto; }
+}
+@media (max-width: 600px) {
+  .field-toggle { right: .75rem; bottom: .75rem; }
+}
+
+/* Field nodes are direct body children; keep the site-wide body-child layer
+   rule from converting their viewport positioning into document flow. */
+body:not(.robotics-page) > .field-color-canvas {
+  position: fixed;
+  z-index: 1;
+}
+body:not(.robotics-page) > .field-toggle {
+  position: fixed;
+  z-index: 20;
+}
+body:not(.robotics-page) > .field-cursor-artifact {
+  position: fixed;
+  z-index: 19;
+}
