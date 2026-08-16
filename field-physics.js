@@ -182,7 +182,7 @@ export function createFieldPhysics(options = {}) {
     };
   });
 
-  const pointer = { x: 0, y: 0, active: false, vx: 0, vy: 0 };
+  const pointer = { x: 0, y: 0, active: false, vx: 0, vy: 0, chargeScale: 1 };
   let reducedMotion = Boolean(options.reducedMotion);
   let elapsed = 0;
   let activity = 0;
@@ -257,6 +257,7 @@ export function createFieldPhysics(options = {}) {
     }
     pointer.x = x;
     pointer.y = y;
+    pointer.chargeScale = clamp(finite(next.chargeScale, 1), 0, 2000);
     if (typeof next.active === 'boolean') pointer.active = next.active;
     frame = makeFrame();
     return frame;
@@ -305,7 +306,8 @@ export function createFieldPhysics(options = {}) {
           const dy = glyph.y - pointer.y;
           const radiusSquared = dx * dx + dy * dy + config.softening * config.softening;
           const inverseRadius = 1 / Math.sqrt(radiusSquared);
-          const force = chargeStrength * glyph.charge * config.pointerCharge / radiusSquared;
+          const force = chargeStrength * glyph.charge * config.pointerCharge *
+            pointer.chargeScale / radiusSquared;
           forceX += dx * inverseRadius * force;
           forceY += dy * inverseRadius * force;
           // A sweep carries momentum through the field. Proximity attenuates
@@ -371,6 +373,7 @@ export function createFieldPhysics(options = {}) {
     activity = 0;
     pointer.vx = 0;
     pointer.vy = 0;
+    pointer.chargeScale = 1;
     frame = makeFrame();
     return frame;
   }

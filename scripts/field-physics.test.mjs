@@ -256,6 +256,35 @@ test('color and magnetic modes each recruit a coordinated multi-word field', () 
   assert.ok(magnetic.peak <= 32, `expected MAGNETIC legibility cap, got ${magnetic.peak}`);
 });
 
+test('a stationary direct-touch press produces a visible bounded field response', () => {
+  const glyphs = Array.from({ length: 30 }, (_, index) => ({
+    x: (index % 10) * 24,
+    y: Math.floor(index / 10) * 32,
+  }));
+  for (const [mode, cap] of [['color', 18], ['magnetic', 32]]) {
+    const physics = createFieldPhysics({ glyphs, ...fieldPhysicsOptionsForMode(mode) });
+    const peaks = Array(glyphs.length).fill(0);
+    for (let frameIndex = 0; frameIndex < 13; frameIndex += 1) {
+      physics.setPointer({
+        x: 96,
+        y: 32,
+        vx: 0,
+        vy: 0,
+        chargeScale: 1600,
+        active: true,
+      });
+      physics.update(1 / 60).glyphs.forEach((glyph, index) => {
+        peaks[index] = Math.max(peaks[index], Math.hypot(glyph.dx, glyph.dy));
+      });
+    }
+    assert.ok(Math.max(...peaks) >= 2,
+      `${mode} touch press should be plainly visible, peak was ${Math.max(...peaks)}`);
+    assert.ok(peaks.filter((peak) => peak >= 1).length >= Math.ceil(glyphs.length * 0.4),
+      `${mode} touch press should recruit at least 40% of nearby type`);
+    assert.ok(Math.max(...peaks) <= cap, `${mode} touch press exceeded ${cap}px cap`);
+  }
+});
+
 test('unknown modes fall back to color while still explicitly disables motion', () => {
   assert.deepEqual(fieldPhysicsOptionsForMode('unknown'), fieldPhysicsOptionsForMode('color'));
   assert.deepEqual(fieldPhysicsOptionsForMode('still'), { reducedMotion: true });

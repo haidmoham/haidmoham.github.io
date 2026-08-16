@@ -3,8 +3,14 @@ import {
   createWordPolarityMetadata,
   derivePointerVelocity,
   fieldPhysicsOptionsForMode,
-} from './field-physics.js?v=8';
-import { createFieldColor } from './field-color.js?v=8';
+} from './field-physics.js?v=9';
+import { createFieldColor } from './field-color.js?v=9';
+import {
+  DIRECT_TOUCH_CHARGE_SCALE,
+  isDirectPointerType,
+  pointerActivityDeadline,
+  shouldStartDirectFieldGesture,
+} from './field-input.js?v=1';
 
 const MODE_STORAGE_KEY = 'mhaider.field.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -17,6 +23,14 @@ function localDevelopment() {
 
 function reducedMotion() {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+}
+
+function touchTargetContext(target) {
+  const element = target instanceof Element ? target : null;
+  return {
+    authoredTarget: Boolean(element?.closest('[data-field-target]')),
+    interactiveTarget: Boolean(element?.closest('a, button, input, textarea, select, form, label')),
+  };
 }
 
 function readModePreference() {
@@ -154,8 +168,10 @@ function mount() {
     mode: modePreference || (systemReducedMotion ? 'still' : 'color'),
     hidden: false,
     lastPointerAt: -Infinity,
+    pointerActiveUntil: -Infinity,
     lastPointerSample: null,
-    pointer: { x: 0, y: 0, vx: 0, vy: 0, active: false },
+    directPointerId: null,
+    pointer: { x: 0, y: 0, vx: 0, vy: 0, chargeScale: 1, active: false },
   };
   const modeButton = document.createElement('button');
   modeButton.type = 'button';
@@ -250,7 +266,9 @@ function mount() {
     stop();
     state.pointer.vx = 0;
     state.pointer.vy = 0;
+    state.pointer.chargeScale = 1;
     state.pointer.active = false;
+    state.pointerActiveUntil = -Infinity;
     const settled = physics?.reset?.();
     if (settled) applyTargets(glyphTargets, settled);
     else glyphTargets.forEach((target) => target.style.removeProperty('transform'));
@@ -277,18 +295,47 @@ function mount() {
     });
   };
 
-  const pointerMove = (event) => {
+  const beginSweep = (pointerNow) => {
+    if (activeSweep && pointerNow - state.lastPointerAt <= 240) return;
+    finishSweep();
+    activeSweep = {
+      speed: 0,
+      displacement: 0,
+      participationCount: 0,
+      participationRatio: 0,
+      totalGlyphs: glyphTargets.length,
+    };
+  };
+
+  const pointerDown = (event) => {
+    if (!shouldStartDirectFieldGesture({
+      pointerType: event.pointerType,
+      mode: state.mode,
+      ...touchTargetContext(event.target),
+    })) return;
     const pointerNow = performance.now();
-    if (!activeSweep || pointerNow - state.lastPointerAt > 240) {
-      finishSweep();
-      activeSweep = {
-        speed: 0,
-        displacement: 0,
-        participationCount: 0,
-        participationRatio: 0,
-        totalGlyphs: glyphTargets.length,
-      };
-    }
+    const timestamp = Number.isFinite(event.timeStamp) ? event.timeStamp : pointerNow;
+    beginSweep(pointerNow);
+    state.directPointerId = event.pointerId;
+    state.lastPointerSample = { x: event.clientX, y: event.clientY, timestamp };
+    state.pointer = {
+      x: event.clientX,
+      y: event.clientY,
+      vx: 0,
+      vy: 0,
+      chargeScale: DIRECT_TOUCH_CHARGE_SCALE,
+      active: true,
+    };
+    state.lastPointerAt = pointerNow;
+    state.pointerActiveUntil = pointerActivityDeadline(pointerNow, event.pointerType, 'down');
+    start();
+  };
+
+  const pointerMove = (event) => {
+    const isDirect = isDirectPointerType(event.pointerType);
+    if (isDirect && state.directPointerId !== event.pointerId) return;
+    const pointerNow = performance.now();
+    beginSweep(pointerNow);
     const coalesced = event.getCoalescedEvents?.();
     const samples = coalesced?.length ? coalesced : [event];
     for (const sample of samples) {
@@ -296,11 +343,28 @@ function mount() {
       const current = { x: sample.clientX, y: sample.clientY, timestamp: now };
       const velocity = derivePointerVelocity(state.lastPointerSample, current);
       state.lastPointerSample = current;
-      state.pointer = { x: current.x, y: current.y, vx: velocity.vx, vy: velocity.vy, active: true };
+      state.pointer = {
+        x: current.x,
+        y: current.y,
+        vx: velocity.vx,
+        vy: velocity.vy,
+        chargeScale: isDirect ? DIRECT_TOUCH_CHARGE_SCALE : 1,
+        active: true,
+      };
       recordDiagnostics(velocity.speed, now);
     }
     state.lastPointerAt = pointerNow;
+    state.pointerActiveUntil = pointerActivityDeadline(pointerNow, event.pointerType, 'move');
     if (state.mode !== 'still') start();
+  };
+
+  const pointerEnd = (event) => {
+    if (!isDirectPointerType(event.pointerType) || state.directPointerId !== event.pointerId) return;
+    if (event.type === 'pointerup' && state.mode !== 'still') pointerMove(event);
+    state.directPointerId = null;
+    state.lastPointerSample = null;
+    state.pointer.active = false;
+    if (event.type === 'pointercancel') state.pointerActiveUntil = -Infinity;
   };
 
   const loop = (now) => {
@@ -308,7 +372,7 @@ function mount() {
     if (state.hidden || state.mode === 'still') return;
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
-    const active = now - state.lastPointerAt < 160;
+    const active = now < state.pointerActiveUntil;
     const frame = frameFromPhysics(physics, dt, { ...state.pointer, active });
     applyTargets(glyphTargets, frame);
     if (activeSweep && frame?.glyphs) {
@@ -387,10 +451,14 @@ function mount() {
     if (state.hidden) {
       settle();
       state.lastPointerSample = null;
+      state.directPointerId = null;
     }
   };
 
+  window.addEventListener('pointerdown', pointerDown, { passive: true });
   window.addEventListener('pointermove', pointerMove, { passive: true });
+  window.addEventListener('pointerup', pointerEnd, { passive: true });
+  window.addEventListener('pointercancel', pointerEnd, { passive: true });
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', visibility);
   const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -418,7 +486,10 @@ function mount() {
       modeButton.remove();
       diagnostics?.remove();
       canvas.remove();
+      window.removeEventListener('pointerdown', pointerDown);
       window.removeEventListener('pointermove', pointerMove);
+      window.removeEventListener('pointerup', pointerEnd);
+      window.removeEventListener('pointercancel', pointerEnd);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', visibility);
       media?.removeEventListener?.('change', motionPreferenceChanged);
