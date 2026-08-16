@@ -1,13 +1,13 @@
 # mhaider.dev
 
-Personal portfolio site for Mohammad Haider — Software Engineer working in simulation, robotics, scientific computing, and experimental systems.
+Personal portfolio for Mohammad Haider — applied mathematics & software engineering, grounded in production systems, simulation, robotics, and scientific computing.
 
 🌐 **Live at:** [mhaider.dev](https://mhaider.dev)
 
 ## Stack
 
 - Static HTML / CSS — no build step
-- Hosted on GitHub Pages
+- Hosted on Railway; GitHub Pages mirrors `main`
 - DNS via Cloudflare
 
 ## Structure

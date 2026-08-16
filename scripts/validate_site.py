@@ -18,6 +18,23 @@ FIELD_PAGES = (
     Path("projects.html"),
     Path("resume.html"),
 )
+IDENTITY_METADATA_PAGES = (
+    Path("404.html"),
+    Path("about.html"),
+    Path("available.html"),
+    Path("contact.html"),
+    Path("index.html"),
+    Path("notebooks/social-impact-phase1.html"),
+    Path("projects.html"),
+    Path("resume.html"),
+)
+CANONICAL_IDENTITY_TITLE = "Mohammad Haider — Applied Mathematics & Software Engineering"
+CANONICAL_SOCIAL_IMAGE = "https://mhaider.dev/assets/og-portfolio-applied-math-20260816.png"
+LEGACY_IDENTITY_STRINGS = (
+    "data & software engineer",
+    "data and software engineer",
+    "data & analytics engineer",
+)
 INTERACTIVE_TAGS = {"a", "button", "form", "input", "label", "select", "summary", "textarea"}
 EXCLUDED_REGIONS = {"nav", "footer", "article-prose"}
 TYPOGRAPHIC_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "strong"}
@@ -149,6 +166,89 @@ def validate_field_layout_contract() -> None:
     )
 
 
+def metadata_content(parser: DocumentParser, attribute: str, value: str) -> str:
+    matches = [
+        element.attributes.get("content", "")
+        for element in parser.elements
+        if element.tag == "meta" and element.attributes.get(attribute) == value
+    ]
+    require(len(matches) == 1, f"expected one {attribute}={value!r} metadata element, found {len(matches)}")
+    return matches[0]
+
+
+def validate_identity_metadata() -> None:
+    asset_path = ROOT / "assets" / "og-portfolio-applied-math-20260816.png"
+    require(asset_path.is_file(), f"missing canonical social image: {asset_path.relative_to(ROOT)}")
+
+    for relative_path in IDENTITY_METADATA_PAGES:
+        parser = parse_document(ROOT / relative_path)
+        head_elements = [
+            element
+            for element in parser.elements
+            if any(ancestor.tag == "head" for ancestor in element.ancestors())
+        ]
+        metadata_text = " ".join(
+            element.text if element.tag == "title" else element.attributes.get("content", "")
+            for element in head_elements
+            if element.tag in {"meta", "title"}
+        ).lower()
+        for legacy_identity in LEGACY_IDENTITY_STRINGS:
+            require(
+                legacy_identity not in metadata_text,
+                f"{relative_path}: legacy identity remains in metadata: {legacy_identity!r}",
+            )
+
+        require(
+            metadata_content(parser, "property", "og:image") == CANONICAL_SOCIAL_IMAGE,
+            f"{relative_path}: Open Graph image must use the canonical applied-mathematics asset",
+        )
+        require(
+            metadata_content(parser, "name", "twitter:image") == CANONICAL_SOCIAL_IMAGE,
+            f"{relative_path}: Twitter image must use the canonical applied-mathematics asset",
+        )
+        require(
+            metadata_content(parser, "property", "og:image:alt") == CANONICAL_IDENTITY_TITLE,
+            f"{relative_path}: Open Graph image alt must use the canonical identity",
+        )
+        require(
+            metadata_content(parser, "name", "twitter:image:alt") == CANONICAL_IDENTITY_TITLE,
+            f"{relative_path}: Twitter image alt must use the canonical identity",
+        )
+
+    homepage = parse_document(ROOT / "index.html")
+    homepage_titles = [element.text for element in homepage.elements if element.tag == "title"]
+    require(homepage_titles == [CANONICAL_IDENTITY_TITLE], "index.html: title must use the canonical identity")
+    require(
+        metadata_content(homepage, "property", "og:title") == CANONICAL_IDENTITY_TITLE,
+        "index.html: Open Graph title must use the canonical identity",
+    )
+    require(
+        metadata_content(homepage, "name", "twitter:title") == CANONICAL_IDENTITY_TITLE,
+        "index.html: Twitter title must use the canonical identity",
+    )
+
+
+def validate_identity_favicon() -> None:
+    favicon = (ROOT / "favicon.svg").read_text(encoding="utf-8")
+    for color in ("#F8FAFB", "#172A3D", "#28649F", "#F47460"):
+        require(color in favicon, f"favicon must retain the canonical site palette color {color}")
+
+    for html_path in ROOT.rglob("*.html"):
+        if "legacy" in html_path.relative_to(ROOT).parts:
+            continue
+        parser = parse_document(html_path)
+        favicon_links = [
+            element.attributes.get("href", "")
+            for element in parser.elements
+            if element.tag == "link" and element.attributes.get("rel") == "icon"
+        ]
+        for href in favicon_links:
+            require(
+                href.endswith("favicon.svg?v=2"),
+                f"{html_path.relative_to(ROOT)}: favicon reference must use the v2 identity mark",
+            )
+
+
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
@@ -190,6 +290,8 @@ def main() -> int:
 
     validate_field_coverage()
     validate_field_layout_contract()
+    validate_identity_metadata()
+    validate_identity_favicon()
 
     print("site integrity: ok")
     return 0

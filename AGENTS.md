@@ -20,6 +20,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 
 - Write for engineering hiring teams, technical peers, and collaborators.
 - Position Mohammad as an engineer seeking full-time roles unless the user changes that direction.
+- Use **Applied mathematics & software engineering** as the canonical portfolio identity line; keep role labels, job titles, resume lane names, and evidence descriptions specific to their contexts.
 - Use direct, matter-of-fact, engineering-first language. Do not write recruiter-focused or sales copy.
 - Give each full project card a concise `Worth noting:` callout about the judgment that makes the work credible.
 
