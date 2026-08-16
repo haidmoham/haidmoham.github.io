@@ -29,7 +29,7 @@ IDENTITY_METADATA_PAGES = (
     Path("resume.html"),
 )
 CANONICAL_IDENTITY_TITLE = "Mohammad Haider — Applied Mathematics & Software Engineering"
-CANONICAL_SOCIAL_IMAGE = "https://mhaider.dev/assets/og-portfolio-applied-math-20260816.png"
+CANONICAL_SOCIAL_IMAGE = "https://mhaider.dev/assets/og-portfolio-applied-math-20260816-v2.png"
 LEGACY_IDENTITY_STRINGS = (
     "data & software engineer",
     "data and software engineer",
@@ -177,7 +177,7 @@ def metadata_content(parser: DocumentParser, attribute: str, value: str) -> str:
 
 
 def validate_identity_metadata() -> None:
-    asset_path = ROOT / "assets" / "og-portfolio-applied-math-20260816.png"
+    asset_path = ROOT / "assets" / "og-portfolio-applied-math-20260816-v2.png"
     require(asset_path.is_file(), f"missing canonical social image: {asset_path.relative_to(ROOT)}")
 
     for relative_path in IDENTITY_METADATA_PAGES:
