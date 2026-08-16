@@ -418,17 +418,27 @@ function createFallback(canvas, options, firstContext) {
   let destroyed = false;
   const pigment = createPigmentModel(options);
 
-  function resize(nextWidth, nextHeight, nextDpr) {
+  function resize(nextWidth, nextHeight, nextDpr, resizeOptions = {}) {
     if (destroyed || !canvas) return;
     const bounds = canvas.getBoundingClientRect?.() || { width: canvas.clientWidth, height: canvas.clientHeight };
-    width = Math.max(0, finite(nextWidth, bounds.width || canvas.width || 0));
-    height = Math.max(0, finite(nextHeight, bounds.height || canvas.height || 0));
-    dpr = boundedDpr(width, height,
+    const nextLogicalWidth = Math.max(0, finite(nextWidth, bounds.width || canvas.width || 0));
+    const nextLogicalHeight = Math.max(0, finite(nextHeight, bounds.height || canvas.height || 0));
+    const nextPixelRatio = boundedDpr(nextLogicalWidth, nextLogicalHeight,
       finite(nextDpr, finite(options.devicePixelRatio, globalThis.devicePixelRatio || 1)), maxDpr);
-    canvas.width = Math.max(1, Math.round(width * dpr));
-    canvas.height = Math.max(1, Math.round(height * dpr));
+    const preserve = Boolean(resizeOptions.preserve) && width > 0 && height > 0 &&
+      Math.abs(nextLogicalWidth - width) < 1 && Math.abs(nextPixelRatio - dpr) < 0.01;
+    width = nextLogicalWidth;
+    height = nextLogicalHeight;
+    dpr = nextPixelRatio;
+    if (!preserve) {
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+    }
     if (canvas.style) { canvas.style.width = `${width}px`; canvas.style.height = `${height}px`; }
-    context?.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context?.setTransform(
+      canvas.width / Math.max(1, width), 0,
+      0, canvas.height / Math.max(1, height), 0, 0,
+    );
     pigment.resize(width, height);
   }
 
@@ -612,13 +622,24 @@ export function createFieldColor(canvas, options = {}) {
     targets = [];
   }
 
-  function resize(nextWidth, nextHeight, nextDpr) {
+  function resize(nextWidth, nextHeight, nextDpr, resizeOptions = {}) {
     if (destroyed) return;
     const bounds = canvas.getBoundingClientRect?.() || { width: canvas.clientWidth, height: canvas.clientHeight };
-    width = Math.max(0, finite(nextWidth, bounds.width || canvas.width || 0));
-    height = Math.max(0, finite(nextHeight, bounds.height || canvas.height || 0));
-    dpr = boundedDpr(width, height,
+    const nextLogicalWidth = Math.max(0, finite(nextWidth, bounds.width || canvas.width || 0));
+    const nextLogicalHeight = Math.max(0, finite(nextHeight, bounds.height || canvas.height || 0));
+    const nextPixelRatio = boundedDpr(nextLogicalWidth, nextLogicalHeight,
       finite(nextDpr, finite(options.devicePixelRatio, globalThis.devicePixelRatio || 1)), maxDpr);
+    const preserve = Boolean(resizeOptions.preserve) && width > 0 && height > 0 &&
+      targets.length === 2 && Math.abs(nextLogicalWidth - width) < 1 &&
+      Math.abs(nextPixelRatio - dpr) < 0.01;
+    width = nextLogicalWidth;
+    height = nextLogicalHeight;
+    dpr = nextPixelRatio;
+    if (preserve) {
+      if (canvas.style) { canvas.style.width = `${width}px`; canvas.style.height = `${height}px`; }
+      pigment.resize(width, height);
+      return;
+    }
     pixelWidth = Math.max(1, Math.round(width * dpr));
     pixelHeight = Math.max(1, Math.round(height * dpr));
     canvas.width = pixelWidth;

@@ -3,14 +3,16 @@ import {
   createWordPolarityMetadata,
   derivePointerVelocity,
   fieldPhysicsOptionsForMode,
-} from './field-physics.js?v=9';
-import { createFieldColor } from './field-color.js?v=9';
+} from './field-physics.js?v=10';
+import { createFieldColor } from './field-color.js?v=10';
 import {
+  classifyFieldViewportChange,
   DIRECT_TOUCH_CHARGE_SCALE,
+  DIRECT_VIEWPORT_GRACE_MS,
   isDirectPointerType,
   pointerActivityDeadline,
   shouldStartDirectFieldGesture,
-} from './field-input.js?v=1';
+} from './field-input.js?v=2';
 
 const MODE_STORAGE_KEY = 'mhaider.field.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -168,6 +170,7 @@ function mount() {
     mode: modePreference || (systemReducedMotion ? 'still' : 'color'),
     hidden: false,
     lastPointerAt: -Infinity,
+    lastDirectInputAt: -Infinity,
     pointerActiveUntil: -Infinity,
     lastPointerSample: null,
     directPointerId: null,
@@ -194,6 +197,13 @@ function mount() {
   let raf = 0;
   let last = performance.now();
   let resizeFrame = 0;
+  let viewport = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    dpr: window.devicePixelRatio || 1,
+  };
+  let physicsScrollX = window.scrollX;
+  let physicsScrollY = window.scrollY;
   let lastDiagnosticsAt = -Infinity;
   const speedSamples = [];
   const completedSweeps = [];
@@ -282,15 +292,38 @@ function mount() {
       return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, mass, charge };
     });
     physics = createFieldPhysics({ glyphs, ...fieldPhysicsOptionsForMode(state.mode) });
+    physicsScrollX = window.scrollX;
+    physicsScrollY = window.scrollY;
   };
   rebuildPhysics();
 
-  const resize = () => {
+  const resize = (forceLayout = false) => {
     cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const nextViewport = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio || 1,
+      };
+      const recentDirectInput = performance.now() - state.lastDirectInputAt <=
+        DIRECT_VIEWPORT_GRACE_MS;
+      const change = forceLayout === true ? 'layout' : classifyFieldViewportChange(
+        viewport,
+        nextViewport,
+        { recentDirectInput },
+      );
+      viewport = nextViewport;
+      if (change === 'none') return;
+      const dpr = Math.min(nextViewport.dpr, 2);
+      if (change === 'transient-height') {
+        // Mobile browser chrome changes the visual height during a native
+        // scroll. Preserve the backing field instead of treating that as a
+        // responsive-layout teardown.
+        color?.resize?.(nextViewport.width, nextViewport.height, dpr, { preserve: true });
+        return;
+      }
       settle();
-      color?.resize?.(window.innerWidth, window.innerHeight, dpr);
+      color?.resize?.(nextViewport.width, nextViewport.height, dpr);
       rebuildPhysics();
     });
   };
@@ -327,6 +360,7 @@ function mount() {
       active: true,
     };
     state.lastPointerAt = pointerNow;
+    state.lastDirectInputAt = pointerNow;
     state.pointerActiveUntil = pointerActivityDeadline(pointerNow, event.pointerType, 'down');
     start();
   };
@@ -354,6 +388,7 @@ function mount() {
       recordDiagnostics(velocity.speed, now);
     }
     state.lastPointerAt = pointerNow;
+    if (isDirect) state.lastDirectInputAt = pointerNow;
     state.pointerActiveUntil = pointerActivityDeadline(pointerNow, event.pointerType, 'move');
     if (state.mode !== 'still') start();
   };
@@ -361,10 +396,17 @@ function mount() {
   const pointerEnd = (event) => {
     if (!isDirectPointerType(event.pointerType) || state.directPointerId !== event.pointerId) return;
     if (event.type === 'pointerup' && state.mode !== 'still') pointerMove(event);
+    const pointerNow = performance.now();
+    state.lastDirectInputAt = pointerNow;
+    state.pointerActiveUntil = Math.max(
+      state.pointerActiveUntil,
+      pointerActivityDeadline(pointerNow, event.pointerType,
+        event.type === 'pointercancel' ? 'cancel' : 'up'),
+    );
     state.directPointerId = null;
     state.lastPointerSample = null;
     state.pointer.active = false;
-    if (event.type === 'pointercancel') state.pointerActiveUntil = -Infinity;
+    start();
   };
 
   const loop = (now) => {
@@ -373,7 +415,15 @@ function mount() {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     const active = now < state.pointerActiveUntil;
-    const frame = frameFromPhysics(physics, dt, { ...state.pointer, active });
+    const frame = frameFromPhysics(physics, dt, {
+      ...state.pointer,
+      // Physics is measured in the viewport coordinate system that existed
+      // during rebuild. Compensating by scroll delta keeps that map aligned
+      // with the same glyphs without layout reads on every scroll frame.
+      x: state.pointer.x + (window.scrollX - physicsScrollX),
+      y: state.pointer.y + (window.scrollY - physicsScrollY),
+      active,
+    });
     applyTargets(glyphTargets, frame);
     if (activeSweep && frame?.glyphs) {
       const displacements = frame.glyphs.map((glyph) => Math.hypot(glyph.dx, glyph.dy));
@@ -474,8 +524,8 @@ function mount() {
   media?.addEventListener?.('change', motionPreferenceChanged);
   modeButton.addEventListener('click', cycleMode);
   updateModeControl();
-  resize(); updateControl();
-  if (document.fonts?.ready) document.fonts.ready.then(resize);
+  resize(true); updateControl();
+  if (document.fonts?.ready) document.fonts.ready.then(() => resize(true));
 
   window.__mhaiderField = {
     getDiagnostics: diagnosticsSummary,

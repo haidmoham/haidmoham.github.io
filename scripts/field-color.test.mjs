@@ -5,11 +5,37 @@ import { pathToFileURL } from 'node:url';
 const moduleUrl = `${pathToFileURL(new URL('../field-color.js', import.meta.url).pathname).href}?test=${Date.now()}`;
 const {
   advanceColorProgress,
+  createFieldColor,
   smoothRandomHue,
   shouldInjectPigment,
   surfaceTensionEdge,
   INITIAL_PIGMENT_RGB,
 } = await import(moduleUrl);
+
+test('height-only viewport preservation keeps the color backing store alive', () => {
+  const context = {
+    clearRect() {},
+    setTransform(...values) { this.transform = values; },
+  };
+  const canvas = {
+    width: 0,
+    height: 0,
+    style: {},
+    getBoundingClientRect() { return { width: 390, height: 844 }; },
+    getContext(type) { return type === '2d' ? context : null; },
+  };
+  const color = createFieldColor(canvas, { devicePixelRatio: 2 });
+  const initialBacking = { width: canvas.width, height: canvas.height };
+  color.resize(390, 780, 2, { preserve: true });
+  assert.deepEqual({ width: canvas.width, height: canvas.height }, initialBacking);
+  assert.equal(canvas.style.height, '780px');
+  assert.equal(context.transform[0], canvas.width / 390);
+  assert.equal(context.transform[3], canvas.height / 780);
+
+  color.resize(844, 390, 2);
+  assert.notDeepEqual({ width: canvas.width, height: canvas.height }, initialBacking);
+  color.destroy();
+});
 
 const circularStep = (from, to) => Math.abs(((to - from + 1.5) % 1) - 0.5);
 

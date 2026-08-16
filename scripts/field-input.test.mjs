@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 
 const moduleUrl = `${pathToFileURL(new URL('../field-input.js', import.meta.url).pathname).href}?test=${Date.now()}`;
 const {
+  classifyFieldViewportChange,
   DIRECT_TOUCH_ACTIVE_MS,
   DIRECT_TOUCH_CHARGE_SCALE,
   POINTER_ACTIVE_MS,
@@ -12,6 +13,23 @@ const {
   pointerActivityDeadline,
   shouldStartDirectFieldGesture,
 } = await import(moduleUrl);
+
+test('touch-driven browser chrome resizes preserve the field while layout changes reflow', () => {
+  const previous = { width: 390, height: 844, dpr: 3 };
+  assert.equal(classifyFieldViewportChange(previous, { ...previous, height: 780 }, {
+    recentDirectInput: true,
+  }), 'transient-height');
+  assert.equal(classifyFieldViewportChange(previous, { ...previous, height: 780 }, {
+    recentDirectInput: false,
+  }), 'layout');
+  assert.equal(classifyFieldViewportChange(previous, { ...previous, width: 844, height: 390 }, {
+    recentDirectInput: true,
+  }), 'layout');
+  assert.equal(classifyFieldViewportChange(previous, { ...previous, dpr: 2 }, {
+    recentDirectInput: true,
+  }), 'layout');
+  assert.equal(classifyFieldViewportChange(previous, previous, { recentDirectInput: true }), 'none');
+});
 
 test('touch and pen are capability signals independent of viewport size', () => {
   for (const pointerType of ['touch', 'pen']) {
@@ -54,6 +72,11 @@ test('controller and CSS wire touch by pointer capability without taking over sc
   ]);
   assert.match(controller, /addEventListener\('pointerdown', pointerDown, \{ passive: true \}\)/);
   assert.match(controller, /addEventListener\('pointercancel', pointerEnd, \{ passive: true \}\)/);
+  assert.doesNotMatch(controller, /pointercancel'\) state\.pointerActiveUntil = -Infinity/);
+  assert.match(controller, /event\.type === 'pointercancel' \? 'cancel' : 'up'/);
+  assert.match(controller, /scrollX - physicsScrollX/);
+  assert.match(controller, /scrollY - physicsScrollY/);
+  assert.match(controller, /preserve: true/);
   assert.match(controller, /shouldStartDirectFieldGesture/);
   assert.doesNotMatch(inputModule, /innerWidth|screen\.width|max-width/);
   assert.match(stylesheet, /touch-action: manipulation/);
