@@ -166,6 +166,37 @@ def validate_field_layout_contract() -> None:
     )
 
 
+def validate_field_table_contract() -> None:
+    homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+    controller = (ROOT / "field.js").read_text(encoding="utf-8")
+    legacy_page = ROOT / "legacy" / "field" / "index.html"
+    legacy_controller = ROOT / "legacy" / "field" / "field.js"
+
+    require('data-field-stage' in homepage, "homepage must expose the bounded Field Table stage")
+    require(homepage.count('role="radio"') == 3, "Field Table must expose three explicit mode controls")
+    for mode in ("color", "magnetic", "still"):
+        require(
+            f'data-field-mode="{mode}"' in homepage,
+            f"Field Table is missing the {mode!r} mode control",
+        )
+    require('src="field.js?v=11"' in homepage, "homepage must load the current Field Table controller")
+    require("document.querySelector('[data-field-stage]')" in controller, "Field Table controller must bind its stage")
+    require("window.addEventListener('pointer" not in controller, "Field Table pointer ownership must remain stage-scoped")
+
+    require(legacy_page.is_file(), "missing unlinked legacy field route")
+    require(legacy_controller.is_file(), "missing preserved legacy field controller")
+    legacy_html = legacy_page.read_text(encoding="utf-8")
+    require('name="robots" content="noindex, nofollow"' in legacy_html, "legacy field route must remain unindexed")
+    require('src="./field.js"' in legacy_html, "legacy field route must load its preserved controller")
+    for page in ROOT.glob("*.html"):
+        if page == legacy_page:
+            continue
+        require(
+            "/legacy/field/" not in page.read_text(encoding="utf-8"),
+            f"legacy field route must remain unlinked: {page.relative_to(ROOT)}",
+        )
+
+
 def metadata_content(parser: DocumentParser, attribute: str, value: str) -> str:
     matches = [
         element.attributes.get("content", "")
@@ -290,6 +321,7 @@ def main() -> int:
 
     validate_field_coverage()
     validate_field_layout_contract()
+    validate_field_table_contract()
     validate_identity_metadata()
     validate_identity_favicon()
 

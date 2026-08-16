@@ -16,7 +16,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=31" />
+  <link rel="stylesheet" href="style.css?v=32" />
   <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
 </head>
 <body>
@@ -28,14 +28,27 @@
     <button class="nav-burger" aria-label="Open navigation">☰</button>
   </nav>
 
-  <div class="hero-stage">
+  <div class="hero-stage field-table-stage" data-field-stage>
     <section class="hero">
       <div class="hero-content fade-in">
-        <p class="hero-eyebrow" data-field-target>Mohammad Haider · Open to Work</p>
-        <h1 class="hero-title" data-field-target>Applied mathematics &amp; software <span class="hero-title-accent">engineering.</span></h1>
+        <p class="hero-eyebrow" data-field-target data-field-copy>Mohammad Haider · Open to Work</p>
+        <h1 class="hero-title" data-field-target data-field-copy>Applied mathematics &amp; software <span class="hero-title-accent">engineering.</span></h1>
         <p class="hero-sub">B.S. Statistics · four years building and validating production data systems and internal tools at Microsoft and UVA · current work in simulation and scientific computing.</p>
         <p class="hero-availability"><a href="available.html">Available for full-time engineering roles.</a></p>
         <div class="hero-actions"><a href="projects.html" class="btn btn-primary">View Projects</a><a href="resume.html" class="btn btn-ghost">View Resume</a></div>
+        <section class="field-table-dock" data-field-dock aria-label="Interactive typography field controls">
+          <div class="field-table-intro">
+            <p class="field-table-kicker">Touch field</p>
+            <p class="field-table-hint" data-field-hint>Drag through the title. Speed shapes color and force.</p>
+          </div>
+          <div class="field-table-modes" role="radiogroup" aria-label="Field mode">
+            <button type="button" role="radio" data-field-mode="color" aria-checked="true"><span aria-hidden="true" class="field-mode-mark field-mode-mark-color"></span>Color</button>
+            <button type="button" role="radio" data-field-mode="magnetic" aria-checked="false"><span aria-hidden="true" class="field-mode-mark field-mode-mark-magnet"></span>Magnet</button>
+            <button type="button" role="radio" data-field-mode="still" aria-checked="false"><span aria-hidden="true" class="field-mode-mark field-mode-mark-still"></span>Still</button>
+          </div>
+          <button type="button" class="field-table-reset" data-field-reset>Clear color</button>
+          <output class="visually-hidden" data-field-status aria-live="polite"></output>
+        </section>
       </div>
       <div class="hero-visual hero-machine-visual fade-in" aria-hidden="true">
         <canvas id="machine-glyph-canvas" class="machine-glyph-canvas"></canvas>
@@ -61,6 +74,6 @@
   </div><div class="see-all"><a href="projects.html" class="btn btn-outline">See All Projects →</a></div></section>
 
   <footer class="footer"><span>© 2026 Mohammad Haider</span><div class="footer-links"><a href="https://linkedin.com/in/haidmoham" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/haidmoham" target="_blank" rel="noreferrer">GitHub</a></div></footer>
-  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open');});</script><script src="main.js?v=1" defer></script><script src="galaxy.js?v=2" defer></script><script type="module" src="field.js?v=10"></script>
+  <script>document.querySelector('.nav-burger').addEventListener('click',function(){document.querySelector('.nav-links').classList.toggle('open');});</script><script src="main.js?v=1" defer></script><script src="galaxy.js?v=2" defer></script><script type="module" src="field.js?v=11"></script>
 </body>
 </html>

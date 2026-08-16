@@ -64,24 +64,93 @@ test('finger-down gets a short visible hold while moves keep the desktop cadence
   assert.ok(DIRECT_TOUCH_CHARGE_SCALE > 1);
 });
 
-test('controller and CSS wire touch by pointer capability without taking over scroll', async () => {
+test('Field Table scopes direct manipulation to its stage and preserves native touch gestures', async () => {
   const [controller, stylesheet, inputModule] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
     readFile(new URL('../style.css', import.meta.url), 'utf8'),
     readFile(new URL('../field-input.js', import.meta.url), 'utf8'),
   ]);
-  assert.match(controller, /addEventListener\('pointerdown', pointerDown, \{ passive: true \}\)/);
-  assert.match(controller, /addEventListener\('pointercancel', pointerEnd, \{ passive: true \}\)/);
-  assert.doesNotMatch(controller, /pointercancel'\) state\.pointerActiveUntil = -Infinity/);
-  assert.match(controller, /event\.type === 'pointercancel' \? 'cancel' : 'up'/);
-  assert.match(controller, /scrollX - physicsScrollX/);
-  assert.match(controller, /scrollY - physicsScrollY/);
+
+  const stageBinding = controller.match(
+    /(?:const|let)\s+([A-Za-z_$][\w$]*)\s*=\s*document\.querySelector\(\s*(['"])\[data-field-stage\]\2\s*\)/,
+  );
+  assert.ok(stageBinding, 'the controller should bind the authored Field Table stage');
+  const stageName = stageBinding[1].replace(/[$]/g, '\\$&');
+  for (const eventName of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) {
+    assert.match(
+      controller,
+      new RegExp(`${stageName}\\.addEventListener\\(\\s*['"]${eventName}['"]`),
+      `${eventName} should be stage-scoped`,
+    );
+  }
+  assert.doesNotMatch(
+    controller,
+    /window\.(?:add|remove)EventListener\(\s*['"]pointer(?:down|move|up|cancel)['"]/,
+    'pointer listeners must not take over the window',
+  );
+  assert.match(
+    controller,
+    /\.setPointerCapture\(\s*event\.pointerId\s*\)/,
+    'a claimed direct-manipulation pointer should be captured by the stage',
+  );
   assert.match(controller, /preserve: true/);
-  assert.match(controller, /shouldStartDirectFieldGesture/);
   assert.doesNotMatch(inputModule, /innerWidth|screen\.width|max-width/);
-  assert.match(stylesheet, /touch-action: manipulation/);
-  assert.doesNotMatch(stylesheet, /\[data-field-target\][^{]*\{[^}]*touch-action:\s*none/s);
-  assert.match(stylesheet, /@media \(any-pointer: coarse\)/);
-  assert.match(stylesheet, /padding-bottom: calc\(4\.5rem \+ env\(safe-area-inset-bottom\)\)/);
-  assert.match(stylesheet, /@media \(hover: hover\) and \(pointer: fine\)/);
+  assert.match(
+    stylesheet,
+    /\[data-field-stage\][^{]*\{[^}]*touch-action:\s*pan-y\s+pinch-zoom\s*;/s,
+  );
+});
+
+test('Field Table exposes explicit modes and keeps visual feedback decorative', async () => {
+  const [controller, stylesheet, page] = await Promise.all([
+    readFile(new URL('../field.js', import.meta.url), 'utf8'),
+    readFile(new URL('../style.css', import.meta.url), 'utf8'),
+    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  ]);
+
+  assert.match(page, /role="radiogroup"[^>]*aria-label="Field mode"/);
+  for (const mode of ['color', 'magnetic', 'still']) {
+    assert.match(
+      page,
+      new RegExp(`<button[^>]+role="radio"[^>]+data-field-mode="${mode}"[^>]+aria-checked="(?:true|false)"`),
+      `${mode} should have its own radio-like button`,
+    );
+  }
+  assert.match(controller, /querySelectorAll\(\s*(['"])\[data-field-mode\]\1\s*\)/);
+  assert.match(controller, /setAttribute\(\s*(['"])aria-checked\1\s*,/);
+  assert.doesNotMatch(controller, /cycleMode|cycle typography field mode|select to cycle/i);
+
+  assert.match(controller, /field-table-probe/);
+  assert.match(controller, /data-field-probe/);
+  assert.match(controller, /canvas\.setAttribute\(\s*(['"])aria-hidden\1\s*,\s*(['"])true\2\s*\)/);
+  assert.match(controller, /probe\.setAttribute\(\s*(['"])aria-hidden\1\s*,\s*(['"])true\2\s*\)/);
+  assert.match(stylesheet, /\.field-(?:color|table)-canvas[^{]*\{[^}]*pointer-events:\s*none\s*;/s);
+  assert.match(stylesheet, /\.field-table-probe[^{]*\{[^}]*pointer-events:\s*none\s*;/s);
+});
+
+test('Field Table controls retain touch sizing, safe areas, and fine-pointer hover', async () => {
+  const stylesheet = await readFile(new URL('../style.css', import.meta.url), 'utf8');
+
+  assert.match(stylesheet, /field-table-(?:modes|reset)[^{]*\{[^}]*min-height:\s*48px\s*;/s);
+  assert.match(stylesheet, /env\(safe-area-inset-(?:bottom|left|right)\)/);
+  assert.match(
+    stylesheet,
+    /@media\s*\(\s*hover:\s*hover\s*\)\s*and\s*\(\s*pointer:\s*fine\s*\)/,
+  );
+});
+
+test('Field Table suppresses text selection only while direct manipulation is active', async () => {
+  const stylesheet = await readFile(new URL('../style.css', import.meta.url), 'utf8');
+  const baseStageRule = stylesheet.match(/\[data-field-stage\][^{]*\{([^}]*)\}/s);
+  const interactingRule = stylesheet.match(/\.field-table-interacting[^{]*\{([^}]*)\}/s);
+
+  assert.ok(baseStageRule, 'the Field Table stage should have a base rule');
+  assert.doesNotMatch(
+    baseStageRule[1],
+    /(?:^|[;\s])-?(?:webkit-)?user-select\s*:/,
+    'the resting stage must leave text selectable',
+  );
+  assert.ok(interactingRule, 'direct manipulation should have a temporary interaction rule');
+  assert.match(interactingRule[1], /(?:^|[;\s])user-select:\s*none\s*;/);
+  assert.match(interactingRule[1], /(?:^|[;\s])-webkit-user-select:\s*none\s*;/);
 });
