@@ -161,7 +161,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
   max-width: 360px; margin-left: auto; padding: 0.85rem 0 0.85rem 1rem;
   border-left: 1px solid rgba(125,174,255,0.35); color: var(--text-muted);
 }
-.notes-practice span {
+.notes-practice > span {
   display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
   font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-light);
   margin-bottom: 0.35rem;
@@ -815,7 +815,8 @@ body:not(.robotics-page)::before {
   border-inline: 1px solid rgba(33,75,120,.09);
   pointer-events: none;
 }
-body:not(.robotics-page) > * { position: relative; z-index: 1; }
+body:not(.robotics-page) > * { z-index: 1; }
+body:not(.robotics-page) > :not(.field-site-probe) { position: relative; }
 body:not(.robotics-page) > .nav { z-index: 100; }
 .nav { background: rgba(241,244,246,.92); border-bottom-color: var(--border); }
 .nav-logo, .nav-links a.active, .nav-links a:hover, .nav-burger { color: var(--ink); }

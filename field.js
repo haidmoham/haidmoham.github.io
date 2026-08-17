@@ -4,7 +4,7 @@ import {
   derivePointerVelocity,
   fieldPhysicsOptionsForMode,
 } from './field-physics.js?v=10';
-import { createFieldColor } from './field-color.js?v=10';
+import { createFieldColor } from './field-color.js?v=11';
 import {
   classifyFieldViewportChange,
   DIRECT_TOUCH_CHARGE_SCALE,
@@ -14,7 +14,14 @@ import {
   resolveFieldInputModality,
   shouldStartDirectFieldGesture,
   shouldTrackFieldPointerMove,
-} from './field-input.js?v=5';
+  clampScrollColorCommand,
+  consumeColorCommandBatch,
+  shouldQueueScrollColorCommand,
+  shouldQueueTouchColorCommand,
+  touchColorWake,
+  TOUCH_COLOR_HOLD_DELAY_MS,
+  TOUCH_COLOR_HOLD_INTERVAL_MS,
+} from './field-input.js?v=6';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -203,6 +210,14 @@ function mount() {
     lastPointerSample: null,
     lastDirectInputAt: -Infinity,
     pointer: { x: 0, y: 0, vx: 0, vy: 0, chargeScale: 1, active: false },
+    colorCommands: [],
+    touchColor: {
+      startedAt: -Infinity,
+      lastHoldAt: -Infinity,
+      sampleId: 0,
+      lastQueuedSampleId: null,
+      active: false,
+    },
     inputModality: resolveFieldInputModality('', {
       primaryFine: primaryFinePointer?.matches,
       primaryCoarse: primaryCoarsePointer?.matches,
@@ -220,9 +235,81 @@ function mount() {
   let raf = 0;
   let resizeRaf = 0;
   let lastFrameAt = performance.now();
+  let lastScrollX = window.scrollX;
+  let lastScrollY = window.scrollY;
 
   const updateProbe = (sample) => {
     probe.style.transform = `translate3d(${sample.x}px, ${sample.y}px, 0)`;
+  };
+
+  const enqueueColorCommand = (command, { freshSample = true, sampleId = null, cancelled = false } = {}) => {
+    if (state.mode !== 'color' || !shouldQueueTouchColorCommand({
+      freshSample,
+      sampleId,
+      lastQueuedSampleId: state.touchColor.lastQueuedSampleId,
+      cancelled,
+    })) return false;
+    state.colorCommands.push({ ...command, sampleId });
+    if (state.colorCommands.length > 48) state.colorCommands.splice(0, state.colorCommands.length - 48);
+    state.touchColor.lastQueuedSampleId = sampleId;
+    return true;
+  };
+
+  const queueTouchSample = (sample, velocity, phase) => {
+    if (!isDirectPointerType(state.pointerType) || state.mode !== 'color') return;
+    const sampleId = ++state.touchColor.sampleId;
+    const speed = Math.hypot(velocity.vx, velocity.vy);
+    const wake = touchColorWake({ phase, velocity: { x: velocity.vx, y: velocity.vy } });
+    enqueueColorCommand({
+      phase,
+      position: { x: sample.x, y: sample.y },
+      velocity: { x: velocity.vx, y: velocity.vy },
+      wake,
+      energy: phase === 'tap' ? 0.68 : clamp(0.38 + speed / 2600, 0.38, 0.88),
+    }, { sampleId });
+  };
+
+  const queueTouchHold = (now) => {
+    const touch = state.touchColor;
+    if (!touch.active || state.pointerId === null || !isDirectPointerType(state.pointerType) || state.mode !== 'color') return;
+    if (now - touch.startedAt < TOUCH_COLOR_HOLD_DELAY_MS || now - touch.lastHoldAt < TOUCH_COLOR_HOLD_INTERVAL_MS) return;
+    touch.lastHoldAt = now;
+    const sampleId = ++touch.sampleId;
+    enqueueColorCommand({
+      phase: 'hold',
+      position: { x: state.pointer.x, y: state.pointer.y },
+      velocity: { x: 0, y: 0 },
+      wake: { x: 0, y: 0 },
+      energy: 0.42,
+    }, { sampleId });
+  };
+
+  const queueScrollColor = () => {
+    const delta = clampScrollColorCommand({
+      deltaX: window.scrollX - lastScrollX,
+      deltaY: window.scrollY - lastScrollY,
+      maxDistance: 80,
+    });
+    lastScrollX = window.scrollX;
+    lastScrollY = window.scrollY;
+    const distance = Math.hypot(delta.x, delta.y);
+    const now = performance.now();
+    if (state.mode !== 'color' || !shouldQueueScrollColorCommand({
+      activePointer: state.touchColor.active && state.pointerId !== null,
+      pointerType: state.pointerType,
+      recentlyDirect: now - state.lastDirectInputAt <= DIRECT_VIEWPORT_GRACE_MS,
+      distance,
+    })) return;
+    const sampleId = ++state.touchColor.sampleId;
+    const wake = touchColorWake({ phase: 'scroll', velocity: delta });
+    enqueueColorCommand({
+      phase: 'scroll',
+      position: { x: state.pointer.x, y: state.pointer.y },
+      velocity: delta,
+      wake,
+      energy: clamp(0.24 + distance / 160, 0.24, 0.62),
+    }, { sampleId });
+    start();
   };
 
   const resetGlyphs = () => {
@@ -240,6 +327,10 @@ function mount() {
 
   const settle = ({ clearColor = false } = {}) => {
     stop();
+    state.colorCommands.length = 0;
+    state.touchColor.active = false;
+    state.touchColor.startedAt = -Infinity;
+    state.touchColor.lastHoldAt = -Infinity;
     state.pointer.vx = 0;
     state.pointer.vy = 0;
     state.pointer.active = false;
@@ -292,6 +383,7 @@ function mount() {
     if (state.hidden || state.mode === 'still') return;
     const dt = Math.min((now - lastFrameAt) / 1000, 0.05);
     lastFrameAt = now;
+    queueTouchHold(now);
     const physicallyActive = state.pointerId !== null || now < state.pointerActiveUntil;
     physics.setPointer({
       ...state.pointer,
@@ -303,17 +395,20 @@ function mount() {
     applyGlyphFrame(preparedGlyphs, frame);
     if (state.mode === 'color') {
       const cursorIsActive = state.pointerType === 'mouse' && now < state.pointerActiveUntil;
+      const batch = consumeColorCommandBatch(state.colorCommands, 8);
+      state.colorCommands = batch.remaining;
       color.render({
         ...frame,
         enabled: true,
-        inject: state.pointerId !== null || cursorIsActive,
+        commands: batch.commands,
+        inject: cursorIsActive,
         pointer: state.pointer,
         reducedMotion: false,
       }, dt);
     }
     state.pointer.vx *= Math.exp(-10 * dt);
     state.pointer.vy *= Math.exp(-10 * dt);
-    if (!physicallyActive && (frame?.energy || 0) <= 0.002) {
+    if (!physicallyActive && !state.colorCommands.length && (frame?.energy || 0) <= 0.002) {
       stop();
       return;
     }
@@ -414,6 +509,10 @@ function mount() {
         chargeScale: isDirectPointerType(state.pointerType) ? DIRECT_TOUCH_CHARGE_SCALE : 1,
         active: true,
       };
+      if (isDirectPointerType(state.pointerType)) {
+        const colorPhase = phase === 'down' ? 'tap' : phase === 'move' ? 'drag' : '';
+        if (colorPhase) queueTouchSample(sample, velocity, colorPhase);
+      }
       updateProbe(sample);
     }
     const now = performance.now();
@@ -436,6 +535,11 @@ function mount() {
     state.pointerId = event.pointerId;
     state.pointerType = event.pointerType || 'mouse';
     state.lastPointerSample = null;
+    if (directPointer) {
+      state.touchColor.active = true;
+      state.touchColor.startedAt = performance.now();
+      state.touchColor.lastHoldAt = -Infinity;
+    }
     interactionSurface.setPointerCapture(event.pointerId);
     interactionSurface.classList.add('field-table-interacting');
     updatePointer(event, 'down');
@@ -459,10 +563,19 @@ function mount() {
   const pointerEnd = (event) => {
     if (event.pointerId !== state.pointerId) return;
     if (event.type === 'pointerup') updatePointer(event, 'up');
+    const cancelled = event.type === 'pointercancel';
+    if (cancelled && isDirectPointerType(state.pointerType)) {
+      state.colorCommands.length = 0;
+      state.touchColor.lastQueuedSampleId = null;
+    }
     if (interactionSurface.hasPointerCapture?.(event.pointerId)) interactionSurface.releasePointerCapture(event.pointerId);
     state.pointerId = null;
     state.lastPointerSample = null;
     state.pointer.active = false;
+    state.touchColor.active = false;
+    state.touchColor.startedAt = -Infinity;
+    state.touchColor.lastHoldAt = -Infinity;
+    state.pointerType = '';
     state.hasInteracted = true;
     interactionSurface.classList.remove('field-table-interacting');
     announceMode();
@@ -508,6 +621,7 @@ function mount() {
   interactionSurface.addEventListener('pointermove', pointerMove, { passive: true });
   interactionSurface.addEventListener('pointerup', pointerEnd, { passive: true });
   interactionSurface.addEventListener('pointercancel', pointerEnd, { passive: true });
+  window.addEventListener('scroll', queueScrollColor, { passive: true });
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', visibilityChanged);
   media?.addEventListener?.('change', motionPreferenceChanged);
@@ -536,6 +650,7 @@ function mount() {
       interactionSurface.removeEventListener('pointermove', pointerMove);
       interactionSurface.removeEventListener('pointerup', pointerEnd);
       interactionSurface.removeEventListener('pointercancel', pointerEnd);
+      window.removeEventListener('scroll', queueScrollColor);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', visibilityChanged);
       media?.removeEventListener?.('change', motionPreferenceChanged);

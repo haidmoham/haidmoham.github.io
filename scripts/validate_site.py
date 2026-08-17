@@ -6,8 +6,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FIELD_STYLE_VERSION = 34
-FIELD_CONTROLLER_VERSION = 14
+FIELD_STYLE_VERSION = 35
+FIELD_CONTROLLER_VERSION = 15
 
 FIELD_PAGES = (
     Path("404.html"),

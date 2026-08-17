@@ -2,8 +2,77 @@ export const POINTER_ACTIVE_MS = 160;
 export const DIRECT_TOUCH_ACTIVE_MS = 220;
 export const DIRECT_TOUCH_CHARGE_SCALE = 1600;
 export const DIRECT_VIEWPORT_GRACE_MS = 1500;
+export const TOUCH_COLOR_HOLD_DELAY_MS = 280;
+export const TOUCH_COLOR_HOLD_INTERVAL_MS = 150;
 
 const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
+
+/**
+ * Color commands are consumed once by the renderer. A physical pointer
+ * sample may be rendered across several animation frames, so the sample id
+ * is the idempotency boundary rather than the frame cadence.
+ */
+export function shouldQueueTouchColorCommand({
+  phase = '',
+  freshSample = false,
+  sampleId = null,
+  lastQueuedSampleId = null,
+  cancelled = false,
+  touchActive,
+  scrollEligible,
+} = {}) {
+  if (phase === 'scroll' && touchActive === false && scrollEligible === false) return false;
+  if (cancelled || !freshSample || !Number.isFinite(sampleId)) return false;
+  return sampleId !== lastQueuedSampleId;
+}
+
+export function shouldQueueTouchPointerEnd({
+  moved = false,
+  freshSample = false,
+  cancelled = false,
+} = {}) {
+  return !cancelled && Boolean(moved) && Boolean(freshSample);
+}
+
+export function shouldQueueScrollColorCommand({
+  activePointer = false,
+  pointerType = '',
+  recentlyDirect = false,
+  distance = 0,
+} = {}) {
+  return Boolean(activePointer) && isDirectPointerType(pointerType) && Boolean(recentlyDirect) &&
+    finite(distance) > 0;
+}
+
+export function consumeColorCommandBatch(commands = [], maximum = 8) {
+  const queue = Array.isArray(commands) ? commands : [];
+  const limit = Math.max(0, Math.floor(finite(maximum, 8)));
+  return {
+    commands: queue.slice(0, limit),
+    remaining: queue.slice(limit),
+  };
+}
+
+/** Stationary touch gestures deliberately produce a dab/bloom, never a wake. */
+export function touchColorWake({ phase = '', velocity = {} } = {}) {
+  if (phase !== 'drag' && phase !== 'scroll') return { x: 0, y: 0 };
+  const x = finite(velocity?.x);
+  const y = finite(velocity?.y);
+  const distance = Math.hypot(x, y);
+  if (distance <= 1e-8) return { x: 0, y: 0 };
+  return { x: x / distance, y: y / distance };
+}
+
+/** Bound scroll-derived color to a small local displacement. */
+export function clampScrollColorCommand({ deltaX = 0, deltaY = 0, maxDistance = 80 } = {}) {
+  const x = finite(deltaX);
+  const y = finite(deltaY);
+  const limit = Math.max(0, finite(maxDistance, 80));
+  const distance = Math.hypot(x, y);
+  if (distance <= limit || distance <= 1e-8) return { x, y };
+  const scale = limit / distance;
+  return { x: x * scale, y: y * scale };
+}
 
 export function classifyFieldViewportChange(previous = {}, next = {}, {
   recentDirectInput = false,
