@@ -51,6 +51,24 @@ const commandWake = (command = {}) => {
   return length > 0.001 ? { x: wake.x / length, y: wake.y / length } : { x: 0, y: 0 };
 };
 
+/**
+ * Touch gestures are radial marks by default. A directional filament is an
+ * explicit drawing affordance, never an accidental consequence of velocity
+ * or a stale wake carried by a tap, hold, or native-scroll command.
+ */
+export function touchColorGeometry({ phase = '', wake = {}, intentionalDrag = true } = {}) {
+  const directional = phase === 'drag' && intentionalDrag !== false && magnitude(point(wake)) > 0.001;
+  return {
+    directional,
+    filamentCount: directional ? 3 : 0,
+    tailLength: directional ? 1 : 0,
+  };
+}
+
+const commandGeometry = (command = {}) => touchColorGeometry(command);
+const commandDirectionalWake = (command = {}) =>
+  commandGeometry(command).directional ? commandWake(command) : { x: 0, y: 0 };
+
 function compressCommands(commands, maximum) {
   if (!Array.isArray(commands) || commands.length <= maximum) return commands || [];
   const compressed = [];
@@ -61,7 +79,7 @@ function compressCommands(commands, maximum) {
     const totals = group.reduce((result, command) => {
       const position = commandPoint(command);
       const velocity = commandVelocity(command);
-      const wake = commandWake(command);
+      const wake = commandDirectionalWake(command);
       result.x += position.x;
       result.y += position.y;
       result.vx += velocity.x;
@@ -200,7 +218,7 @@ function createPigmentModel(options = {}) {
       const energy = commandEnergy(command, finite(frame.energy, 0.5));
       const pointer = commandPoint(command, frame.pointer || frame.position);
       const velocity = commandVelocity(command);
-      const wake = commandWake(command);
+      const wake = commandDirectionalWake(command);
       const speed = magnitude(velocity);
       const mark = marks[cursor];
       cursor = (cursor + 1) % maxMarks;
@@ -393,12 +411,12 @@ const DYE_SHADER = `
       vec2 p1 = cursor - directionQ * trail * 0.72 + side * radius * 0.52;
       vec2 p2 = cursor - directionQ * trail * 1.38 - side * radius * 0.68;
       float g0 = exp(-dot(q - p0, q - p0) / (radius * radius));
-      float g1 = exp(-dot(q - p1, q - p1) / (radius * radius * 1.7));
-      float g2 = exp(-dot(q - p2, q - p2) / (radius * radius * 2.4));
+      float g1 = exp(-dot(q - p1, q - p1) / (radius * radius * 1.7)) * directional;
+      float g2 = exp(-dot(q - p2, q - p2) / (radius * radius * 2.4)) * directional;
       // A tight ring gives fast gestures a filament/vortex edge instead of a
       // static coloured cursor dot. It remains bounded and decays with dye.
       float ringRadius = radius * (0.82 + speed * 0.62);
-      float ring = exp(-abs(length(radial) - ringRadius) / max(0.009, radius * 0.14));
+      float ring = exp(-abs(length(radial) - ringRadius) / max(0.009, radius * 0.14)) * directional;
       float impulse = (0.42 + energy * 1.75 + speed * 0.92) * mix(1.0, 0.22, uReduced);
       // Neighboring filaments remain within one pigment family. The host
       // advances uHuePhase slowly from time and path length, never directly
@@ -592,7 +610,8 @@ function createFallback(canvas, options, firstContext) {
     const commands = compressCommands(frame.commands, maxSamples);
     const samplesForFrame = commands.length
       ? commands.map((command) => {
-        const wake = commandWake(command);
+        const geometry = touchColorGeometry(command);
+        const wake = geometry.directional ? commandWake(command) : { x: 0, y: 0 };
         const commandVelocityValue = commandVelocity(command);
         return {
           x: clamp(commandPoint(command, pointer).x, -width * 0.1, width * 1.1),
@@ -601,7 +620,7 @@ function createFallback(canvas, options, firstContext) {
           vy: commandVelocityValue.y,
           energy: commandEnergy(command, energy),
           direction: wake,
-          directional: Boolean(wake.x || wake.y),
+          directional: geometry.directional,
           color: colorAt(huePhase * COLORS.length),
           age: 0,
         };
@@ -683,6 +702,7 @@ export function createFieldColor(canvas, options = {}) {
   let slowFrames = 0;
   let fastFrames = 0;
   let quality = 1;
+  const maxWebGLCommands = Math.round(clamp(finite(options.maxSamples, MAX_SAMPLES), 4, MAX_SAMPLES));
   const pigment = createPigmentModel(options);
 
   function makeTarget() {
@@ -774,7 +794,7 @@ export function createFieldColor(canvas, options = {}) {
     const energy = clamp(finite(frame.energy), 0, 1);
     const reduced = Boolean(frame.reducedMotion);
     const active = shouldInjectPigment(frame);
-    const commands = compressCommands(frame.commands, 8);
+    const commands = compressCommands(frame.commands, maxWebGLCommands);
     pigment.update(frame, dt);
     time += dt;
     hueProgress = advanceColorProgress(hueProgress, { ...frame, velocity, energy }, dt, { width, height });
@@ -793,7 +813,9 @@ export function createFieldColor(canvas, options = {}) {
         const write = targets[1];
         const commandPointer = commandPoint(command || {}, pointer);
         const commandVelocityValue = command ? commandVelocity(command) : velocity;
-        const commandWakeValue = command ? commandWake(command) : direction;
+        const commandWakeValue = command
+          ? (touchColorGeometry(command).directional ? commandWake(command) : { x: 0, y: 0 })
+          : direction;
         const commandEnergyValue = command ? commandEnergy(command, energy) : energy;
         gl.bindFramebuffer(gl.FRAMEBUFFER, write.framebuffer);
         gl.viewport(0, 0, pixelWidth, pixelHeight);

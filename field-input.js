@@ -4,6 +4,8 @@ export const DIRECT_TOUCH_CHARGE_SCALE = 1600;
 export const DIRECT_VIEWPORT_GRACE_MS = 1500;
 export const TOUCH_COLOR_HOLD_DELAY_MS = 280;
 export const TOUCH_COLOR_HOLD_INTERVAL_MS = 150;
+export const TOUCH_COLOR_SLOP_PX = 8;
+export const TOUCH_SCROLL_SESSION_MS = 1500;
 
 const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
 
@@ -39,9 +41,48 @@ export function shouldQueueScrollColorCommand({
   pointerType = '',
   recentlyDirect = false,
   distance = 0,
+  scrollSessionActive = false,
+  sessionStartedAt = -Infinity,
+  now = 0,
+  sessionDurationMs = TOUCH_SCROLL_SESSION_MS,
 } = {}) {
-  return Boolean(activePointer) && isDirectPointerType(pointerType) && Boolean(recentlyDirect) &&
-    finite(distance) > 0;
+  if (!isDirectPointerType(pointerType) || !recentlyDirect || finite(distance) <= 0) return false;
+  if (activePointer) return true;
+  if (!scrollSessionActive) return false;
+  const started = finite(sessionStartedAt, -Infinity);
+  const current = finite(now);
+  const duration = Math.max(0, finite(sessionDurationMs, TOUCH_SCROLL_SESSION_MS));
+  return current - started >= 0 && current - started < duration;
+}
+
+export function classifyTouchColorPhase({ pointerType = '', distance = 0, slop = TOUCH_COLOR_SLOP_PX } = {}) {
+  if (pointerType === 'pen') return 'drag';
+  return finite(distance) <= Math.max(0, finite(slop, TOUCH_COLOR_SLOP_PX)) ? 'tap' : 'drag';
+}
+
+export function touchScrollSessionFromPointerEnd({
+  pointerType = '',
+  eventType = '',
+  now = 0,
+  position = {},
+} = {}) {
+  const direct = pointerType === 'touch';
+  const cancelled = eventType === 'pointercancel';
+  return {
+    activePointer: false,
+    scrollSessionActive: direct && cancelled,
+    startedAt: direct && cancelled ? finite(now) : -Infinity,
+    anchor: { x: finite(position.x), y: finite(position.y) },
+  };
+}
+
+export function touchColorPointerPolicy({ pointerType = '', phase = '' } = {}) {
+  const touch = pointerType === 'touch';
+  return {
+    radial: touch,
+    intentionalDrag: !touch && phase === 'drag',
+    scrollSession: touch,
+  };
 }
 
 export function consumeColorCommandBatch(commands = [], maximum = 8) {

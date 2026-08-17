@@ -4,7 +4,7 @@ import {
   derivePointerVelocity,
   fieldPhysicsOptionsForMode,
 } from './field-physics.js?v=10';
-import { createFieldColor } from './field-color.js?v=11';
+import { createFieldColor } from './field-color.js?v=12';
 import {
   classifyFieldViewportChange,
   DIRECT_TOUCH_CHARGE_SCALE,
@@ -19,9 +19,14 @@ import {
   shouldQueueScrollColorCommand,
   shouldQueueTouchColorCommand,
   touchColorWake,
+  classifyTouchColorPhase,
+  touchColorPointerPolicy,
+  touchScrollSessionFromPointerEnd,
+  TOUCH_COLOR_SLOP_PX,
+  TOUCH_SCROLL_SESSION_MS,
   TOUCH_COLOR_HOLD_DELAY_MS,
   TOUCH_COLOR_HOLD_INTERVAL_MS,
-} from './field-input.js?v=6';
+} from './field-input.js?v=7';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -214,6 +219,11 @@ function mount() {
     touchColor: {
       startedAt: -Infinity,
       lastHoldAt: -Infinity,
+      startPosition: null,
+      scrollSessionActive: false,
+      scrollSessionStartedAt: -Infinity,
+      scrollAnchor: { x: 0, y: 0 },
+      scrollPointerType: '',
       sampleId: 0,
       lastQueuedSampleId: null,
       active: false,
@@ -259,9 +269,14 @@ function mount() {
     if (!isDirectPointerType(state.pointerType) || state.mode !== 'color') return;
     const sampleId = ++state.touchColor.sampleId;
     const speed = Math.hypot(velocity.vx, velocity.vy);
-    const wake = touchColorWake({ phase, velocity: { x: velocity.vx, y: velocity.vy } });
+    const policy = touchColorPointerPolicy({ pointerType: state.pointerType, phase });
+    // Touch is a radial color brush; pen remains a directional drawing input.
+    const wake = policy.intentionalDrag
+      ? touchColorWake({ phase, velocity: { x: velocity.vx, y: velocity.vy } })
+      : { x: 0, y: 0 };
     enqueueColorCommand({
       phase,
+      intentionalDrag: policy.intentionalDrag,
       position: { x: sample.x, y: sample.y },
       velocity: { x: velocity.vx, y: velocity.vy },
       wake,
@@ -294,19 +309,25 @@ function mount() {
     lastScrollY = window.scrollY;
     const distance = Math.hypot(delta.x, delta.y);
     const now = performance.now();
+    const touch = state.touchColor;
+    const pointerType = touch.scrollPointerType || state.pointerType;
     if (state.mode !== 'color' || !shouldQueueScrollColorCommand({
-      activePointer: state.touchColor.active && state.pointerId !== null,
-      pointerType: state.pointerType,
+      activePointer: touch.active && state.pointerId !== null,
+      pointerType,
       recentlyDirect: now - state.lastDirectInputAt <= DIRECT_VIEWPORT_GRACE_MS,
+      scrollSessionActive: touch.scrollSessionActive,
+      sessionStartedAt: touch.scrollSessionStartedAt,
+      now,
+      sessionDurationMs: TOUCH_SCROLL_SESSION_MS,
       distance,
     })) return;
     const sampleId = ++state.touchColor.sampleId;
-    const wake = touchColorWake({ phase: 'scroll', velocity: delta });
     enqueueColorCommand({
       phase: 'scroll',
-      position: { x: state.pointer.x, y: state.pointer.y },
+      intentionalDrag: false,
+      position: { ...touch.scrollAnchor },
       velocity: delta,
-      wake,
+      wake: { x: 0, y: 0 },
       energy: clamp(0.24 + distance / 160, 0.24, 0.62),
     }, { sampleId });
     start();
@@ -331,6 +352,10 @@ function mount() {
     state.touchColor.active = false;
     state.touchColor.startedAt = -Infinity;
     state.touchColor.lastHoldAt = -Infinity;
+    state.touchColor.startPosition = null;
+    state.touchColor.scrollSessionActive = false;
+    state.touchColor.scrollSessionStartedAt = -Infinity;
+    state.touchColor.scrollPointerType = '';
     state.pointer.vx = 0;
     state.pointer.vy = 0;
     state.pointer.active = false;
@@ -510,8 +535,19 @@ function mount() {
         active: true,
       };
       if (isDirectPointerType(state.pointerType)) {
-        const colorPhase = phase === 'down' ? 'tap' : phase === 'move' ? 'drag' : '';
-        if (colorPhase) queueTouchSample(sample, velocity, colorPhase);
+        if (phase === 'down') {
+          state.touchColor.startPosition = { x: sample.x, y: sample.y };
+          queueTouchSample(sample, velocity, 'tap');
+        } else if (phase === 'move') {
+          const start = state.touchColor.startPosition || sample;
+          const distance = Math.hypot(sample.x - start.x, sample.y - start.y);
+          const colorPhase = classifyTouchColorPhase({
+            pointerType: state.pointerType,
+            distance,
+            slop: TOUCH_COLOR_SLOP_PX,
+          });
+          if (colorPhase === 'drag') queueTouchSample(sample, velocity, colorPhase);
+        }
       }
       updateProbe(sample);
     }
@@ -539,6 +575,10 @@ function mount() {
       state.touchColor.active = true;
       state.touchColor.startedAt = performance.now();
       state.touchColor.lastHoldAt = -Infinity;
+      state.touchColor.startPosition = null;
+      state.touchColor.scrollSessionActive = false;
+      state.touchColor.scrollSessionStartedAt = -Infinity;
+      state.touchColor.scrollPointerType = '';
     }
     interactionSurface.setPointerCapture(event.pointerId);
     interactionSurface.classList.add('field-table-interacting');
@@ -564,7 +604,14 @@ function mount() {
     if (event.pointerId !== state.pointerId) return;
     if (event.type === 'pointerup') updatePointer(event, 'up');
     const cancelled = event.type === 'pointercancel';
-    if (cancelled && isDirectPointerType(state.pointerType)) {
+    const directPointer = isDirectPointerType(state.pointerType);
+    const scrollSession = touchScrollSessionFromPointerEnd({
+      pointerType: state.pointerType,
+      eventType: event.type,
+      now: performance.now(),
+      position: state.pointer,
+    });
+    if (cancelled && directPointer) {
       state.colorCommands.length = 0;
       state.touchColor.lastQueuedSampleId = null;
     }
@@ -575,6 +622,11 @@ function mount() {
     state.touchColor.active = false;
     state.touchColor.startedAt = -Infinity;
     state.touchColor.lastHoldAt = -Infinity;
+    state.touchColor.startPosition = null;
+    state.touchColor.scrollSessionActive = scrollSession.scrollSessionActive;
+    state.touchColor.scrollSessionStartedAt = scrollSession.startedAt;
+    state.touchColor.scrollAnchor = scrollSession.anchor;
+    state.touchColor.scrollPointerType = scrollSession.scrollSessionActive ? state.pointerType : '';
     state.pointerType = '';
     state.hasInteracted = true;
     interactionSurface.classList.remove('field-table-interacting');
