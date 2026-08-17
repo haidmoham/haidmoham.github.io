@@ -12,6 +12,7 @@ const {
   isDirectPointerType,
   pointerActivityDeadline,
   resolveFieldInputModality,
+  shouldTrackFieldPointerMove,
   shouldStartDirectFieldGesture,
 } = await import(moduleUrl);
 
@@ -57,6 +58,27 @@ test('field presentation follows the primary capability until an actual pointer 
   assert.equal(resolveFieldInputModality('mouse', { primaryCoarse: true }), 'cursor');
   assert.equal(resolveFieldInputModality('touch', { primaryFine: true }), 'touch');
   assert.equal(resolveFieldInputModality('pen', { primaryFine: true }), 'pen');
+});
+
+test('mouse hover drives the field while touch and pen still require ownership', () => {
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'mouse', pointerId: 4, ownedPointerId: null,
+  }), true);
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'mouse', pointerId: 4, ownedPointerId: null, interactiveTarget: true,
+  }), false);
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'touch', pointerId: 8, ownedPointerId: null,
+  }), false);
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'pen', pointerId: 9, ownedPointerId: null,
+  }), false);
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'touch', pointerId: 8, ownedPointerId: 8,
+  }), true);
+  assert.equal(shouldTrackFieldPointerMove({
+    pointerType: 'touch', pointerId: 7, ownedPointerId: 8,
+  }), false);
 });
 
 test('direct gestures start only on authored non-interactive text in a moving mode', () => {
@@ -130,7 +152,6 @@ test('Field Table exposes explicit modes and keeps visual feedback decorative', 
   }
   assert.match(controller, /querySelectorAll\(\s*(['"])\[data-field-mode\]\1\s*\)/);
   assert.match(controller, /setAttribute\(\s*(['"])aria-checked\1\s*,/);
-  assert.doesNotMatch(controller, /cycleMode|cycle typography field mode|select to cycle/i);
 
   assert.match(controller, /field-table-probe/);
   assert.match(controller, /data-field-probe/);
@@ -153,6 +174,23 @@ test('Field Table starts neutral and routes its instructions by pointer capabili
   assert.match(controller, /resolveFieldInputModality\(\s*pointerType/);
   assert.match(controller, /routeInputModality\(\s*event\.pointerType/);
   assert.match(controller, /dataset\.fieldInput/);
+});
+
+test('desktop keeps the compact mode pill while mobile keeps the explicit picker', async () => {
+  const [controller, stylesheet] = await Promise.all([
+    readFile(new URL('../field.js', import.meta.url), 'utf8'),
+    readFile(new URL('../style.css', import.meta.url), 'utf8'),
+  ]);
+
+  assert.match(controller, /field-toggle field-mode-toggle field-table-desktop-toggle/);
+  assert.match(controller, /MODE: COLOR \+ MAGNET/);
+  assert.match(controller, /MODE: MAGNET ONLY/);
+  assert.match(controller, /MODE: STILL/);
+  assert.match(stylesheet, /\.field-table-desktop-toggle\s*\{[^}]*display:\s*none\s*;/s);
+  assert.match(
+    stylesheet,
+    /@media\s*\(\s*hover:\s*hover\s*\)\s*and\s*\(\s*pointer:\s*fine\s*\)[^{]*\{[\s\S]*?\.field-table-dock\s*\{[^}]*display:\s*none\s*;[\s\S]*?\.field-table-desktop-toggle\s*\{[^}]*display:\s*inline-flex\s*;/,
+  );
 });
 
 test('Field Table controls retain touch sizing, safe areas, and fine-pointer hover', async () => {

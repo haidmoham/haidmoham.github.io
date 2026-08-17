@@ -178,7 +178,8 @@ def validate_field_table_contract() -> None:
             f'data-field-mode="{mode}"' in homepage,
             f"Field Table is missing the {mode!r} mode control",
         )
-    require('src="field.js?v=12"' in homepage, "homepage must load the current Field Table controller")
+    require('href="style.css?v=33"' in homepage, "homepage must load the current Field Table styles")
+    require('src="field.js?v=13"' in homepage, "homepage must load the current Field Table controller")
     require("document.querySelector('[data-field-stage]')" in controller, "Field Table controller must bind its stage")
     require("window.addEventListener('pointer" not in controller, "Field Table pointer ownership must remain stage-scoped")
 

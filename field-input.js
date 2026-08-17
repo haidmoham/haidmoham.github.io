@@ -40,6 +40,18 @@ export function resolveFieldInputModality(pointerType, {
   return 'pointer';
 }
 
+export function shouldTrackFieldPointerMove({
+  pointerType,
+  pointerId,
+  ownedPointerId = null,
+  interactiveTarget = false,
+  isPrimary = true,
+} = {}) {
+  if (isPrimary === false) return false;
+  if (ownedPointerId !== null) return pointerId === ownedPointerId;
+  return pointerType === 'mouse' && !interactiveTarget;
+}
+
 export function shouldStartDirectFieldGesture({
   pointerType,
   mode,

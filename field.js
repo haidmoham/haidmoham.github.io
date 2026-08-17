@@ -12,7 +12,8 @@ import {
   isDirectPointerType,
   pointerActivityDeadline,
   resolveFieldInputModality,
-} from './field-input.js?v=3';
+  shouldTrackFieldPointerMove,
+} from './field-input.js?v=4';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -167,6 +168,11 @@ function mount() {
   probe.innerHTML = '<span class="field-table-probe-ring"></span><span class="field-table-probe-core"></span>';
   stage.append(probe);
 
+  const desktopModeButton = document.createElement('button');
+  desktopModeButton.type = 'button';
+  desktopModeButton.className = 'field-toggle field-mode-toggle field-table-desktop-toggle';
+  document.body.append(desktopModeButton);
+
   const systemReducedMotion = reducedMotion();
   const storedMode = readModePreference();
   const primaryFinePointer = window.matchMedia?.('(pointer: fine)');
@@ -272,10 +278,11 @@ function mount() {
     const frame = physics.update(dt);
     applyGlyphFrame(preparedGlyphs, frame);
     if (state.mode === 'color') {
+      const cursorIsActive = state.pointerType === 'mouse' && now < state.pointerActiveUntil;
       color.render({
         ...frame,
         enabled: true,
-        inject: state.pointerId !== null,
+        inject: state.pointerId !== null || cursorIsActive,
         pointer: state.pointer,
         reducedMotion: false,
       }, dt);
@@ -326,6 +333,16 @@ function mount() {
   };
 
   const updateControls = () => {
+    const desktopLabels = {
+      color: 'MODE: COLOR + MAGNET',
+      magnetic: 'MODE: MAGNET ONLY',
+      still: 'MODE: STILL',
+    };
+    const desktopDescriptions = {
+      color: 'Fluid color with broad, restrained magnetic type',
+      magnetic: 'Stronger broad magnetic type without the fluid color field',
+      still: 'Static field with no motion',
+    };
     ROOT.classList.add('field-table-enabled');
     FIELD_MODES.forEach((mode) => ROOT.classList.toggle(`field-mode-${mode}`, state.mode === mode));
     ROOT.classList.toggle('field-motion-opt-in', state.explicitMode && state.mode !== 'still');
@@ -337,6 +354,9 @@ function mount() {
     });
     resetButton.textContent = state.mode === 'color' ? 'Clear color' : 'Reset type';
     resetButton.disabled = state.mode === 'still';
+    desktopModeButton.textContent = desktopLabels[state.mode];
+    desktopModeButton.title = `${desktopDescriptions[state.mode]}. Select to cycle modes.`;
+    desktopModeButton.setAttribute('aria-label', `${desktopDescriptions[state.mode]}. Cycle typography field mode.`);
     announceMode();
   };
 
@@ -387,7 +407,17 @@ function mount() {
   };
 
   const pointerMove = (event) => {
-    if (event.pointerId !== state.pointerId) return;
+    if (!shouldTrackFieldPointerMove({
+      pointerType: event.pointerType,
+      pointerId: event.pointerId,
+      ownedPointerId: state.pointerId,
+      interactiveTarget: pointerIsInteractive(event.target),
+      isPrimary: event.isPrimary,
+    })) return;
+    if (state.pointerId === null) {
+      routeInputModality(event.pointerType);
+      state.pointerType = event.pointerType || 'mouse';
+    }
     updatePointer(event, 'move');
   };
 
@@ -433,6 +463,10 @@ function mount() {
 
   const inputCapabilityChanged = () => routeInputModality('');
   const pointerEntered = (event) => routeInputModality(event.pointerType);
+  const cycleDesktopMode = () => {
+    const currentIndex = FIELD_MODES.indexOf(state.mode);
+    selectMode(FIELD_MODES[(currentIndex + 1) % FIELD_MODES.length]);
+  };
 
   stage.addEventListener('pointerover', pointerEntered, { passive: true });
   stage.addEventListener('pointerdown', pointerDown, { passive: true });
@@ -449,6 +483,7 @@ function mount() {
     button.addEventListener('keydown', keyDown);
   });
   resetButton.addEventListener('click', resetField);
+  desktopModeButton.addEventListener('click', cycleDesktopMode);
 
   rebuildPhysics();
   updateControls();
@@ -473,9 +508,11 @@ function mount() {
       primaryCoarsePointer?.removeEventListener?.('change', inputCapabilityChanged);
       modeButtons.forEach((button) => button.removeEventListener('keydown', keyDown));
       resetButton.removeEventListener('click', resetField);
+      desktopModeButton.removeEventListener('click', cycleDesktopMode);
       color.destroy();
       canvas.remove();
       probe.remove();
+      desktopModeButton.remove();
       ROOT.classList.remove('field-table-enabled', 'field-motion-opt-in', ...FIELD_MODES.map((mode) => `field-mode-${mode}`));
       delete window.__mhaiderFieldTable;
     },
