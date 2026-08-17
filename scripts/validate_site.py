@@ -6,6 +6,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FIELD_STYLE_VERSION = 34
+FIELD_CONTROLLER_VERSION = 14
 
 FIELD_PAGES = (
     Path("404.html"),
@@ -127,6 +129,8 @@ def eligible_field_element(element: Element) -> bool:
 
 
 def validate_field_coverage() -> None:
+    total_targets = 0
+    total_eligible = 0
     for relative_path in FIELD_PAGES:
         parser = parse_document(ROOT / relative_path)
         targets = [element for element in parser.elements if "data-field-target" in element.attributes]
@@ -144,6 +148,11 @@ def validate_field_coverage() -> None:
         ratio = eligible_targets / len(eligible) if eligible else 0
         require(ratio >= 0.40, f"{relative_path}: field coverage {eligible_targets}/{len(eligible)} ({ratio:.1%}) is below 40%")
         print(f"field coverage: {relative_path}: {eligible_targets}/{len(eligible)} ({ratio:.1%})")
+        total_targets += eligible_targets
+        total_eligible += len(eligible)
+
+    total_ratio = total_targets / total_eligible if total_eligible else 0
+    print(f"field coverage: aggregate: {total_targets}/{total_eligible} ({total_ratio:.1%})")
 
     for robotics_page in (ROOT / "robotics").rglob("*.html"):
         require("data-field-target" not in robotics_page.read_text(encoding="utf-8"), f"robotics page must not contain field targets: {robotics_page.relative_to(ROOT)}")
@@ -178,10 +187,23 @@ def validate_field_table_contract() -> None:
             f'data-field-mode="{mode}"' in homepage,
             f"Field Table is missing the {mode!r} mode control",
         )
-    require('href="style.css?v=33"' in homepage, "homepage must load the current Field Table styles")
-    require('src="field.js?v=13"' in homepage, "homepage must load the current Field Table controller")
-    require("document.querySelector('[data-field-stage]')" in controller, "Field Table controller must bind its stage")
-    require("window.addEventListener('pointer" not in controller, "Field Table pointer ownership must remain stage-scoped")
+    for relative_path in FIELD_PAGES:
+        field_page = (ROOT / relative_path).read_text(encoding="utf-8")
+        require(
+            f'href="style.css?v={FIELD_STYLE_VERSION}"' in field_page,
+            f"{relative_path}: must load the current site-wide field styles",
+        )
+        require(
+            f'src="field.js?v={FIELD_CONTROLLER_VERSION}"' in field_page,
+            f"{relative_path}: must load the current site-wide field controller",
+        )
+    require(
+        "document.querySelectorAll('[data-field-target]')" in controller,
+        "site-wide field controller must consume the authored field target map",
+    )
+    require("if (!stage ||" not in controller, "site-wide field must not require the homepage stage to mount")
+    require("document.body.prepend(canvas)" in controller, "site-wide field canvas must mount outside the homepage stage")
+    require("window.addEventListener('pointer" not in controller, "field pointer ownership must remain bounded to the document body")
 
     require(legacy_page.is_file(), "missing unlinked legacy field route")
     require(legacy_controller.is_file(), "missing preserved legacy field controller")

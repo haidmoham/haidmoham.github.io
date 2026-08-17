@@ -1210,8 +1210,8 @@ body:not(.robotics-page) > .field-cursor-artifact {
 }
 
 /* FIELD TABLE · POINTER-AWARE TYPOGRAPHY INSTRUMENT
-   The current experience is bounded to the home hero. The page keeps native
-   vertical scroll and pinch zoom while the stage owns the captured pointer. */
+   The field follows the authored site-wide target map. The home stage adds the
+   touch picker while every page keeps native vertical scroll and pinch zoom. */
 [data-field-stage] {
   position: relative;
   isolation: isolate;
@@ -1282,6 +1282,7 @@ body:not(.robotics-page) > .field-cursor-artifact {
   will-change: transform;
   transition: opacity 140ms ease;
 }
+.field-site-probe { position: fixed; }
 .field-table-interacting .field-table-probe { opacity: 1; }
 .field-table-probe-ring,
 .field-table-probe-core {
@@ -1315,6 +1316,15 @@ body:not(.robotics-page) > .field-cursor-artifact {
 }
 .field-table-stage[data-field-mode="magnetic"] .field-table-probe-core { background: #28649f; }
 .field-table-stage[data-field-mode="still"] .field-table-probe { display: none; }
+.field-mode-magnetic .field-site-probe .field-table-probe-ring {
+  width: 88px;
+  height: 88px;
+  border-color: rgba(40, 100, 159, .52);
+  background: radial-gradient(circle, rgba(40, 100, 159, .1), transparent 66%);
+  box-shadow: 0 0 0 14px rgba(40, 100, 159, .035);
+}
+.field-mode-magnetic .field-site-probe .field-table-probe-core { background: #28649f; }
+.field-mode-still .field-site-probe { display: none; }
 
 .field-table-dock {
   position: relative;

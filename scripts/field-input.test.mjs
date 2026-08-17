@@ -98,23 +98,23 @@ test('finger-down gets a short visible hold while moves keep the desktop cadence
   assert.ok(DIRECT_TOUCH_CHARGE_SCALE > 1);
 });
 
-test('Field Table scopes direct manipulation to its stage and preserves native touch gestures', async () => {
+test('the site-wide field owns input from the document body and preserves native touch gestures', async () => {
   const [controller, stylesheet, inputModule] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
     readFile(new URL('../style.css', import.meta.url), 'utf8'),
     readFile(new URL('../field-input.js', import.meta.url), 'utf8'),
   ]);
 
-  const stageBinding = controller.match(
-    /(?:const|let)\s+([A-Za-z_$][\w$]*)\s*=\s*document\.querySelector\(\s*(['"])\[data-field-stage\]\2\s*\)/,
+  const surfaceBinding = controller.match(
+    /(?:const|let)\s+([A-Za-z_$][\w$]*)\s*=\s*document\.body\s*;/,
   );
-  assert.ok(stageBinding, 'the controller should bind the authored Field Table stage');
-  const stageName = stageBinding[1].replace(/[$]/g, '\\$&');
+  assert.ok(surfaceBinding, 'the controller should bind the document-wide interaction surface');
+  const surfaceName = surfaceBinding[1].replace(/[$]/g, '\\$&');
   for (const eventName of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) {
     assert.match(
       controller,
-      new RegExp(`${stageName}\\.addEventListener\\(\\s*['"]${eventName}['"]`),
-      `${eventName} should be stage-scoped`,
+      new RegExp(`${surfaceName}\\.addEventListener\\(\\s*['"]${eventName}['"]`),
+      `${eventName} should cover the authored site-wide field`,
     );
   }
   assert.doesNotMatch(
@@ -124,7 +124,7 @@ test('Field Table scopes direct manipulation to its stage and preserves native t
   );
   assert.match(
     controller,
-    /\.setPointerCapture\(\s*event\.pointerId\s*\)/,
+    /interactionSurface\.setPointerCapture\(\s*event\.pointerId\s*\)/,
     'a claimed direct-manipulation pointer should be captured by the stage',
   );
   assert.match(controller, /preserve: true/);
@@ -191,6 +191,15 @@ test('desktop keeps the compact mode pill while mobile keeps the explicit picker
     stylesheet,
     /@media\s*\(\s*hover:\s*hover\s*\)\s*and\s*\(\s*pointer:\s*fine\s*\)[^{]*\{[\s\S]*?\.field-table-dock\s*\{[^}]*display:\s*none\s*;[\s\S]*?\.field-table-desktop-toggle\s*\{[^}]*display:\s*inline-flex\s*;/,
   );
+});
+
+test('the new field retains the authored site-wide scope instead of requiring the home stage', async () => {
+  const controller = await readFile(new URL('../field.js', import.meta.url), 'utf8');
+
+  assert.match(controller, /document\.querySelectorAll\(\s*(['"])\[data-field-target\]\1\s*\)/);
+  assert.doesNotMatch(controller, /if\s*\(\s*!stage\s*\|\|/);
+  assert.match(controller, /document\.body\.prepend\(\s*canvas\s*\)/);
+  assert.match(controller, /window\.scroll[XY]\s*-\s*physicsScroll[XY]/);
 });
 
 test('Field Table controls retain touch sizing, safe areas, and fine-pointer hover', async () => {

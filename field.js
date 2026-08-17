@@ -12,8 +12,9 @@ import {
   isDirectPointerType,
   pointerActivityDeadline,
   resolveFieldInputModality,
+  shouldStartDirectFieldGesture,
   shouldTrackFieldPointerMove,
-} from './field-input.js?v=4';
+} from './field-input.js?v=5';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -36,7 +37,7 @@ const INPUT_COPY = {
   },
 };
 const ROOT = document.documentElement;
-const stage = document.querySelector('[data-field-stage]');
+const tableStage = document.querySelector('[data-field-stage]');
 
 const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
@@ -72,6 +73,19 @@ function sessionSeed(key) {
 
 function pointerIsInteractive(target) {
   return target instanceof Element && Boolean(target.closest('a, button, input, textarea, select, form, label'));
+}
+
+function touchTargetContext(target) {
+  const element = target instanceof Element ? target : null;
+  return {
+    authoredTarget: Boolean(element?.closest('[data-field-target]')),
+    interactiveTarget: pointerIsInteractive(element),
+  };
+}
+
+function collectTargets() {
+  return [...document.querySelectorAll('[data-field-target]')].filter((target) =>
+    !target.closest('nav, a, button, form, input, textarea, select, [aria-hidden="true"]'));
 }
 
 function pointerInStage(event, bounds) {
@@ -146,27 +160,28 @@ function prepareGlyphs(targets, polaritySeed) {
 }
 
 function mount() {
-  if (!stage || window.__mhaiderFieldTable) return window.__mhaiderFieldTable || null;
-  const targets = [...stage.querySelectorAll('[data-field-copy]')];
-  const dock = stage.querySelector('[data-field-dock]');
-  const modeButtons = [...stage.querySelectorAll('[data-field-mode]')];
-  const resetButton = stage.querySelector('[data-field-reset]');
-  const kicker = stage.querySelector('[data-field-kicker]');
-  const hint = stage.querySelector('[data-field-hint]');
-  const status = stage.querySelector('[data-field-status]');
-  if (!targets.length || !dock || modeButtons.length !== FIELD_MODES.length || !resetButton || !kicker) return null;
+  if (window.__mhaiderFieldTable) return window.__mhaiderFieldTable;
+  const targets = collectTargets();
+  if (!targets.length) return null;
+  const interactionSurface = document.body;
+  const dock = tableStage?.querySelector('[data-field-dock]') || null;
+  const modeButtons = tableStage ? [...tableStage.querySelectorAll('[data-field-mode]')] : [];
+  const resetButton = tableStage?.querySelector('[data-field-reset]') || null;
+  const kicker = tableStage?.querySelector('[data-field-kicker]') || null;
+  const hint = tableStage?.querySelector('[data-field-hint]') || null;
+  const status = tableStage?.querySelector('[data-field-status]') || null;
 
   const canvas = document.createElement('canvas');
-  canvas.className = 'field-table-canvas';
+  canvas.className = 'field-color-canvas';
   canvas.setAttribute('aria-hidden', 'true');
-  stage.prepend(canvas);
+  document.body.prepend(canvas);
 
   const probe = document.createElement('div');
-  probe.className = 'field-table-probe';
+  probe.className = 'field-table-probe field-site-probe';
   probe.setAttribute('data-field-probe', '');
   probe.setAttribute('aria-hidden', 'true');
   probe.innerHTML = '<span class="field-table-probe-ring"></span><span class="field-table-probe-core"></span>';
-  stage.append(probe);
+  document.body.append(probe);
 
   const desktopModeButton = document.createElement('button');
   desktopModeButton.type = 'button';
@@ -198,8 +213,10 @@ function mount() {
   const preparedGlyphs = prepareGlyphs(targets, sessionSeed('mhaider.field.table.polarity-seed'));
   const color = createFieldColor(canvas, { maxDpr: 2 });
   let physics = null;
-  let stageBounds = stage.getBoundingClientRect();
+  let stageBounds = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
   let viewport = { width: window.innerWidth, height: window.innerHeight, dpr: window.devicePixelRatio || 1 };
+  let physicsScrollX = window.scrollX;
+  let physicsScrollY = window.scrollY;
   let raf = 0;
   let resizeRaf = 0;
   let lastFrameAt = performance.now();
@@ -217,7 +234,7 @@ function mount() {
   const stop = () => {
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
-    stage.classList.remove('field-table-active');
+    interactionSurface.classList.remove('field-table-active');
     preparedGlyphs.forEach((glyph) => glyph.node.style.removeProperty('will-change'));
   };
 
@@ -232,16 +249,18 @@ function mount() {
   };
 
   const rebuildPhysics = () => {
-    stageBounds = stage.getBoundingClientRect();
+    stageBounds = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
     const glyphs = preparedGlyphs.map((glyph) => {
       const bounds = glyph.node.getBoundingClientRect();
       return {
-        x: bounds.left - stageBounds.left + bounds.width / 2,
-        y: bounds.top - stageBounds.top + bounds.height / 2,
+        x: bounds.left + bounds.width / 2,
+        y: bounds.top + bounds.height / 2,
         mass: glyph.mass,
         charge: glyph.charge,
       };
     });
+    physicsScrollX = window.scrollX;
+    physicsScrollY = window.scrollY;
     physics = createFieldPhysics({ glyphs, ...fieldPhysicsOptionsForMode(state.mode) });
   };
 
@@ -257,7 +276,7 @@ function mount() {
       const change = forceLayout ? 'layout' : classifyFieldViewportChange(viewport, nextViewport, { recentDirectInput });
       viewport = nextViewport;
       if (change === 'none') return;
-      stageBounds = stage.getBoundingClientRect();
+      stageBounds = { left: 0, top: 0, width: nextViewport.width, height: nextViewport.height };
       if (change === 'transient-height') {
         color.resize(stageBounds.width, stageBounds.height, Math.min(nextViewport.dpr, 2), { preserve: true });
         return;
@@ -274,7 +293,12 @@ function mount() {
     const dt = Math.min((now - lastFrameAt) / 1000, 0.05);
     lastFrameAt = now;
     const physicallyActive = state.pointerId !== null || now < state.pointerActiveUntil;
-    physics.setPointer({ ...state.pointer, active: physicallyActive });
+    physics.setPointer({
+      ...state.pointer,
+      x: state.pointer.x + (window.scrollX - physicsScrollX),
+      y: state.pointer.y + (window.scrollY - physicsScrollY),
+      active: physicallyActive,
+    });
     const frame = physics.update(dt);
     applyGlyphFrame(preparedGlyphs, frame);
     if (state.mode === 'color') {
@@ -299,7 +323,7 @@ function mount() {
   const start = () => {
     if (!state.hidden && state.mode !== 'still' && !raf) {
       lastFrameAt = performance.now();
-      stage.classList.add('field-table-active');
+      interactionSurface.classList.add('field-table-active');
       preparedGlyphs.forEach((glyph) => { glyph.node.style.willChange = 'transform'; });
       raf = requestAnimationFrame(loop);
     }
@@ -312,14 +336,16 @@ function mount() {
       still: 'Field motion is off.',
     };
     const inputCopy = INPUT_COPY[state.inputModality] || INPUT_COPY.pointer;
-    stage.dataset.fieldInput = state.inputModality;
-    kicker.textContent = inputCopy.kicker;
-    status.textContent = labels[state.mode];
-    hint.textContent = state.mode === 'still'
-      ? 'Motion is off. Choose Color or Magnet to explore.'
-      : state.hasInteracted
-        ? 'Move slowly for pull. Flick for a wider wake.'
-        : inputCopy.idle;
+    if (tableStage) tableStage.dataset.fieldInput = state.inputModality;
+    if (kicker) kicker.textContent = inputCopy.kicker;
+    if (status) status.textContent = labels[state.mode];
+    if (hint) {
+      hint.textContent = state.mode === 'still'
+        ? 'Motion is off. Choose Color or Magnet to explore.'
+        : state.hasInteracted
+          ? 'Move slowly for pull. Flick for a wider wake.'
+          : inputCopy.idle;
+    }
   };
 
   const routeInputModality = (pointerType = '') => {
@@ -343,17 +369,19 @@ function mount() {
       magnetic: 'Stronger broad magnetic type without the fluid color field',
       still: 'Static field with no motion',
     };
-    ROOT.classList.add('field-table-enabled');
+    ROOT.classList.add('field-enabled', 'field-table-enabled');
     FIELD_MODES.forEach((mode) => ROOT.classList.toggle(`field-mode-${mode}`, state.mode === mode));
     ROOT.classList.toggle('field-motion-opt-in', state.explicitMode && state.mode !== 'still');
-    stage.dataset.fieldMode = state.mode;
+    if (tableStage) tableStage.dataset.fieldMode = state.mode;
     modeButtons.forEach((button) => {
       const selected = button.dataset.fieldMode === state.mode;
       button.setAttribute('aria-checked', String(selected));
       button.tabIndex = selected ? 0 : -1;
     });
-    resetButton.textContent = state.mode === 'color' ? 'Clear color' : 'Reset type';
-    resetButton.disabled = state.mode === 'still';
+    if (resetButton) {
+      resetButton.textContent = state.mode === 'color' ? 'Clear color' : 'Reset type';
+      resetButton.disabled = state.mode === 'still';
+    }
     desktopModeButton.textContent = desktopLabels[state.mode];
     desktopModeButton.title = `${desktopDescriptions[state.mode]}. Select to cycle modes.`;
     desktopModeButton.setAttribute('aria-label', `${desktopDescriptions[state.mode]}. Cycle typography field mode.`);
@@ -371,7 +399,7 @@ function mount() {
   };
 
   const updatePointer = (event, phase = 'move') => {
-    stageBounds = stage.getBoundingClientRect();
+    stageBounds = { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
     const samples = event.getCoalescedEvents?.();
     const events = samples?.length ? samples : [event];
     for (const pointerEvent of events) {
@@ -397,12 +425,19 @@ function mount() {
 
   const pointerDown = (event) => {
     routeInputModality(event.pointerType);
-    if (state.mode === 'still' || state.pointerId !== null || event.isPrimary === false || pointerIsInteractive(event.target)) return;
+    const directPointer = isDirectPointerType(event.pointerType);
+    if (state.mode === 'still' || state.pointerId !== null || event.isPrimary === false) return;
+    if (directPointer && !shouldStartDirectFieldGesture({
+      pointerType: event.pointerType,
+      mode: state.mode,
+      ...touchTargetContext(event.target),
+    })) return;
+    if (!directPointer && pointerIsInteractive(event.target)) return;
     state.pointerId = event.pointerId;
     state.pointerType = event.pointerType || 'mouse';
     state.lastPointerSample = null;
-    stage.setPointerCapture(event.pointerId);
-    stage.classList.add('field-table-interacting');
+    interactionSurface.setPointerCapture(event.pointerId);
+    interactionSurface.classList.add('field-table-interacting');
     updatePointer(event, 'down');
   };
 
@@ -424,12 +459,12 @@ function mount() {
   const pointerEnd = (event) => {
     if (event.pointerId !== state.pointerId) return;
     if (event.type === 'pointerup') updatePointer(event, 'up');
-    if (stage.hasPointerCapture?.(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+    if (interactionSurface.hasPointerCapture?.(event.pointerId)) interactionSurface.releasePointerCapture(event.pointerId);
     state.pointerId = null;
     state.lastPointerSample = null;
     state.pointer.active = false;
     state.hasInteracted = true;
-    stage.classList.remove('field-table-interacting');
+    interactionSurface.classList.remove('field-table-interacting');
     announceMode();
     start();
   };
@@ -447,7 +482,7 @@ function mount() {
   const resetField = () => {
     if (state.mode === 'color') color.clear();
     resetGlyphs();
-    status.textContent = state.mode === 'color' ? 'Color cleared.' : 'Type reset.';
+    if (status) status.textContent = state.mode === 'color' ? 'Color cleared.' : 'Type reset.';
   };
 
   const visibilityChanged = () => {
@@ -468,11 +503,11 @@ function mount() {
     selectMode(FIELD_MODES[(currentIndex + 1) % FIELD_MODES.length]);
   };
 
-  stage.addEventListener('pointerover', pointerEntered, { passive: true });
-  stage.addEventListener('pointerdown', pointerDown, { passive: true });
-  stage.addEventListener('pointermove', pointerMove, { passive: true });
-  stage.addEventListener('pointerup', pointerEnd, { passive: true });
-  stage.addEventListener('pointercancel', pointerEnd, { passive: true });
+  interactionSurface.addEventListener('pointerover', pointerEntered, { passive: true });
+  interactionSurface.addEventListener('pointerdown', pointerDown, { passive: true });
+  interactionSurface.addEventListener('pointermove', pointerMove, { passive: true });
+  interactionSurface.addEventListener('pointerup', pointerEnd, { passive: true });
+  interactionSurface.addEventListener('pointercancel', pointerEnd, { passive: true });
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', visibilityChanged);
   media?.addEventListener?.('change', motionPreferenceChanged);
@@ -482,7 +517,7 @@ function mount() {
     button.addEventListener('click', () => selectMode(button.dataset.fieldMode));
     button.addEventListener('keydown', keyDown);
   });
-  resetButton.addEventListener('click', resetField);
+  resetButton?.addEventListener('click', resetField);
   desktopModeButton.addEventListener('click', cycleDesktopMode);
 
   rebuildPhysics();
@@ -496,24 +531,24 @@ function mount() {
     destroy() {
       settle({ clearColor: true });
       cancelAnimationFrame(resizeRaf);
-      stage.removeEventListener('pointerdown', pointerDown);
-      stage.removeEventListener('pointerover', pointerEntered);
-      stage.removeEventListener('pointermove', pointerMove);
-      stage.removeEventListener('pointerup', pointerEnd);
-      stage.removeEventListener('pointercancel', pointerEnd);
+      interactionSurface.removeEventListener('pointerdown', pointerDown);
+      interactionSurface.removeEventListener('pointerover', pointerEntered);
+      interactionSurface.removeEventListener('pointermove', pointerMove);
+      interactionSurface.removeEventListener('pointerup', pointerEnd);
+      interactionSurface.removeEventListener('pointercancel', pointerEnd);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', visibilityChanged);
       media?.removeEventListener?.('change', motionPreferenceChanged);
       primaryFinePointer?.removeEventListener?.('change', inputCapabilityChanged);
       primaryCoarsePointer?.removeEventListener?.('change', inputCapabilityChanged);
       modeButtons.forEach((button) => button.removeEventListener('keydown', keyDown));
-      resetButton.removeEventListener('click', resetField);
+      resetButton?.removeEventListener('click', resetField);
       desktopModeButton.removeEventListener('click', cycleDesktopMode);
       color.destroy();
       canvas.remove();
       probe.remove();
       desktopModeButton.remove();
-      ROOT.classList.remove('field-table-enabled', 'field-motion-opt-in', ...FIELD_MODES.map((mode) => `field-mode-${mode}`));
+      ROOT.classList.remove('field-enabled', 'field-table-enabled', 'field-motion-opt-in', ...FIELD_MODES.map((mode) => `field-mode-${mode}`));
       delete window.__mhaiderFieldTable;
     },
   };
