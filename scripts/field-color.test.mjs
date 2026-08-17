@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const moduleUrl = `${pathToFileURL(new URL('../field-color.js', import.meta.url).pathname).href}?test=${Date.now()}`;
@@ -11,6 +12,7 @@ const {
   surfaceTensionEdge,
   INITIAL_PIGMENT_RGB,
 } = await import(moduleUrl);
+const colorSource = await readFile(new URL('../field-color.js', import.meta.url), 'utf8');
 
 test('height-only viewport preservation keeps the color backing store alive', () => {
   const context = {
@@ -107,6 +109,15 @@ test('residual spring energy cannot inject pigment after physical input stops', 
   assert.equal(shouldInjectPigment({ enabled: true, inject: true, energy: 0.9 }), true);
   assert.equal(shouldInjectPigment({ enabled: true, inject: true, energy: 0 }), false);
   assert.equal(shouldInjectPigment({ enabled: false, inject: true, energy: 0.9 }), false);
+});
+
+test('zero-wake tap and hold do not apply directional WebGL drift', () => {
+  const driftAssignment = colorSource.match(/vec2\s+drift\s*=\s*([^;]+);/)?.[1] ?? '';
+  assert.match(
+    driftAssignment,
+    /directional/,
+    'shader advection must be gated by wake direction so tap/hold remain radial',
+  );
 });
 
 test('surface-tension edge is absent in uniform fluid, positive at boundaries, and bounded', () => {

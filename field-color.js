@@ -40,6 +40,71 @@ const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallbac
 const point = (value) => ({ x: finite(value && value.x), y: finite(value && value.y) });
 const magnitude = (value) => Math.hypot(value.x, value.y);
 
+const commandEnergy = (command = {}, fallback = 0.5) =>
+  clamp(finite(command.energy, finite(command.strength, fallback)), 0.02, 1);
+const commandPoint = (command = {}, fallback = {}) =>
+  point(command.position || command.pointer || fallback);
+const commandVelocity = (command = {}) => point(command.velocity || command.delta);
+const commandWake = (command = {}) => {
+  const wake = point(command.wake);
+  const length = magnitude(wake);
+  return length > 0.001 ? { x: wake.x / length, y: wake.y / length } : { x: 0, y: 0 };
+};
+
+/**
+ * Touch gestures are radial marks by default. A directional filament is an
+ * explicit drawing affordance, never an accidental consequence of velocity
+ * or a stale wake carried by a tap, hold, or native-scroll command.
+ */
+export function touchColorGeometry({ phase = '', wake = {}, intentionalDrag = true } = {}) {
+  const directional = phase === 'drag' && intentionalDrag !== false && magnitude(point(wake)) > 0.001;
+  return {
+    directional,
+    filamentCount: directional ? 3 : 0,
+    tailLength: directional ? 1 : 0,
+  };
+}
+
+const commandGeometry = (command = {}) => touchColorGeometry(command);
+const commandDirectionalWake = (command = {}) =>
+  commandGeometry(command).directional ? commandWake(command) : { x: 0, y: 0 };
+
+function compressCommands(commands, maximum) {
+  if (!Array.isArray(commands) || commands.length <= maximum) return commands || [];
+  const compressed = [];
+  for (let index = 0; index < maximum; index += 1) {
+    const start = Math.floor(index * commands.length / maximum);
+    const end = Math.max(start + 1, Math.floor((index + 1) * commands.length / maximum));
+    const group = commands.slice(start, end);
+    const totals = group.reduce((result, command) => {
+      const position = commandPoint(command);
+      const velocity = commandVelocity(command);
+      const wake = commandDirectionalWake(command);
+      result.x += position.x;
+      result.y += position.y;
+      result.vx += velocity.x;
+      result.vy += velocity.y;
+      result.wx += wake.x;
+      result.wy += wake.y;
+      result.energy += commandEnergy(command);
+      result.directional ||= Boolean(wake.x || wake.y);
+      return result;
+    }, { x: 0, y: 0, vx: 0, vy: 0, wx: 0, wy: 0, energy: 0, directional: false });
+    const count = group.length;
+    let wake = commandWake({ wake: { x: totals.wx, y: totals.wy } });
+    if (totals.directional && !wake.x && !wake.y) wake = commandWake(group[count - 1]);
+    compressed.push({
+      ...group[count - 1],
+      position: { x: totals.x / count, y: totals.y / count },
+      velocity: { x: totals.vx / count, y: totals.vy / count },
+      wake,
+      energy: totals.energy / count,
+      mergedSamples: count,
+    });
+  }
+  return compressed;
+}
+
 /** New pigment requires an explicit, recent physical pointer sample. */
 export function shouldInjectPigment(frame = {}) {
   return frame.enabled !== false && frame.inject === true &&
@@ -149,24 +214,39 @@ function createPigmentModel(options = {}) {
       mark.age += dt;
       if (mark.age >= mark.life) mark.active = false;
     }
-    const energy = clamp(finite(frame.energy), 0, 1);
+    const addMark = (command = {}) => {
+      const energy = commandEnergy(command, finite(frame.energy, 0.5));
+      const pointer = commandPoint(command, frame.pointer || frame.position);
+      const velocity = commandVelocity(command);
+      const wake = commandDirectionalWake(command);
+      const speed = magnitude(velocity);
+      const mark = marks[cursor];
+      cursor = (cursor + 1) % maxMarks;
+      mark.active = true;
+      mark.x = clamp(pointer.x, -width * 0.1, width * 1.1);
+      mark.y = clamp(pointer.y, -height * 0.1, height * 1.1);
+      // Stationary gestures remain dabs even when physics has residual speed.
+      mark.directional = Boolean(wake.x || wake.y);
+      mark.vx = mark.directional ? velocity.x : 0;
+      mark.vy = mark.directional ? velocity.y : 0;
+      mark.energy = energy;
+      mark.radius = clamp((reduced ? 12 : 14) + energy * (reduced ? 12 : 32) + speed * 0.0045, 8, reduced ? 28 : 54);
+      mark.age = 0;
+      mark.life = reduced ? REDUCED_MARK_LIFE : clamp(1.8 + energy * 2.2, 1.8, SAMPLE_LIFE);
+    };
+    const commands = compressCommands(frame.commands, maxMarks);
+    if (commands.length) {
+      commands.forEach(addMark);
+      return;
+    }
     if (!shouldInjectPigment(frame)) return;
-    const pointer = point(frame.pointer || frame.position);
-    const velocity = point(frame.velocity);
-    const speed = magnitude(velocity);
-    const mark = marks[cursor];
-    cursor = (cursor + 1) % maxMarks;
-    mark.active = true;
-    mark.x = clamp(pointer.x, -width * 0.1, width * 1.1);
-    mark.y = clamp(pointer.y, -height * 0.1, height * 1.1);
-    mark.vx = velocity.x;
-    mark.vy = velocity.y;
-    mark.energy = energy;
-    // Keep the detector precise: fast motion lengthens the wake, while the
-    // core remains a small oil mark instead of a full-screen light blob.
-    mark.radius = clamp((reduced ? 12 : 14) + energy * (reduced ? 12 : 32) + speed * 0.0045, 8, reduced ? 28 : 54);
-    mark.age = 0;
-    mark.life = reduced ? REDUCED_MARK_LIFE : clamp(1.8 + energy * 2.2, 1.8, SAMPLE_LIFE);
+    addMark({
+      phase: 'drag',
+      position: frame.pointer || frame.position,
+      velocity: frame.velocity,
+      wake: frame.direction,
+      energy: frame.energy,
+    });
   }
 
   function getPigmentAt(x, y) {
@@ -182,10 +262,10 @@ function createPigmentModel(options = {}) {
       const dy = sampleY - mark.y;
       const distance = Math.hypot(dx, dy);
       const core = Math.exp(-(distance * distance) / (mark.radius * mark.radius));
-      const speed = Math.hypot(mark.vx, mark.vy);
+      const speed = mark.directional ? Math.hypot(mark.vx, mark.vy) : 0;
       const wakeLength = clamp(speed * 0.015 + mark.radius * (0.8 + mark.energy), 18, 180);
       const along = (dx * mark.vx + dy * mark.vy) / Math.max(speed, 1);
-      const wake = along < 0 ? Math.exp(-((Math.abs(along) / wakeLength) ** 2)) * Math.exp(-((distance / (mark.radius * 1.45)) ** 2)) : 0;
+      const wake = mark.directional && along < 0 ? Math.exp(-((Math.abs(along) / wakeLength) ** 2)) * Math.exp(-((distance / (mark.radius * 1.45)) ** 2)) : 0;
       const contribution = (core + wake * 0.72) * ageRatio * mark.energy;
       density = Math.max(density, contribution);
       weightedEnergy += contribution * mark.energy;
@@ -255,6 +335,7 @@ const DYE_SHADER = `
   uniform vec2 uPointer;
   uniform vec2 uVelocity;
   uniform vec2 uDirection;
+  uniform vec2 uWake;
   uniform float uEnergy;
   uniform float uDt;
   uniform float uTime;
@@ -302,6 +383,7 @@ const DYE_SHADER = `
     float nearCursor = exp(-dist2 / 0.18);
     float directionLength = max(length(uDirection), 0.001);
     vec2 direction = uDirection / directionLength;
+    float directional = step(0.001, length(uWake));
     vec2 directionQ = normalize(vec2(direction.x * uAspect, direction.y) + vec2(0.0001));
 
     float speed = clamp(length(uVelocity) / 2200.0, 0.0, 1.0);
@@ -310,7 +392,7 @@ const DYE_SHADER = `
       cos(q.x * 21.0 - uTime * 0.62) - sin(q.y * 15.0 + uTime * 0.51)
     ) * (0.0022 + energy * 0.004 + speed * 0.006);
     vec2 swirl = vec2(-radial.y, radial.x) * nearCursor * (0.004 + energy * 0.034 + speed * 0.045);
-    vec2 drift = directionQ * (0.002 + energy * 0.026 + speed * 0.035);
+    vec2 drift = directionQ * (0.002 + energy * 0.026 + speed * 0.035) * directional;
     float motionScale = mix(1.0, 0.08, uReduced);
     vec2 advectedUv = clamp(vUv - (curl + swirl + drift) * (uDt * 60.0) * motionScale, 0.001, 0.999);
     vec4 previous = texture2D(uDye, advectedUv);
@@ -323,18 +405,18 @@ const DYE_SHADER = `
       // Saturated, velocity-shaped filaments: energetic but kept close to the
       // cursor path so the composition never turns into a page-sized blob.
       float radius = mix(0.038, 0.13, energy) * mix(1.0, 0.62, uReduced);
-      float trail = mix(0.06, 0.32, energy) + speed * 0.12;
+      float trail = (mix(0.06, 0.32, energy) + speed * 0.12) * directional;
       vec2 side = vec2(-directionQ.y, directionQ.x);
       vec2 p0 = cursor;
       vec2 p1 = cursor - directionQ * trail * 0.72 + side * radius * 0.52;
       vec2 p2 = cursor - directionQ * trail * 1.38 - side * radius * 0.68;
       float g0 = exp(-dot(q - p0, q - p0) / (radius * radius));
-      float g1 = exp(-dot(q - p1, q - p1) / (radius * radius * 1.7));
-      float g2 = exp(-dot(q - p2, q - p2) / (radius * radius * 2.4));
+      float g1 = exp(-dot(q - p1, q - p1) / (radius * radius * 1.7)) * directional;
+      float g2 = exp(-dot(q - p2, q - p2) / (radius * radius * 2.4)) * directional;
       // A tight ring gives fast gestures a filament/vortex edge instead of a
       // static coloured cursor dot. It remains bounded and decays with dye.
       float ringRadius = radius * (0.82 + speed * 0.62);
-      float ring = exp(-abs(length(radial) - ringRadius) / max(0.009, radius * 0.14));
+      float ring = exp(-abs(length(radial) - ringRadius) / max(0.009, radius * 0.14)) * directional;
       float impulse = (0.42 + energy * 1.75 + speed * 0.92) * mix(1.0, 0.22, uReduced);
       // Neighboring filaments remain within one pigment family. The host
       // advances uHuePhase slowly from time and path length, never directly
@@ -457,8 +539,8 @@ function createFallback(canvas, options, firstContext) {
     const [red, green, blue] = sample.color;
     const speed = Math.hypot(sample.vx, sample.vy);
     const radius = clamp((reduced ? 11 : 16) + sample.energy * (reduced ? 14 : 42) + speed * 0.0055, 9, reduced ? 30 : 68);
-    const direction = sample.direction;
-    const length = reduced ? 0 : clamp(radius * (0.7 + sample.energy * 1.45) + speed * 0.016, 16, 185);
+    const direction = sample.direction || { x: 0, y: 0 };
+    const length = !sample.directional || reduced ? 0 : clamp(radius * (0.7 + sample.energy * 1.45) + speed * 0.016, 16, 185);
     const gradient = context.createRadialGradient(sample.x, sample.y, 0, sample.x, sample.y, radius);
     gradient.addColorStop(0, `rgba(${red},${green},${blue},${(reduced ? 0.16 : 0.30) * alpha})`);
     gradient.addColorStop(0.32, `rgba(${red},${green},${blue},${(reduced ? 0.08 : 0.14) * alpha})`);
@@ -506,7 +588,7 @@ function createFallback(canvas, options, firstContext) {
     const velocity = point(frame.velocity);
     const rawDirection = point(frame.direction);
     const directionLength = magnitude(rawDirection);
-    const direction = directionLength > 0.001 ? { x: rawDirection.x / directionLength, y: rawDirection.y / directionLength } : { x: 1, y: 0 };
+    const direction = directionLength > 0.001 ? { x: rawDirection.x / directionLength, y: rawDirection.y / directionLength } : { x: 0, y: 0 };
     const energy = clamp(finite(frame.energy), 0, 1);
     const reduced = Boolean(frame.reducedMotion);
     const enabled = frame.enabled !== false;
@@ -525,17 +607,39 @@ function createFallback(canvas, options, firstContext) {
       drawSample(sample, life * life, false);
       if (life <= 0) samples.splice(index, 1);
     }
+    const commands = compressCommands(frame.commands, maxSamples);
+    const samplesForFrame = commands.length
+      ? commands.map((command) => {
+        const geometry = touchColorGeometry(command);
+        const wake = geometry.directional ? commandWake(command) : { x: 0, y: 0 };
+        const commandVelocityValue = commandVelocity(command);
+        return {
+          x: clamp(commandPoint(command, pointer).x, -width * 0.1, width * 1.1),
+          y: clamp(commandPoint(command, pointer).y, -height * 0.1, height * 1.1),
+          vx: commandVelocityValue.x,
+          vy: commandVelocityValue.y,
+          energy: commandEnergy(command, energy),
+          direction: wake,
+          directional: geometry.directional,
+          color: colorAt(huePhase * COLORS.length),
+          age: 0,
+        };
+      }) : [];
     if (reduced) {
-      if (injecting) {
-        reducedMark = { x: pointer.x, y: pointer.y, vx: velocity.x, vy: velocity.y, energy: energy * 0.42, direction, color: colorAt(huePhase * COLORS.length), age: 0 };
+      if (injecting || samplesForFrame.length) {
+        const sample = samplesForFrame.at(-1);
+        reducedMark = sample || { x: pointer.x, y: pointer.y, vx: velocity.x, vy: velocity.y, energy: energy * 0.42, direction, directional: directionLength > 0.001, color: colorAt(huePhase * COLORS.length), age: 0 };
       }
       if (reducedMark) {
         reducedMark.age += dt;
         drawSample(reducedMark, clamp(1 - reducedMark.age / REDUCED_MARK_LIFE, 0, 1), true);
         if (reducedMark.age >= REDUCED_MARK_LIFE) reducedMark = null;
       }
+    } else if (samplesForFrame.length) {
+      samples.unshift(...samplesForFrame.reverse());
+      if (samples.length > maxSamples) samples.length = maxSamples;
     } else if (injecting) {
-      samples.unshift({ x: clamp(pointer.x, -width * 0.1, width * 1.1), y: clamp(pointer.y, -height * 0.1, height * 1.1), vx: velocity.x, vy: velocity.y, direction, energy, color: colorAt(huePhase * COLORS.length), age: 0 });
+      samples.unshift({ x: clamp(pointer.x, -width * 0.1, width * 1.1), y: clamp(pointer.y, -height * 0.1, height * 1.1), vx: velocity.x, vy: velocity.y, direction, directional: directionLength > 0.001, energy, color: colorAt(huePhase * COLORS.length), age: 0 });
       if (samples.length > maxSamples) samples.length = maxSamples;
     }
     context.globalCompositeOperation = 'source-over';
@@ -576,7 +680,7 @@ export function createFieldColor(canvas, options = {}) {
   const dye = {
     program: dyeProgram,
     position: gl.getAttribLocation(dyeProgram, 'aPosition'),
-    uniforms: Object.fromEntries(['uDye', 'uPointer', 'uVelocity', 'uDirection', 'uEnergy', 'uDt', 'uTime', 'uAspect', 'uActive', 'uReduced', 'uHuePhase', ...Array.from({ length: 12 }, (_, index) => `uColor${index}`)].map((name) => [name, gl.getUniformLocation(dyeProgram, name)])),
+    uniforms: Object.fromEntries(['uDye', 'uPointer', 'uVelocity', 'uDirection', 'uWake', 'uEnergy', 'uDt', 'uTime', 'uAspect', 'uActive', 'uReduced', 'uHuePhase', ...Array.from({ length: 12 }, (_, index) => `uColor${index}`)].map((name) => [name, gl.getUniformLocation(dyeProgram, name)])),
   };
   const composite = {
     program: compositeProgram,
@@ -598,6 +702,7 @@ export function createFieldColor(canvas, options = {}) {
   let slowFrames = 0;
   let fastFrames = 0;
   let quality = 1;
+  const maxWebGLCommands = Math.round(clamp(finite(options.maxSamples, MAX_SAMPLES), 4, MAX_SAMPLES));
   const pigment = createPigmentModel(options);
 
   function makeTarget() {
@@ -689,6 +794,7 @@ export function createFieldColor(canvas, options = {}) {
     const energy = clamp(finite(frame.energy), 0, 1);
     const reduced = Boolean(frame.reducedMotion);
     const active = shouldInjectPigment(frame);
+    const commands = compressCommands(frame.commands, maxWebGLCommands);
     pigment.update(frame, dt);
     time += dt;
     hueProgress = advanceColorProgress(hueProgress, { ...frame, velocity, energy }, dt, { width, height });
@@ -699,33 +805,43 @@ export function createFieldColor(canvas, options = {}) {
     if (dt > 1 / 30) { slowFrames += 1; fastFrames = 0; } else if (dt < 0.024) { fastFrames += 1; slowFrames = 0; }
     if (slowFrames >= 6) { quality = Math.max(0.65, quality - 0.1); slowFrames = 0; }
     if (fastFrames >= 120) { quality = Math.min(1, quality + 0.1); fastFrames = 0; }
-    const skipUpdate = !reduced && quality < 0.88 && frameCount % 2 === 0;
+    const skipUpdate = !commands.length && !reduced && quality < 0.88 && frameCount % 2 === 0;
     let read = targets[0];
     if (!skipUpdate) {
-      const write = targets[1];
-      gl.bindFramebuffer(gl.FRAMEBUFFER, write.framebuffer);
-      gl.viewport(0, 0, pixelWidth, pixelHeight);
-      gl.useProgram(dye.program);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, read.texture);
-      gl.uniform1i(dye.uniforms.uDye, 0);
-      gl.uniform2f(dye.uniforms.uPointer, clamp(pointer.x / Math.max(1, width), -0.2, 1.2), clamp(1 - pointer.y / Math.max(1, height), -0.2, 1.2));
-      gl.uniform2f(dye.uniforms.uVelocity, velocity.x, -velocity.y);
-      gl.uniform2f(dye.uniforms.uDirection, direction.x, -direction.y);
-      gl.uniform1f(dye.uniforms.uEnergy, energy * quality);
-      gl.uniform1f(dye.uniforms.uDt, dt);
-      gl.uniform1f(dye.uniforms.uTime, time);
-      gl.uniform1f(dye.uniforms.uAspect, width / Math.max(1, height));
-      gl.uniform1f(dye.uniforms.uActive, active ? 1 : 0);
-      gl.uniform1f(dye.uniforms.uReduced, reduced ? 1 : 0);
-      gl.uniform1f(dye.uniforms.uHuePhase, huePhase);
-      COLORS.forEach((color, index) => {
-        gl.uniform3f(dye.uniforms[`uColor${index}`], color[0] / 255, color[1] / 255, color[2] / 255);
-      });
-      draw(dye);
-      targets[0] = write;
-      targets[1] = read;
-      read = targets[0];
+      const passes = commands.length ? commands : [null];
+      for (const command of passes) {
+        const write = targets[1];
+        const commandPointer = commandPoint(command || {}, pointer);
+        const commandVelocityValue = command ? commandVelocity(command) : velocity;
+        const commandWakeValue = command
+          ? (touchColorGeometry(command).directional ? commandWake(command) : { x: 0, y: 0 })
+          : direction;
+        const commandEnergyValue = command ? commandEnergy(command, energy) : energy;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, write.framebuffer);
+        gl.viewport(0, 0, pixelWidth, pixelHeight);
+        gl.useProgram(dye.program);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, read.texture);
+        gl.uniform1i(dye.uniforms.uDye, 0);
+        gl.uniform2f(dye.uniforms.uPointer, clamp(commandPointer.x / Math.max(1, width), -0.2, 1.2), clamp(1 - commandPointer.y / Math.max(1, height), -0.2, 1.2));
+        gl.uniform2f(dye.uniforms.uVelocity, commandVelocityValue.x, -commandVelocityValue.y);
+        gl.uniform2f(dye.uniforms.uDirection, commandWakeValue.x, -commandWakeValue.y);
+        gl.uniform2f(dye.uniforms.uWake, commandWakeValue.x, -commandWakeValue.y);
+        gl.uniform1f(dye.uniforms.uEnergy, commandEnergyValue * quality);
+        gl.uniform1f(dye.uniforms.uDt, dt / passes.length);
+        gl.uniform1f(dye.uniforms.uTime, time);
+        gl.uniform1f(dye.uniforms.uAspect, width / Math.max(1, height));
+        gl.uniform1f(dye.uniforms.uActive, command ? 1 : (active ? 1 : 0));
+        gl.uniform1f(dye.uniforms.uReduced, reduced ? 1 : 0);
+        gl.uniform1f(dye.uniforms.uHuePhase, huePhase);
+        COLORS.forEach((color, index) => {
+          gl.uniform3f(dye.uniforms[`uColor${index}`], color[0] / 255, color[1] / 255, color[2] / 255);
+        });
+        draw(dye);
+        targets[0] = write;
+        targets[1] = read;
+        read = targets[0];
+      }
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, pixelWidth, pixelHeight);

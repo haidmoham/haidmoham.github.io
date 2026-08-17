@@ -12,8 +12,12 @@ const {
   isDirectPointerType,
   pointerActivityDeadline,
   resolveFieldInputModality,
+  resolveInitialFieldMode,
   shouldTrackFieldPointerMove,
   shouldStartDirectFieldGesture,
+  shouldQueueTouchPointerEnd,
+  shouldQueueScrollColorCommand,
+  consumeColorCommandBatch,
 } = await import(moduleUrl);
 
 test('touch-driven browser chrome resizes preserve the field while layout changes reflow', () => {
@@ -60,6 +64,35 @@ test('field presentation follows the primary capability until an actual pointer 
   assert.equal(resolveFieldInputModality('pen', { primaryFine: true }), 'pen');
 });
 
+test('coarse touch capability defaults to Magnet while fine pointers retain Color', () => {
+  assert.deepEqual(resolveInitialFieldMode({ primaryCoarse: true }), {
+    mode: 'magnetic', explicit: false,
+  });
+  assert.deepEqual(resolveInitialFieldMode({ primaryFine: true, primaryCoarse: true }), {
+    mode: 'color', explicit: false,
+  });
+  assert.deepEqual(resolveInitialFieldMode({ primaryFine: true }), {
+    mode: 'color', explicit: false,
+  });
+});
+
+test('saved mode is explicit and survives capability and reduced-motion changes', () => {
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'color',
+    reducedMotion: true,
+    primaryCoarse: true,
+  }), { mode: 'color', explicit: true });
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'magnetic',
+    primaryFine: true,
+  }), { mode: 'magnetic', explicit: true });
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'not-a-mode',
+    reducedMotion: true,
+    primaryCoarse: true,
+  }), { mode: 'still', explicit: false });
+});
+
 test('mouse hover drives the field while touch and pen still require ownership', () => {
   assert.equal(shouldTrackFieldPointerMove({
     pointerType: 'mouse', pointerId: 4, ownedPointerId: null,
@@ -98,6 +131,60 @@ test('finger-down gets a short visible hold while moves keep the desktop cadence
   assert.ok(DIRECT_TOUCH_CHARGE_SCALE > 1);
 });
 
+test('stationary pointerup does not create a duplicate color command', () => {
+  assert.equal(shouldQueueTouchPointerEnd({
+    moved: false,
+    freshSample: false,
+    cancelled: false,
+  }), false);
+  assert.equal(shouldQueueTouchPointerEnd({
+    moved: true,
+    freshSample: true,
+    cancelled: false,
+  }), true);
+  assert.equal(shouldQueueTouchPointerEnd({
+    moved: true,
+    freshSample: true,
+    cancelled: true,
+  }), false);
+});
+
+test('a burst command batch retains every command beyond the WebGL pass budget', () => {
+  const burst = Array.from({ length: 12 }, (_, index) => ({ sampleId: index + 1 }));
+  const first = consumeColorCommandBatch(burst, 8);
+  assert.equal(first.commands.length, 8);
+  assert.equal(first.remaining.length, 4);
+  assert.deepEqual(
+    [...first.commands, ...first.remaining],
+    burst,
+    'consumption must not silently discard commands above the per-frame pass budget',
+  );
+  const second = consumeColorCommandBatch(first.remaining, 8);
+  assert.deepEqual(second.commands, burst.slice(8));
+  assert.deepEqual(second.remaining, []);
+});
+
+test('ended touch cannot authorize unrelated later scroll color', () => {
+  assert.equal(shouldQueueScrollColorCommand({
+    activePointer: false,
+    pointerType: 'touch',
+    recentlyDirect: true,
+    distance: 12,
+  }), false);
+  assert.equal(shouldQueueScrollColorCommand({
+    activePointer: true,
+    pointerType: 'touch',
+    recentlyDirect: true,
+    distance: 12,
+  }), true);
+  assert.equal(shouldQueueScrollColorCommand({
+    activePointer: false,
+    pointerType: 'mouse',
+    recentlyDirect: true,
+    distance: 12,
+  }), false);
+});
+
 test('the site-wide field owns input from the document body and preserves native touch gestures', async () => {
   const [controller, stylesheet, inputModule] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
@@ -133,6 +220,39 @@ test('the site-wide field owns input from the document body and preserves native
     stylesheet,
     /\[data-field-stage\][^{]*\{[^}]*touch-action:\s*pan-y\s+pinch-zoom\s*;/s,
   );
+});
+
+test('the site probe stays fixed instead of extending native scroll range', async () => {
+  const stylesheet = await readFile(new URL('../style.css', import.meta.url), 'utf8');
+  const broadChildRule = stylesheet.match(/(body:not\(\.robotics-page\)\s*>\s*\*\s*)\{([^}]*)\}/s);
+  assert.ok(broadChildRule, 'the site-wide child stacking rule should remain explicit');
+  const broadSelector = broadChildRule[1];
+  const broadDeclarations = broadChildRule[2];
+  const probeFixedImportant = /\.field-site-probe\s*\{[^}]*position:\s*fixed\s*!important\s*;/s.test(stylesheet);
+  const broadRuleExcludesProbe = /:not\(\s*\.field-site-probe\s*\)/.test(broadSelector);
+
+  assert.ok(
+    !/position:\s*relative\s*;/.test(broadDeclarations) || broadRuleExcludesProbe || probeFixedImportant,
+    'the body child position rule must not override the fixed field-site-probe and add phantom scroll height',
+  );
+});
+
+test('interaction assets bump their cache versions when the touch contract changes', async () => {
+  const [controller, stylesheet, page] = await Promise.all([
+    readFile(new URL('../field.js', import.meta.url), 'utf8'),
+    readFile(new URL('../style.css', import.meta.url), 'utf8'),
+    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  ]);
+  const importedColorVersion = Number(controller.match(/field-color\.js\?v=(\d+)/)?.[1]);
+  const importedInputVersion = Number(controller.match(/field-input\.js\?v=(\d+)/)?.[1]);
+  const controllerVersion = Number(page.match(/field\.js\?v=(\d+)/)?.[1]);
+  const stylesheetVersion = Number(page.match(/style\.css\?v=(\d+)/)?.[1]);
+
+  assert.ok(importedColorVersion > 10, 'field-color.js cache version must advance');
+  assert.ok(importedInputVersion > 7, 'field-input.js cache version must advance for the mobile default');
+  assert.ok(controllerVersion > 16, 'field.js cache version must advance for the mobile default');
+  assert.ok(stylesheetVersion > 35, 'style.css cache version must advance for the mobile beta label');
+  assert.match(stylesheet, /\.notes-practice\s*>\s*span\s*\{/);
 });
 
 test('Field Table exposes explicit modes and keeps visual feedback decorative', async () => {
@@ -186,6 +306,7 @@ test('desktop keeps the compact mode pill while mobile keeps the explicit picker
   assert.match(controller, /MODE: COLOR \+ MAGNET/);
   assert.match(controller, /MODE: MAGNET ONLY/);
   assert.match(controller, /MODE: STILL/);
+  assert.match(controller, /Color \(mobile beta\)/);
   assert.match(stylesheet, /\.field-table-desktop-toggle\s*\{[^}]*display:\s*none\s*;/s);
   assert.match(
     stylesheet,
