@@ -12,6 +12,7 @@ const {
   isDirectPointerType,
   pointerActivityDeadline,
   resolveFieldInputModality,
+  resolveInitialFieldMode,
   shouldTrackFieldPointerMove,
   shouldStartDirectFieldGesture,
   shouldQueueTouchPointerEnd,
@@ -61,6 +62,35 @@ test('field presentation follows the primary capability until an actual pointer 
   assert.equal(resolveFieldInputModality('mouse', { primaryCoarse: true }), 'cursor');
   assert.equal(resolveFieldInputModality('touch', { primaryFine: true }), 'touch');
   assert.equal(resolveFieldInputModality('pen', { primaryFine: true }), 'pen');
+});
+
+test('coarse touch capability defaults to Magnet while fine pointers retain Color', () => {
+  assert.deepEqual(resolveInitialFieldMode({ primaryCoarse: true }), {
+    mode: 'magnetic', explicit: false,
+  });
+  assert.deepEqual(resolveInitialFieldMode({ primaryFine: true, primaryCoarse: true }), {
+    mode: 'color', explicit: false,
+  });
+  assert.deepEqual(resolveInitialFieldMode({ primaryFine: true }), {
+    mode: 'color', explicit: false,
+  });
+});
+
+test('saved mode is explicit and survives capability and reduced-motion changes', () => {
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'color',
+    reducedMotion: true,
+    primaryCoarse: true,
+  }), { mode: 'color', explicit: true });
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'magnetic',
+    primaryFine: true,
+  }), { mode: 'magnetic', explicit: true });
+  assert.deepEqual(resolveInitialFieldMode({
+    storedMode: 'not-a-mode',
+    reducedMotion: true,
+    primaryCoarse: true,
+  }), { mode: 'still', explicit: false });
 });
 
 test('mouse hover drives the field while touch and pen still require ownership', () => {
@@ -219,9 +249,9 @@ test('interaction assets bump their cache versions when the touch contract chang
   const stylesheetVersion = Number(page.match(/style\.css\?v=(\d+)/)?.[1]);
 
   assert.ok(importedColorVersion > 10, 'field-color.js cache version must advance');
-  assert.ok(importedInputVersion > 5, 'field-input.js cache version must advance');
-  assert.ok(controllerVersion > 14, 'field.js cache version must advance');
-  assert.ok(stylesheetVersion > 34, 'style.css cache version must advance');
+  assert.ok(importedInputVersion > 7, 'field-input.js cache version must advance for the mobile default');
+  assert.ok(controllerVersion > 16, 'field.js cache version must advance for the mobile default');
+  assert.ok(stylesheetVersion > 35, 'style.css cache version must advance for the mobile beta label');
   assert.match(stylesheet, /\.notes-practice\s*>\s*span\s*\{/);
 });
 
@@ -276,6 +306,7 @@ test('desktop keeps the compact mode pill while mobile keeps the explicit picker
   assert.match(controller, /MODE: COLOR \+ MAGNET/);
   assert.match(controller, /MODE: MAGNET ONLY/);
   assert.match(controller, /MODE: STILL/);
+  assert.match(controller, /Color \(mobile beta\)/);
   assert.match(stylesheet, /\.field-table-desktop-toggle\s*\{[^}]*display:\s*none\s*;/s);
   assert.match(
     stylesheet,

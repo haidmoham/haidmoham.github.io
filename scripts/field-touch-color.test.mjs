@@ -193,9 +193,9 @@ test('interactive pages use a coherent bumped asset-query set', () => {
   const physicsVersion = Number(fieldSource.match(/field-physics\.js\?v=(\d+)/)?.[1]);
   const colorVersion = Number(fieldSource.match(/field-color\.js\?v=(\d+)/)?.[1]);
   const inputVersion = Number(fieldSource.match(/field-input\.js\?v=(\d+)/)?.[1]);
-  assert.ok(fieldVersions[0] >= 15, 'field.js query must advance after the touch-color change');
-  assert.ok(styleVersions[0] >= 35, 'style.css query must advance after the working-notes layout change');
+  assert.ok(fieldVersions[0] >= 17, 'field.js query must advance after the mobile-default change');
+  assert.ok(styleVersions[0] >= 36, 'style.css query must advance after the mobile beta label');
   assert.ok(colorVersion >= 11, 'field-color.js query must advance after the touch-color change');
-  assert.ok(inputVersion >= 6, 'field-input.js query must advance after the touch-color change');
+  assert.ok(inputVersion >= 8, 'field-input.js query must advance after the mobile-default change');
   assert.ok(physicsVersion >= 10, 'field-physics.js query must remain explicitly versioned');
 });

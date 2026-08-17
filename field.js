@@ -26,7 +26,8 @@ import {
   TOUCH_SCROLL_SESSION_MS,
   TOUCH_COLOR_HOLD_DELAY_MS,
   TOUCH_COLOR_HOLD_INTERVAL_MS,
-} from './field-input.js?v=7';
+  resolveInitialFieldMode,
+} from './field-input.js?v=8';
 
 const MODE_STORAGE_KEY = 'mhaider.field.table.mode';
 const FIELD_MODES = ['color', 'magnetic', 'still'];
@@ -204,9 +205,15 @@ function mount() {
   const storedMode = readModePreference();
   const primaryFinePointer = window.matchMedia?.('(pointer: fine)');
   const primaryCoarsePointer = window.matchMedia?.('(pointer: coarse)');
+  const initialMode = resolveInitialFieldMode({
+    storedMode,
+    reducedMotion: systemReducedMotion,
+    primaryFine: primaryFinePointer?.matches,
+    primaryCoarse: primaryCoarsePointer?.matches,
+  });
   const state = {
-    mode: storedMode || (systemReducedMotion ? 'still' : 'color'),
-    explicitMode: Boolean(storedMode),
+    mode: initialMode.mode,
+    explicitMode: initialMode.explicit,
     systemReducedMotion,
     hidden: document.hidden,
     pointerId: null,
@@ -504,7 +511,18 @@ function mount() {
     }
     desktopModeButton.textContent = desktopLabels[state.mode];
     desktopModeButton.title = `${desktopDescriptions[state.mode]}. Select to cycle modes.`;
-    desktopModeButton.setAttribute('aria-label', `${desktopDescriptions[state.mode]}. Cycle typography field mode.`);
+    const mobileColorBeta = state.mode === 'color' && (
+      primaryCoarsePointer?.matches || state.inputModality === 'touch'
+    );
+    const accessibleModeDescription = mobileColorBeta
+      ? `${desktopDescriptions[state.mode]} (mobile beta)`
+      : desktopDescriptions[state.mode];
+    desktopModeButton.setAttribute('aria-label', `${accessibleModeDescription}. Cycle typography field mode.`);
+    modeButtons.forEach((button) => {
+      if (button.dataset.fieldMode === 'color') {
+        button.setAttribute('aria-label', mobileColorBeta ? 'Color (mobile beta)' : 'Color');
+      }
+    });
     announceMode();
   };
 
@@ -658,10 +676,27 @@ function mount() {
   const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   const motionPreferenceChanged = (event) => {
     state.systemReducedMotion = event.matches;
-    if (!state.explicitMode) selectMode(event.matches ? 'still' : 'color', { explicit: false });
+    if (!state.explicitMode) {
+      const next = resolveInitialFieldMode({
+        reducedMotion: state.systemReducedMotion,
+        primaryFine: primaryFinePointer?.matches,
+        primaryCoarse: primaryCoarsePointer?.matches,
+      });
+      if (next.mode !== state.mode) selectMode(next.mode, { explicit: false });
+    }
   };
 
-  const inputCapabilityChanged = () => routeInputModality('');
+  const inputCapabilityChanged = () => {
+    routeInputModality('');
+    if (!state.explicitMode) {
+      const next = resolveInitialFieldMode({
+        reducedMotion: state.systemReducedMotion,
+        primaryFine: primaryFinePointer?.matches,
+        primaryCoarse: primaryCoarsePointer?.matches,
+      });
+      if (next.mode !== state.mode) selectMode(next.mode, { explicit: false });
+    }
+  };
   const pointerEntered = (event) => routeInputModality(event.pointerType);
   const cycleDesktopMode = () => {
     const currentIndex = FIELD_MODES.indexOf(state.mode);

@@ -6,8 +6,27 @@ export const TOUCH_COLOR_HOLD_DELAY_MS = 280;
 export const TOUCH_COLOR_HOLD_INTERVAL_MS = 150;
 export const TOUCH_COLOR_SLOP_PX = 8;
 export const TOUCH_SCROLL_SESSION_MS = 1500;
+export const FIELD_MODES = ['color', 'magnetic', 'still'];
 
 const finite = (value, fallback = 0) => Number.isFinite(value) ? value : fallback;
+
+/**
+ * Choose the initial mode from durable user preference and input capability.
+ * A saved mode is explicit and wins across devices; reduced motion wins when
+ * no choice exists. Coarse-primary devices start in Magnet, while fine
+ * pointers retain the existing Color default.
+ */
+export function resolveInitialFieldMode({
+  storedMode = null,
+  reducedMotion = false,
+  primaryFine = false,
+  primaryCoarse = false,
+} = {}) {
+  if (FIELD_MODES.includes(storedMode)) return { mode: storedMode, explicit: true };
+  if (reducedMotion) return { mode: 'still', explicit: false };
+  if (primaryCoarse && !primaryFine) return { mode: 'magnetic', explicit: false };
+  return { mode: 'color', explicit: false };
+}
 
 /**
  * Color commands are consumed once by the renderer. A physical pointer
