@@ -310,6 +310,7 @@ def require(condition: bool, message: str) -> None:
 
 def main() -> int:
     c1n = (ROOT / "c1n" / "index.html").read_text(encoding="utf-8")
+    spider_redirect = (ROOT / "spider" / "index.html").read_text(encoding="utf-8")
     manifest = (ROOT / "spider" / "manifest.json").read_text(encoding="utf-8")
     nginx = (ROOT / "railway-nginx.conf.template").read_text(encoding="utf-8")
     vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
@@ -320,6 +321,7 @@ def main() -> int:
         "railway-nginx.conf.template",
         "vercel.json",
         "c1n/index.html",
+        "spider/index.html",
         "spider/spider.js",
         "spider/model/spider.xml",
         "spider/model/shuffle.xml",
@@ -337,6 +339,21 @@ def main() -> int:
     require('data-model-mass' in c1n and 'data-model-gravity' in c1n, "C-1N must show current model constants")
     require('data-perturbation-force' in c1n, "C-1N must show the current force-pulse calculation")
     require('data-perturbation-magnitude' in c1n and 'data-perturbation-direction' in c1n and 'data-perturbation-run' in c1n, "C-1N must provide compact perturbation controls")
+    for relative_path in ("index.html", "about.html", "available.html", "projects.html", "robotics/index.html"):
+        portfolio_page = (ROOT / relative_path).read_text(encoding="utf-8")
+        require('href="https://c1n.mhaider.dev/"' in portfolio_page, f"{relative_path} must link directly to the canonical C-1N host")
+        require('href="/c1n/"' not in portfolio_page, f"{relative_path} must not rely on the legacy C-1N redirect")
+    for destination in (
+        "https://mhaider.dev/",
+        "https://mhaider.dev/about.html",
+        "https://mhaider.dev/projects.html",
+        "https://mhaider.dev/robotics/",
+        "https://mhaider.dev/notes.html",
+        "https://mhaider.dev/resume.html",
+        "https://mhaider.dev/contact.html",
+    ):
+        require(f'href="{destination}"' in c1n, f"C-1N must link directly to {destination}")
+    require(spider_redirect.count("https://c1n.mhaider.dev/") == 4, "legacy Spider route must hand off directly to the canonical C-1N host")
     runtime = (ROOT / "spider" / "spider.js").read_text(encoding="utf-8")
     require('const PULSE_SECONDS = 0.2' in runtime and 'const OBSERVATION_SECONDS = 1' in runtime and 'const PERTURBATION_CASE_SECONDS = PULSE_SECONDS + OBSERVATION_SECONDS' in runtime, "C-1N must retain immediate 200 ms force pulses with one-second observation")
     require("application/wasm" in nginx, "Railway must serve Wasm with application/wasm")
@@ -347,6 +364,23 @@ def main() -> int:
     root_route = vercel.get("routes", [{}])[0]
     require(root_route.get("src") == "^/$" and root_route.get("dest") == "/c1n/index.html", "Vercel must serve the C-1N document at the subdomain root")
     require("wasm-unsafe-eval" in root_route.get("headers", {}).get("Content-Security-Policy", ""), "Vercel CSP must allow WebAssembly compilation")
+    redirect_routes = {
+        route.get("src"): (route.get("status"), route.get("headers", {}).get("Location"))
+        for route in vercel.get("routes", [])
+        if route.get("status")
+    }
+    expected_redirects = {
+        r"^/index\.html$": "https://mhaider.dev/",
+        r"^/about\.html$": "https://mhaider.dev/about.html",
+        r"^/available\.html$": "https://mhaider.dev/available.html",
+        r"^/projects\.html$": "https://mhaider.dev/projects.html",
+        r"^/robotics/?$": "https://mhaider.dev/robotics/",
+        r"^/notes\.html$": "https://mhaider.dev/notes.html",
+        r"^/resume\.html$": "https://mhaider.dev/resume.html",
+        r"^/contact\.html$": "https://mhaider.dev/contact.html",
+    }
+    for source, destination in expected_redirects.items():
+        require(redirect_routes.get(source) == (308, destination), f"Vercel must permanently redirect {source} to {destination}")
 
     validate_field_coverage()
     validate_field_layout_contract()

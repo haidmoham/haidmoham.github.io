@@ -10,6 +10,62 @@
       }
     },
     {
+      "src": "^/index\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/"
+      }
+    },
+    {
+      "src": "^/about\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/about.html"
+      }
+    },
+    {
+      "src": "^/available\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/available.html"
+      }
+    },
+    {
+      "src": "^/projects\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/projects.html"
+      }
+    },
+    {
+      "src": "^/robotics/?$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/robotics/"
+      }
+    },
+    {
+      "src": "^/notes\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/notes.html"
+      }
+    },
+    {
+      "src": "^/resume\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/resume.html"
+      }
+    },
+    {
+      "src": "^/contact\\.html$",
+      "status": 308,
+      "headers": {
+        "Location": "https://mhaider.dev/contact.html"
+      }
+    },
+    {
       "handle": "filesystem"
     }
   ]
