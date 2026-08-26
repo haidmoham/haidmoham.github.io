@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from html.parser import HTMLParser
+import json
 import sys
 
 
@@ -311,11 +312,13 @@ def main() -> int:
     c1n = (ROOT / "c1n" / "index.html").read_text(encoding="utf-8")
     manifest = (ROOT / "spider" / "manifest.json").read_text(encoding="utf-8")
     nginx = (ROOT / "railway-nginx.conf.template").read_text(encoding="utf-8")
+    vercel = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
 
     required_files = (
         "Dockerfile",
         "railway.json",
         "railway-nginx.conf.template",
+        "vercel.json",
         "c1n/index.html",
         "spider/spider.js",
         "spider/model/spider.xml",
@@ -339,7 +342,11 @@ def main() -> int:
     require("application/wasm" in nginx, "Railway must serve Wasm with application/wasm")
     require("'unsafe-eval'" in nginx, "Railway CSP must allow the generated MuJoCo JavaScript runtime")
     require("'wasm-unsafe-eval'" in nginx, "Railway CSP must allow WebAssembly compilation")
-    require("location = /c1n/" in nginx and 'Cache-Control "no-cache"' in nginx, "C-1N HTML must revalidate")
+    require("location = /c1n {" in nginx and "location = /c1n/ {" in nginx, "Railway must match both C-1N route forms")
+    require(nginx.count("return 308 https://c1n.mhaider.dev/;") == 2, "Railway must redirect both C-1N route forms to Vercel")
+    root_route = vercel.get("routes", [{}])[0]
+    require(root_route.get("src") == "^/$" and root_route.get("dest") == "/c1n/index.html", "Vercel must serve the C-1N document at the subdomain root")
+    require("wasm-unsafe-eval" in root_route.get("headers", {}).get("Content-Security-Policy", ""), "Vercel CSP must allow WebAssembly compilation")
 
     validate_field_coverage()
     validate_field_layout_contract()

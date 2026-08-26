@@ -10,12 +10,14 @@ server {
     # silently fall back to a host policy that blocks WebAssembly.
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
 
-    # The checkpoint page changes with the robot. Revalidate the HTML on each
-    # visit while allowing its large static Wasm asset to remain cacheable.
+    # Vercel is the public C-1N host. Keep both historical portfolio route
+    # forms as permanent redirects after the Vercel deployment is verified.
+    location = /c1n {
+        return 308 https://c1n.mhaider.dev/;
+    }
+
     location = /c1n/ {
-        add_header Cache-Control "no-cache" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
-        try_files /c1n/index.html =404;
+        return 308 https://c1n.mhaider.dev/;
     }
 
     location / {

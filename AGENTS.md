@@ -6,10 +6,10 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 
 - Keep the site static HTML, CSS, and JavaScript. Do not add a framework or build step unless the user asks.
 - `main` in `haidmoham/haidmoham.github.io` is the only deployment source of truth.
-- Railway deploys `mhaider.dev` from `main` with `Dockerfile`, `railway.json`, and `railway-nginx.conf.template`. Preserve these files.
+- Railway deploys `mhaider.dev` from `main` with `Dockerfile`, `railway.json`, and `railway-nginx.conf.template`. Vercel deploys `c1n.mhaider.dev` from the same commit with `vercel.json`. Preserve these files.
 - GitHub Pages also deploys from `main` as a static mirror. Do not treat the Pages deployment as the production authority for `mhaider.dev`.
 - A normal publish is one commit and one push to `main`. Do not copy site files between hosts or make host-only edits.
-- Keep the C-1N browser runtime, models, and vendored Wasm under `spider/`. Keep `/c1n/` as the public document route.
+- Keep the C-1N browser runtime, models, and vendored Wasm under `spider/`. Keep `c1n.mhaider.dev/` as the public document route and both `mhaider.dev/c1n` forms as permanent redirects.
 - Run `python scripts/validate_site.py` before publication. This check protects the C-1N route, checkpoint models, Wasm MIME configuration, and Railway CSP support.
 - Commit and push only when the user authorizes publication.
 - For a vetted portfolio post, completed content and visual review is publication authorization: commit and push that post’s scoped change without asking for a separate confirmation, unless the user says to hold it.
@@ -35,7 +35,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 ## C-1N
 
 - The public robot identity is **C-1N**. The old name Spider is legacy only.
-- The canonical portfolio route is `/c1n/`. Keep `/spider/` only as a compatibility redirect or asset namespace.
+- The canonical public route is `https://c1n.mhaider.dev/`. Keep `/spider/` only as an asset namespace and keep the old `mhaider.dev/c1n` route as a compatibility redirect.
 - Existing `spider-*` CSS classes, JavaScript filenames, model paths, and the `haidmoham/spider` repository slug may remain as implementation compatibility identifiers. Do not expose them as the robot's public name except when provenance requires the literal repository or path.
 - Public checkpoints use `C-1N // NN · CODENAME`.
 - `C-1N // 00 · SPAWN` is the historical deterministic six-foot spawn baseline.

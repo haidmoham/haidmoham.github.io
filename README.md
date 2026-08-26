@@ -7,7 +7,7 @@ Personal portfolio for Mohammad Haider — applied mathematics & software engine
 ## Stack
 
 - Static HTML / CSS — no build step
-- Hosted on Railway; GitHub Pages mirrors `main`
+- Railway hosts `mhaider.dev`; Vercel hosts `c1n.mhaider.dev`; GitHub Pages mirrors `main`
 - DNS via Cloudflare
 
 ## Structure
