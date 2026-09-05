@@ -7,6 +7,9 @@
     {
       "id": "robotics",
       "label": "robotics test bench",
+      "ledgerEligible": false,
+      "language": "Jupyter Notebook",
+      "updatedAt": "2026-09-05",
       "source": "https://github.com/haidmoham/robotics-test-bench",
       "branch": "main",
       "latestCommit": {
@@ -153,6 +156,9 @@
     {
       "id": "c1n",
       "label": "c-1n",
+      "ledgerEligible": false,
+      "language": "Python",
+      "updatedAt": "2026-09-05",
       "source": "https://github.com/haidmoham/spider",
       "branch": "master",
       "latestCommit": {
@@ -280,6 +286,9 @@
     {
       "id": "lm",
       "label": "lm lab",
+      "ledgerEligible": false,
+      "language": "Jupyter Notebook",
+      "updatedAt": "2026-09-04",
       "source": "https://github.com/haidmoham/lmlab",
       "branch": "main",
       "latestCommit": {
@@ -407,6 +416,9 @@
     {
       "id": "ecosim",
       "label": "ecosim lab",
+      "ledgerEligible": true,
+      "language": "TypeScript",
+      "updatedAt": "2026-08-20",
       "source": "https://github.com/haidmoham/ecosimlab",
       "branch": "main",
       "latestCommit": {
@@ -534,6 +546,9 @@
     {
       "id": "tiramisu",
       "label": "tiramisu",
+      "ledgerEligible": false,
+      "language": "TypeScript",
+      "updatedAt": "2026-08-30",
       "source": "https://github.com/haidmoham/tiramisu",
       "branch": "main",
       "latestCommit": {
@@ -661,6 +676,9 @@
     {
       "id": "nebvis",
       "label": "nebvis",
+      "ledgerEligible": true,
+      "language": "TypeScript",
+      "updatedAt": "2026-08-28",
       "source": "https://github.com/haidmoham/nebvis",
       "branch": "main",
       "latestCommit": {
@@ -788,6 +806,9 @@
     {
       "id": "soundspace",
       "label": "soundspace",
+      "ledgerEligible": true,
+      "language": "TypeScript",
+      "updatedAt": "2026-08-31",
       "source": "https://github.com/haidmoham/soundspace",
       "branch": "main",
       "latestCommit": {
@@ -915,6 +936,9 @@
     {
       "id": "punkcubes",
       "label": "punkcubes",
+      "ledgerEligible": true,
+      "language": "TypeScript",
+      "updatedAt": "2026-08-29",
       "source": "https://github.com/haidmoham/punkcubes",
       "branch": "codex/punkcubes-one-shot",
       "latestCommit": {
@@ -1042,6 +1066,9 @@
     {
       "id": "physics",
       "label": "test bench",
+      "ledgerEligible": true,
+      "language": "Jupyter Notebook",
+      "updatedAt": "2026-08-22",
       "source": "https://github.com/haidmoham/test-bench",
       "branch": "main",
       "latestCommit": {
@@ -1169,6 +1196,9 @@
     {
       "id": "agent",
       "label": "agent physics lab",
+      "ledgerEligible": true,
+      "language": "JavaScript",
+      "updatedAt": "2026-08-25",
       "source": "https://github.com/haidmoham/agent-physics-lab",
       "branch": "main",
       "latestCommit": {
@@ -1291,6 +1321,266 @@
         }
       ],
       "visual": "/project-state/agent.svg",
+      "evidence": []
+    },
+    {
+      "id": "social",
+      "label": "social vulnerability & health",
+      "ledgerEligible": true,
+      "language": "Jupyter Notebook",
+      "updatedAt": "2026-08-13",
+      "source": "https://github.com/haidmoham/social-impact-analysis",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "b12b3b421bfce72202054648ed0189c59d55587f",
+        "date": "2026-08-13T17:57:07Z",
+        "url": "https://github.com/haidmoham/social-impact-analysis/commit/b12b3b421bfce72202054648ed0189c59d55587f"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/social.svg",
+      "evidence": []
+    },
+    {
+      "id": "flowers",
+      "label": "flowers",
+      "ledgerEligible": true,
+      "language": "JavaScript",
+      "updatedAt": "2026-09-05",
+      "source": "https://github.com/haidmoham/flowers",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "b5c751abaa4f87b954ccf7c1f58f131b48184c30",
+        "date": "2026-09-05T03:14:01Z",
+        "url": "https://github.com/haidmoham/flowers/commit/b5c751abaa4f87b954ccf7c1f58f131b48184c30"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 2
+        }
+      ],
+      "visual": "/project-state/flowers.svg",
       "evidence": []
     }
   ]

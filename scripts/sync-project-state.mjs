@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const escape = (value) => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 const dayMs = 86_400_000;
+const featuredIds = new Set(['robotics', 'c1n', 'lm', 'indigo', 'fourier', 'jelly', 'voidpulse', 'tiramisu', 'magnet']);
 
 export function projectRecord(source, repository, commits, days) {
   assert.equal(repository.private, false, `${source.id}: source must be public`);
@@ -22,6 +23,9 @@ export function projectRecord(source, repository, commits, days) {
   }
   return {
     id: source.id, label: source.label,
+    ledgerEligible: source.ledgerEligible === true && !featuredIds.has(source.id),
+    language: typeof repository.language === 'string' ? repository.language : null,
+    updatedAt: commits[0] ? new Date(commits[0].commit.committer.date).toISOString().slice(0, 10) : null,
     source: `https://github.com/${source.repository}`, branch: repository.default_branch,
     latestCommit: commits[0] ? { sha: commits[0].sha, date: commits[0].commit.committer.date, url: `https://github.com/${source.repository}/commit/${commits[0].sha}` } : null,
     activity: [...buckets].map(([date, commits]) => ({ date, commits })),
@@ -36,7 +40,7 @@ export function activitySvg(record) {
     const height = 64 * day.commits / maximum;
     return `<rect x="${20 + index * 10}" y="${100 - height}" width="7" height="${height}" rx="2"><title>${day.date}: ${day.commits} commits</title></rect>`;
   }).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-labelledby="title description"><title id="title">${escape(record.label)}: commit activity</title><desc id="description">${total} commits on the default branch, ${record.activity[0].date} through ${record.activity.at(-1).date} UTC. Daily bars share a scale with a maximum of ${maximum} commits. Commit volume is not a measure of quality or completion.</desc><rect width="320" height="140" rx="14" fill="#211c2b"/><g fill="#d5b6ef">${bars}</g><g font-family="system-ui,sans-serif" fill="#eee5f4"><text x="20" y="23" font-size="12">${escape(record.label)}</text><text x="20" y="122" font-size="10">${total} commits · 28 days · default branch</text></g></svg>\n`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-labelledby="title description"><title id="title">${escape(record.label)}: commit activity</title><desc id="description">${total} commits on the default branch, ${record.activity[0].date} through ${record.activity.at(-1).date} UTC. Daily bars share a scale with a maximum of ${maximum} commits. Commit volume is not a measure of quality or completion.</desc><rect width="320" height="140" rx="14" fill="#211c2b"/><g fill="#d5b6ef">${bars}</g><g font-family="system-ui,sans-serif" fill="#eee5f4"><text x="20" y="23" font-size="12">${escape(record.label)}</text><text x="20" y="122" font-size="10">${total} commits Â· 28 days Â· default branch</text></g></svg>\n`;
 }
 
 async function github(endpoint) {
@@ -56,6 +60,8 @@ async function main() {
     assert.match(source.id, /^[a-z][a-z0-9-]*$/);
     assert.match(source.repository, /^haidmoham\/[a-zA-Z0-9_.-]+$/);
     assert.ok(!ids.has(source.id), 'duplicate project id'); ids.add(source.id);
+    assert.equal(typeof source.ledgerEligible, 'boolean', 'ledger eligibility must be explicit');
+    assert.ok(!source.ledgerEligible || !featuredIds.has(source.id), 'featured projects cannot enter the ledger');
   }
   // Use complete UTC days. The same source snapshot and day produce identical files.
   const end = new Date(new Date().toISOString().slice(0, 10));
@@ -74,7 +80,9 @@ async function main() {
     const record = projectRecord(source, repo, commits, days);
     // Latest commit may be older than the activity window. Read it separately.
     const { data: latest } = await github(`/repos/${source.repository}/commits?sha=${encodeURIComponent(repo.default_branch)}&per_page=1`);
-    record.latestCommit = projectRecord(source, repo, latest, days).latestCommit;
+    const latestRecord = projectRecord(source, repo, latest, days);
+    record.latestCommit = latestRecord.latestCommit;
+    record.updatedAt = latestRecord.updatedAt;
     record.evidence = [];
     for (const evidence of source.evidence || []) {
       assert.match(evidence.reviewedRevision, /^[a-f0-9]{40}$/);
@@ -98,7 +106,7 @@ async function main() {
   const common = { schemaVersion: 1, through: days.at(-1), windowDays: 28, meaning: 'Default-branch commit activity. Counts do not establish quality, project completion, or experimental results.' };
   const files = new Map([
     ['index.json', JSON.stringify({ ...common, projects: records }, null, 2) + '\n'],
-    ['anonymous.json', JSON.stringify({ ...common, projects: records.map(({ id, label, activity, visual, evidence }) => ({ id, label, activity, visual, evidence: evidence.map(({ id, visual, sourceChanged, status }) => ({ id, visual, sourceChanged, status })) })) }, null, 2) + '\n'],
+    ['anonymous.json', JSON.stringify({ ...common, projects: records.map(({ id, label, ledgerEligible, language, updatedAt, activity, visual, evidence }) => ({ id, label, ledgerEligible, language, updatedAt, activity, visual, evidence: evidence.map(({ id, visual, sourceChanged, status }) => ({ id, visual, sourceChanged, status })) })) }, null, 2) + '\n'],
     ...records.map(record => [`${record.id}.svg`, activitySvg(record)]),
   ]);
   if (!process.argv.includes('--check')) {
@@ -111,15 +119,20 @@ async function main() {
 }
 
 if (process.argv.includes('--self-test')) {
-  const source = { id: 'example', label: '<example>', repository: 'haidmoham/example' };
-  const repository = { private: false, full_name: source.repository, default_branch: 'main' };
+  const source = { id: 'example', label: '<example>', repository: 'haidmoham/example', ledgerEligible: true };
+  const repository = { private: false, full_name: source.repository, default_branch: 'main', language: 'TypeScript' };
   const commit = { sha: 'a'.repeat(40), commit: { committer: { date: '2026-09-01T01:00:00Z' } } };
   const record = projectRecord(source, repository, [commit, commit], ['2026-09-01', '2026-09-02']);
   assert.deepEqual(record.activity.map(day => day.commits), [1, 0]);
+  assert.equal(record.updatedAt, '2026-09-01');
+  assert.equal(record.language, 'TypeScript');
+  assert.equal(record.ledgerEligible, true);
+  assert.equal(projectRecord({ ...source, id: 'lm' }, repository, [commit], ['2026-09-01']).ledgerEligible, false);
+  assert.equal(projectRecord(source, { ...repository, language: null }, [], ['2026-09-01']).updatedAt, null);
   assert.equal(activitySvg(record), activitySvg(record));
   assert.ok(activitySvg(record).includes('&lt;example&gt;'));
   assert.throws(() => projectRecord(source, { ...repository, private: true }, [commit], ['2026-09-01']));
-  console.log('Projection checks passed: deduplication, dates, deterministic SVG, escaping, private-source rejection.');
+  console.log('Projection checks passed: deduplication, dates, ledger eligibility, language, deterministic SVG, escaping, private-source rejection.');
 } else if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main().catch(error => { console.error(error.message); process.exitCode = 1; });
 }

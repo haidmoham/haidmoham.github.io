@@ -19,52 +19,74 @@
           "reviewedRevision": "1075e95d2c56ee08d8b757cf6ed45eaa9ac6337a",
           "visual": "/robotics/c1n-leg-workspace-2dof.png"
         }
-      ]
+      ],
+      "ledgerEligible": false
     },
     {
       "id": "c1n",
       "label": "c-1n",
-      "repository": "haidmoham/spider"
+      "repository": "haidmoham/spider",
+      "ledgerEligible": false
     },
     {
       "id": "lm",
       "label": "lm lab",
-      "repository": "haidmoham/lmlab"
+      "repository": "haidmoham/lmlab",
+      "ledgerEligible": false
     },
     {
       "id": "ecosim",
       "label": "ecosim lab",
-      "repository": "haidmoham/ecosimlab"
+      "repository": "haidmoham/ecosimlab",
+      "ledgerEligible": true
     },
     {
       "id": "tiramisu",
       "label": "tiramisu",
-      "repository": "haidmoham/tiramisu"
+      "repository": "haidmoham/tiramisu",
+      "ledgerEligible": false
     },
     {
       "id": "nebvis",
       "label": "nebvis",
-      "repository": "haidmoham/nebvis"
+      "repository": "haidmoham/nebvis",
+      "ledgerEligible": true
     },
     {
       "id": "soundspace",
       "label": "soundspace",
-      "repository": "haidmoham/soundspace"
+      "repository": "haidmoham/soundspace",
+      "ledgerEligible": true
     },
     {
       "id": "punkcubes",
       "label": "punkcubes",
-      "repository": "haidmoham/punkcubes"
+      "repository": "haidmoham/punkcubes",
+      "ledgerEligible": true
     },
     {
       "id": "physics",
       "label": "test bench",
-      "repository": "haidmoham/test-bench"
+      "repository": "haidmoham/test-bench",
+      "ledgerEligible": true
     },
     {
       "id": "agent",
       "label": "agent physics lab",
-      "repository": "haidmoham/agent-physics-lab"
+      "repository": "haidmoham/agent-physics-lab",
+      "ledgerEligible": true
+    },
+    {
+      "id": "social",
+      "label": "social vulnerability & health",
+      "repository": "haidmoham/social-impact-analysis",
+      "ledgerEligible": true
+    },
+    {
+      "id": "flowers",
+      "label": "flowers",
+      "repository": "haidmoham/flowers",
+      "ledgerEligible": true
     }
   ]
 }
