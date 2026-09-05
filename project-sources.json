@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "windowDays": 28,
+  "projects": [
+    {
+      "id": "robotics",
+      "label": "robotics test bench",
+      "repository": "haidmoham/robotics-test-bench",
+      "evidence": [
+        {
+          "id": "static-support",
+          "path": "experiments/2026-08-13-static-support-boundary/static_support_boundary.ipynb",
+          "reviewedRevision": "c3e7ccad2824ee2d58709520ecbba3aa50668b8d",
+          "visual": "/robotics/static-support-boundary-sweep.png"
+        },
+        {
+          "id": "leg-workspace",
+          "path": "experiments/2026-08-13-c1n-leg-workspace/c1n_leg_workspace.ipynb",
+          "reviewedRevision": "1075e95d2c56ee08d8b757cf6ed45eaa9ac6337a",
+          "visual": "/robotics/c1n-leg-workspace-2dof.png"
+        }
+      ]
+    },
+    {
+      "id": "c1n",
+      "label": "c-1n",
+      "repository": "haidmoham/spider"
+    },
+    {
+      "id": "lm",
+      "label": "lm lab",
+      "repository": "haidmoham/lmlab"
+    },
+    {
+      "id": "ecosim",
+      "label": "ecosim lab",
+      "repository": "haidmoham/ecosimlab"
+    },
+    {
+      "id": "tiramisu",
+      "label": "tiramisu",
+      "repository": "haidmoham/tiramisu"
+    },
+    {
+      "id": "nebvis",
+      "label": "nebvis",
+      "repository": "haidmoham/nebvis"
+    },
+    {
+      "id": "soundspace",
+      "label": "soundspace",
+      "repository": "haidmoham/soundspace"
+    },
+    {
+      "id": "punkcubes",
+      "label": "punkcubes",
+      "repository": "haidmoham/punkcubes"
+    },
+    {
+      "id": "physics",
+      "label": "test bench",
+      "repository": "haidmoham/test-bench"
+    },
+    {
+      "id": "agent",
+      "label": "agent physics lab",
+      "repository": "haidmoham/agent-physics-lab"
+    }
+  ]
+}

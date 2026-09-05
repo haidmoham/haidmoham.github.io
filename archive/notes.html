@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working Notes — Mohammad Haider</title>
+  <meta name="description" content="An inspectable record of Mohammad Haider's engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta property="og:title" content="Working Notes — Mohammad Haider" />
+  <meta property="og:description" content="An inspectable record of engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta property="og:url" content="https://portfolioredo.mhaider.dev/archive/notes.html" />
+  <meta property="og:image" content="https://portfolioredo.mhaider.dev/archive/assets/og-working-notes-20260724.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Working Notes — Public engineering practice" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Working Notes — Mohammad Haider" />
+  <meta name="twitter:description" content="An inspectable record of engineering reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing." />
+  <meta name="twitter:image" content="https://portfolioredo.mhaider.dev/archive/assets/og-working-notes-20260724.png" />
+  <meta name="twitter:image:alt" content="Working Notes — Public engineering practice" />
+  <link rel="icon" type="image/svg+xml" href="/archive/favicon.svg?v=2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=36" />
+  <script>if(!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))document.documentElement.classList.add("reveal-on");</script>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo" aria-label="Home">MH</a>
+    <ul class="nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="robotics/">Robotics Lab</a></li>
+      <li><a href="notes.html" class="nav-notes active" aria-current="page">Working Notes</a></li>
+      <li><a href="resume.html" class="nav-cta-outline">Resume</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Open navigation">☰</button>
+  </nav>
+
+  <header class="page-hero">
+    <p class="section-eyebrow" data-field-target>Public engineering practice</p>
+    <h1 data-field-target>Working Notes</h1>
+    <p>A place to inspect the work behind the work: reasoning, implementation decisions, revisions, demonstrations, notebooks, and technical writing.</p>
+    <details class="notes-principles">
+      <summary>How I use this space</summary>
+      <div class="notes-principles-panel">
+        <ol class="notes-principles-list">
+          <li>
+            <span class="notes-principle-num" data-field-target>01</span>
+            <h2 data-field-target>Start with a real, evaluable question.</h2>
+            <p>Write when there is an approach to test, a constraint to work through, an assumption to examine, or a result worth understanding.</p>
+          </li>
+          <li>
+            <span class="notes-principle-num" data-field-target>02</span>
+            <h2 data-field-target>Keep the decision trail visible.</h2>
+            <p>Show the options considered, the tradeoffs made, the revisions that followed, and the evidence that changed the direction.</p>
+          </li>
+          <li>
+            <span class="notes-principle-num" data-field-target>03</span>
+            <h2 data-field-target>Show the work when it helps.</h2>
+            <p>Use runnable demonstrations, notebooks, or implementation detail when they make a claim easier to inspect—not just to decorate it.</p>
+          </li>
+        </ol>
+      </div>
+    </details>
+  </header>
+
+  <main class="notes-section">
+    <section class="notes-lab-section" aria-labelledby="notes-lab-title">
+      <div class="notes-lab-heading">
+        <p class="section-eyebrow" data-field-target>Ongoing lab</p>
+        <h2 id="notes-lab-title" data-field-target>Robotics Test Bench</h2>
+        <p>A dedicated engineering workspace for controlled MuJoCo experiments, model updates, and inspectable simulation evidence.</p>
+      </div>
+      <article class="notes-robotics">
+        <a href="robotics/" class="notes-post-card notes-entry-link">
+          <div>
+            <p class="notes-post-status">Experiment record</p>
+            <h3>Question → prediction → experiment → model update</h3>
+            <p>Follow the current studies, their evidence, and the boundaries each result establishes.</p>
+          </div>
+          <span class="notes-entry-link-label">Enter lab →</span>
+        </a>
+      </article>
+    </section>
+
+    <aside class="notes-practice notes-footnote" aria-label="What to expect in Working Notes">
+      <span data-field-target>What to expect</span>
+      <p data-field-target>Decision trails · implementation detail · revisions and demos · notebooks and technical writing</p>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Mohammad Haider</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/haidmoham" target="_blank">LinkedIn</a>
+      <a href="https://github.com/haidmoham" target="_blank">GitHub</a>
+    </div>
+  </footer>
+  <script>
+    document.querySelector('.nav-burger').addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+    document.querySelector('.notes-principles').addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && this.open) {
+        this.open = false;
+        this.querySelector('summary').focus();
+      }
+    });
+  </script>
+  <script src="main.js?v=1" defer></script><script type="module" src="field.js?v=17"></script>
+</body>
+</html>

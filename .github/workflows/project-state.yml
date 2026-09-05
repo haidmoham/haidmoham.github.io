@@ -1,0 +1,44 @@
+name: Refresh public project activity
+
+on:
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: portfolio-project-state
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check projection rules
+        run: node scripts/sync-project-state.mjs --self-test
+      - name: Read public sources and regenerate activity graphics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/sync-project-state.mjs
+      - name: Validate the site before publishing generated files
+        run: python scripts/validate_site.py
+      - name: Commit only generated project activity
+        shell: bash
+        run: |
+          git add -- project-state
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: refresh public project activity'
+          git push origin HEAD:main

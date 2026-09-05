@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 
-const stylesheet = await readFile(new URL('../style.css', import.meta.url), 'utf8');
+const stylesheet = await readFile(new URL('../style.css', import.meta.url), 'utf8').then(text => text.replaceAll('\r\n', '\n'));
 
 test('a primary coarse pointer retains one persistent, touch-sized field control', () => {
   const coarseControls = stylesheet.slice(stylesheet.indexOf('@media (pointer: coarse) {\n  .field-table-stage .hero'));

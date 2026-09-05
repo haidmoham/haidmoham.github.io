@@ -1,9 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
 
-const moduleUrl = `${pathToFileURL(new URL('../field-input.js', import.meta.url).pathname).href}?test=${Date.now()}`;
+const moduleUrl = `${new URL('../field-input.js', import.meta.url).href}?test=${Date.now()}`;
 const {
   classifyFieldViewportChange,
   DIRECT_TOUCH_ACTIVE_MS,
@@ -241,7 +240,7 @@ test('interaction assets bump their cache versions when the touch contract chang
   const [controller, stylesheet, page] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
     readFile(new URL('../style.css', import.meta.url), 'utf8'),
-    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../archive/index.html', import.meta.url), 'utf8'),
   ]);
   const importedColorVersion = Number(controller.match(/field-color\.js\?v=(\d+)/)?.[1]);
   const importedInputVersion = Number(controller.match(/field-input\.js\?v=(\d+)/)?.[1]);
@@ -259,7 +258,7 @@ test('Field Table exposes explicit modes and keeps visual feedback decorative', 
   const [controller, stylesheet, page] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
     readFile(new URL('../style.css', import.meta.url), 'utf8'),
-    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../archive/index.html', import.meta.url), 'utf8'),
   ]);
 
   assert.match(page, /role="radiogroup"[^>]*aria-label="Field mode"/);
@@ -284,7 +283,7 @@ test('Field Table exposes explicit modes and keeps visual feedback decorative', 
 test('Field Table starts neutral and routes its instructions by pointer capability', async () => {
   const [controller, page] = await Promise.all([
     readFile(new URL('../field.js', import.meta.url), 'utf8'),
-    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../archive/index.html', import.meta.url), 'utf8'),
   ]);
 
   assert.match(page, /data-field-kicker[^>]*>Interactive field</);

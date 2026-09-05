@@ -1,9 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
 
-const moduleUrl = `${pathToFileURL(new URL('../field-color.js', import.meta.url).pathname).href}?test=${Date.now()}`;
+const moduleUrl = `${new URL('../field-color.js', import.meta.url).href}?test=${Date.now()}`;
 const {
   advanceColorProgress,
   createFieldColor,

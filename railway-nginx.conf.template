@@ -8,7 +8,7 @@ server {
     # MuJoCo compiles its first-party WebAssembly runtime in the browser.
     # Keep this policy in the production server so a Railway deploy cannot
     # silently fall back to a host policy that blocks WebAssembly.
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
 
     # Vercel is the public C-1N host. Keep both historical portfolio route
     # forms as permanent redirects after the Vercel deployment is verified.
@@ -20,6 +20,8 @@ server {
         return 308 https://c1n.mhaider.dev/;
     }
 
+    error_page 404 /404.html;
+
     location / {
         try_files $uri $uri/ =404;
     }
@@ -27,7 +29,7 @@ server {
     location ~* \.wasm$ {
         default_type application/wasm;
         add_header Cache-Control "public, max-age=31536000, immutable" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
         try_files $uri =404;
     }
 }

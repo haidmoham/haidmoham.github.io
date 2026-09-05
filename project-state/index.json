@@ -1,0 +1,1297 @@
+{
+  "schemaVersion": 1,
+  "through": "2026-09-04",
+  "windowDays": 28,
+  "meaning": "Default-branch commit activity. Counts do not establish quality, project completion, or experimental results.",
+  "projects": [
+    {
+      "id": "robotics",
+      "label": "robotics test bench",
+      "source": "https://github.com/haidmoham/robotics-test-bench",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "17581ff4e2ab81280fd586e0189b6dea7165c3a6",
+        "date": "2026-09-05T00:40:31Z",
+        "url": "https://github.com/haidmoham/robotics-test-bench/commit/17581ff4e2ab81280fd586e0189b6dea7165c3a6"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 17
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 32
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 43
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/robotics.svg",
+      "evidence": [
+        {
+          "id": "static-support",
+          "visual": "/robotics/static-support-boundary-sweep.png",
+          "reviewedSource": "https://github.com/haidmoham/robotics-test-bench/blob/c3e7ccad2824ee2d58709520ecbba3aa50668b8d/experiments/2026-08-13-static-support-boundary/static_support_boundary.ipynb",
+          "reviewedBlob": "ce2e45d523f73e5ecd05a91005ad5cc0768e9803",
+          "currentBlob": "ce2e45d523f73e5ecd05a91005ad5cc0768e9803",
+          "sourceChanged": false,
+          "status": "published visual matches the reviewed source version"
+        },
+        {
+          "id": "leg-workspace",
+          "visual": "/robotics/c1n-leg-workspace-2dof.png",
+          "reviewedSource": "https://github.com/haidmoham/robotics-test-bench/blob/1075e95d2c56ee08d8b757cf6ed45eaa9ac6337a/experiments/2026-08-13-c1n-leg-workspace/c1n_leg_workspace.ipynb",
+          "reviewedBlob": "ee0b93a55d9b779234485305765e2299846ce890",
+          "currentBlob": "ee0b93a55d9b779234485305765e2299846ce890",
+          "sourceChanged": false,
+          "status": "published visual matches the reviewed source version"
+        }
+      ]
+    },
+    {
+      "id": "c1n",
+      "label": "c-1n",
+      "source": "https://github.com/haidmoham/spider",
+      "branch": "master",
+      "latestCommit": {
+        "sha": "329e991d38d0a78d04c7dcc742ecd5795fbc8d8f",
+        "date": "2026-09-05T00:40:31Z",
+        "url": "https://github.com/haidmoham/spider/commit/329e991d38d0a78d04c7dcc742ecd5795fbc8d8f"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 4
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 28
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 12
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/c1n.svg",
+      "evidence": []
+    },
+    {
+      "id": "lm",
+      "label": "lm lab",
+      "source": "https://github.com/haidmoham/lmlab",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "19222f1ac6e78ccf8a814f38d18e13bbc30f6221",
+        "date": "2026-09-04T19:54:45Z",
+        "url": "https://github.com/haidmoham/lmlab/commit/19222f1ac6e78ccf8a814f38d18e13bbc30f6221"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 5
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 3
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 5
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 3
+        }
+      ],
+      "visual": "/project-state/lm.svg",
+      "evidence": []
+    },
+    {
+      "id": "ecosim",
+      "label": "ecosim lab",
+      "source": "https://github.com/haidmoham/ecosimlab",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "0eeb09ddf8e8a5dd814cb54cad39c77fb210445f",
+        "date": "2026-08-20T19:35:41Z",
+        "url": "https://github.com/haidmoham/ecosimlab/commit/0eeb09ddf8e8a5dd814cb54cad39c77fb210445f"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/ecosim.svg",
+      "evidence": []
+    },
+    {
+      "id": "tiramisu",
+      "label": "tiramisu",
+      "source": "https://github.com/haidmoham/tiramisu",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "408c9231b66353faad7af9a666eb1daf72a3de3d",
+        "date": "2026-08-30T16:34:46Z",
+        "url": "https://github.com/haidmoham/tiramisu/commit/408c9231b66353faad7af9a666eb1daf72a3de3d"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 22
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/tiramisu.svg",
+      "evidence": []
+    },
+    {
+      "id": "nebvis",
+      "label": "nebvis",
+      "source": "https://github.com/haidmoham/nebvis",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "ece544bfa58a61b0b3d72fd5b60462afe93d03a7",
+        "date": "2026-08-28T20:29:45Z",
+        "url": "https://github.com/haidmoham/nebvis/commit/ece544bfa58a61b0b3d72fd5b60462afe93d03a7"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/nebvis.svg",
+      "evidence": []
+    },
+    {
+      "id": "soundspace",
+      "label": "soundspace",
+      "source": "https://github.com/haidmoham/soundspace",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "1a8814f16abdde2e9b13e09104b3ac4274730d4a",
+        "date": "2026-08-31T04:12:19Z",
+        "url": "https://github.com/haidmoham/soundspace/commit/1a8814f16abdde2e9b13e09104b3ac4274730d4a"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 26
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 2
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/soundspace.svg",
+      "evidence": []
+    },
+    {
+      "id": "punkcubes",
+      "label": "punkcubes",
+      "source": "https://github.com/haidmoham/punkcubes",
+      "branch": "codex/punkcubes-one-shot",
+      "latestCommit": {
+        "sha": "873b2a0e3c501c85c17f7359977e6d892a481d3e",
+        "date": "2026-08-29T02:12:30Z",
+        "url": "https://github.com/haidmoham/punkcubes/commit/873b2a0e3c501c85c17f7359977e6d892a481d3e"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/punkcubes.svg",
+      "evidence": []
+    },
+    {
+      "id": "physics",
+      "label": "test bench",
+      "source": "https://github.com/haidmoham/test-bench",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "13418bbe7dcda7ad47586cd2e52dad568aad2516",
+        "date": "2026-08-22T21:08:19Z",
+        "url": "https://github.com/haidmoham/test-bench/commit/13418bbe7dcda7ad47586cd2e52dad568aad2516"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/physics.svg",
+      "evidence": []
+    },
+    {
+      "id": "agent",
+      "label": "agent physics lab",
+      "source": "https://github.com/haidmoham/agent-physics-lab",
+      "branch": "main",
+      "latestCommit": {
+        "sha": "b1cdc70b1c5a3259d12999c202c23da68f33edba",
+        "date": "2026-08-25T21:36:23Z",
+        "url": "https://github.com/haidmoham/agent-physics-lab/commit/b1cdc70b1c5a3259d12999c202c23da68f33edba"
+      },
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/agent.svg",
+      "evidence": []
+    }
+  ]
+}

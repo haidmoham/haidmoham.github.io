@@ -20,9 +20,9 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 
 - Write for engineering hiring teams, technical peers, and collaborators.
 - Position Mohammad as an engineer seeking full-time roles unless the user changes that direction.
-- Use **Applied mathematics & software engineering** as the canonical portfolio identity line; keep role labels, job titles, resume lane names, and evidence descriptions specific to their contexts.
+- Use **software engineer** as the canonical portfolio identity line; tell the applied mathematics story through concrete work; keep role labels, job titles, resume lane names, and evidence descriptions specific to their contexts.
 - Use direct, matter-of-fact, engineering-first language. Do not write recruiter-focused or sales copy.
-- Give each full project card a concise `Worth noting:` callout about the judgment that makes the work credible.
+- Describe each project with concrete implementation, evidence, and current limits. Preserve lowercase authored interface copy.
 
 ## Projects and evidence
 
@@ -66,8 +66,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 
 ## Robotics Test Bench visual system
 
-- Use a muted light blue-gray paper surface with a low-contrast graph-paper grid.
-- Use dark blue text and links with clear reading contrast.
-- Use JetBrains Mono for test-bench headings and experiment titles.
-- Give the Robotics entry in Working Notes the same light treatment.
+- Use the approved charcoal and lime lab treatment, with readable notebook evidence and scoped monospace instrumentation.
+- Keep the lab subordinate to the software engineering portfolio.
+- Give the Robotics entry in Working Notes the same scoped treatment.
 - Scope this system to test-bench work.

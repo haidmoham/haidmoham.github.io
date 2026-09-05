@@ -1,0 +1,1221 @@
+{
+  "schemaVersion": 1,
+  "through": "2026-09-04",
+  "windowDays": 28,
+  "meaning": "Default-branch commit activity. Counts do not establish quality, project completion, or experimental results.",
+  "projects": [
+    {
+      "id": "robotics",
+      "label": "robotics test bench",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 17
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 32
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 43
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/robotics.svg",
+      "evidence": [
+        {
+          "id": "static-support",
+          "visual": "/robotics/static-support-boundary-sweep.png",
+          "sourceChanged": false,
+          "status": "published visual matches the reviewed source version"
+        },
+        {
+          "id": "leg-workspace",
+          "visual": "/robotics/c1n-leg-workspace-2dof.png",
+          "sourceChanged": false,
+          "status": "published visual matches the reviewed source version"
+        }
+      ]
+    },
+    {
+      "id": "c1n",
+      "label": "c-1n",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 4
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 28
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 12
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/c1n.svg",
+      "evidence": []
+    },
+    {
+      "id": "lm",
+      "label": "lm lab",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 11
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 5
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 3
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 5
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 3
+        }
+      ],
+      "visual": "/project-state/lm.svg",
+      "evidence": []
+    },
+    {
+      "id": "ecosim",
+      "label": "ecosim lab",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/ecosim.svg",
+      "evidence": []
+    },
+    {
+      "id": "tiramisu",
+      "label": "tiramisu",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 22
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/tiramisu.svg",
+      "evidence": []
+    },
+    {
+      "id": "nebvis",
+      "label": "nebvis",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/nebvis.svg",
+      "evidence": []
+    },
+    {
+      "id": "soundspace",
+      "label": "soundspace",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 26
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 2
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/soundspace.svg",
+      "evidence": []
+    },
+    {
+      "id": "punkcubes",
+      "label": "punkcubes",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 2
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/punkcubes.svg",
+      "evidence": []
+    },
+    {
+      "id": "physics",
+      "label": "test bench",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 6
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 1
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/physics.svg",
+      "evidence": []
+    },
+    {
+      "id": "agent",
+      "label": "agent physics lab",
+      "activity": [
+        {
+          "date": "2026-08-08",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-09",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-10",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-11",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-12",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-13",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-14",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-15",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-16",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-17",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-18",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-19",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-20",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-21",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-22",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-23",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-24",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-25",
+          "commits": 3
+        },
+        {
+          "date": "2026-08-26",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-28",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-29",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-30",
+          "commits": 0
+        },
+        {
+          "date": "2026-08-31",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-01",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-02",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-03",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-04",
+          "commits": 0
+        }
+      ],
+      "visual": "/project-state/agent.svg",
+      "evidence": []
+    }
+  ]
+}

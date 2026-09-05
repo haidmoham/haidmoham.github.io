@@ -1,0 +1,212 @@
+{
+  "origin": "https://mhaider.dev",
+  "files": [
+    {
+      "url": "https://mhaider.dev/",
+      "file": "index.html",
+      "bytes": 10967,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/assets/og-portfolio-applied-math-20260816-v2.png",
+      "file": "assets/og-portfolio-applied-math-20260816-v2.png",
+      "bytes": 949388,
+      "content_type": "image/png"
+    },
+    {
+      "url": "https://mhaider.dev/favicon.svg",
+      "file": "favicon.svg",
+      "bytes": 979,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "url": "https://mhaider.dev/style.css",
+      "file": "style.css",
+      "bytes": 92292,
+      "content_type": "text/css"
+    },
+    {
+      "url": "https://mhaider.dev/index.html",
+      "file": "index.html",
+      "bytes": 10967,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/about.html",
+      "file": "about.html",
+      "bytes": 8165,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/projects.html",
+      "file": "projects.html",
+      "bytes": 11543,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/",
+      "file": "robotics/index.html",
+      "bytes": 6249,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/notes.html",
+      "file": "notes.html",
+      "bytes": 6256,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/resume.html",
+      "file": "resume.html",
+      "bytes": 5346,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/contact.html",
+      "file": "contact.html",
+      "bytes": 7916,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/available.html",
+      "file": "available.html",
+      "bytes": 8273,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/notebooks/social-impact-phase1.html",
+      "file": "notebooks/social-impact-phase1.html",
+      "bytes": 1080968,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/main.js",
+      "file": "main.js",
+      "bytes": 832,
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://mhaider.dev/galaxy.js",
+      "file": "galaxy.js",
+      "bytes": 9590,
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://mhaider.dev/field.js",
+      "file": "field.js",
+      "bytes": 29534,
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://mhaider.dev/profile.jpg",
+      "file": "profile.jpg",
+      "bytes": 38939,
+      "content_type": "image/jpeg"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/01-feedback-fundamentals.html",
+      "file": "robotics/01-feedback-fundamentals.html",
+      "bytes": 9551,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/02-multi-dof-coupling.html",
+      "file": "robotics/02-multi-dof-coupling.html",
+      "bytes": 7644,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/03-model-based-control.html",
+      "file": "robotics/03-model-based-control.html",
+      "bytes": 14978,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/04-jacobians-task-space.html",
+      "file": "robotics/04-jacobians-task-space.html",
+      "bytes": 12556,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/05-static-support-stop-boundary.html",
+      "file": "robotics/05-static-support-stop-boundary.html",
+      "bytes": 22720,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/06-leg-workspace-reachability.html",
+      "file": "robotics/06-leg-workspace-reachability.html",
+      "bytes": 11086,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/assets/og-working-notes-20260724.png",
+      "file": "assets/og-working-notes-20260724.png",
+      "bytes": 777697,
+      "content_type": "image/png"
+    },
+    {
+      "url": "https://mhaider.dev/resumes/Mohammad_Haider_Production_Software_Engineering_Resume.pdf",
+      "file": "resumes/Mohammad_Haider_Production_Software_Engineering_Resume.pdf",
+      "bytes": 102260,
+      "content_type": "application/pdf"
+    },
+    {
+      "url": "https://mhaider.dev/resumes/Mohammad_Haider_Simulation_and_Scientific_Computing_Resume.pdf",
+      "file": "resumes/Mohammad_Haider_Simulation_and_Scientific_Computing_Resume.pdf",
+      "bytes": 102269,
+      "content_type": "application/pdf"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/index.html",
+      "file": "robotics/index.html",
+      "bytes": 6249,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/robotics.js",
+      "file": "robotics/robotics.js",
+      "bytes": 8997,
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/static-support-boundary-sweep.png",
+      "file": "robotics/static-support-boundary-sweep.png",
+      "bytes": 41390,
+      "content_type": "image/png"
+    },
+    {
+      "url": "https://mhaider.dev/notebooks/static-support-boundary.html",
+      "file": "notebooks/static-support-boundary.html",
+      "bytes": 363318,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/robotics/c1n-leg-workspace-2dof.png",
+      "file": "robotics/c1n-leg-workspace-2dof.png",
+      "bytes": 85981,
+      "content_type": "image/png"
+    },
+    {
+      "url": "https://mhaider.dev/notebooks/c1n-leg-workspace.html",
+      "file": "notebooks/c1n-leg-workspace.html",
+      "bytes": 380750,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://mhaider.dev/assets/robotics/two-link-trajectories.json",
+      "file": "assets/robotics/two-link-trajectories.json",
+      "bytes": 253445,
+      "content_type": "application/json"
+    }
+  ],
+  "forms": [
+    {
+      "page": "/contact.html",
+      "attributes": {
+        "id": "contact-form"
+      }
+    }
+  ],
+  "failures": []
+}

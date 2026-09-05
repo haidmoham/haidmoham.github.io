@@ -1,17 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { pathToFileURL } from 'node:url';
 
 // These tests describe the COLOR touch-command boundary. They deliberately do
 // not import field-physics.js: mobile magnet behavior is outside this change.
-const moduleUrl = `${pathToFileURL(new URL('../field-input.js', import.meta.url).pathname).href}?touchColorTest=${Date.now()}`;
+const moduleUrl = `${new URL('../field-input.js', import.meta.url).href}?touchColorTest=${Date.now()}`;
 const {
   clampScrollColorCommand,
   shouldQueueTouchColorCommand,
   touchColorWake,
 } = await import(moduleUrl);
-const colorModuleUrl = `${pathToFileURL(new URL('../field-color.js', import.meta.url).pathname).href}?touchColorBurstTest=${Date.now()}`;
+const colorModuleUrl = `${new URL('../field-color.js', import.meta.url).href}?touchColorBurstTest=${Date.now()}`;
 const { createFieldColor } = await import(colorModuleUrl);
 
 test('a fresh touch sample queues exactly one color command', () => {
@@ -171,7 +170,7 @@ test('a burst of more than eight color commands is not silently dropped', () => 
 });
 
 test('interactive pages use a coherent bumped asset-query set', () => {
-  const repoRoot = new URL('..', import.meta.url);
+  const repoRoot = new URL('../archive/', import.meta.url);
   const htmlFiles = fs.readdirSync(repoRoot).filter((file) => file.endsWith('.html'));
   const fieldVersions = [];
   const styleVersions = [];
