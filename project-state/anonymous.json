@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "through": "2026-09-04",
+  "through": "2026-09-05",
   "windowDays": 28,
   "meaning": "Default-branch commit activity. Counts do not establish quality, project completion, or experimental results.",
   "projects": [
@@ -11,10 +11,6 @@
       "language": "Jupyter Notebook",
       "updatedAt": "2026-09-05",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 17
-        },
         {
           "date": "2026-08-09",
           "commits": 32
@@ -122,6 +118,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 1
         }
       ],
       "visual": "/project-state/robotics.svg",
@@ -145,12 +145,8 @@
       "label": "c-1n",
       "ledgerEligible": false,
       "language": "Python",
-      "updatedAt": "2026-09-05",
+      "updatedAt": "2026-09-06",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 4
@@ -258,6 +254,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 2
         }
       ],
       "visual": "/project-state/c1n.svg",
@@ -270,10 +270,6 @@
       "language": "Jupyter Notebook",
       "updatedAt": "2026-09-04",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -381,6 +377,10 @@
         {
           "date": "2026-09-04",
           "commits": 3
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/lm.svg",
@@ -393,10 +393,6 @@
       "language": "TypeScript",
       "updatedAt": "2026-08-20",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -504,6 +500,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/ecosim.svg",
@@ -514,12 +514,8 @@
       "label": "tiramisu",
       "ledgerEligible": false,
       "language": "TypeScript",
-      "updatedAt": "2026-08-30",
+      "updatedAt": "2026-09-06",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -627,6 +623,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/tiramisu.svg",
@@ -639,10 +639,6 @@
       "language": "TypeScript",
       "updatedAt": "2026-08-28",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 2
@@ -750,6 +746,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/nebvis.svg",
@@ -762,10 +762,6 @@
       "language": "TypeScript",
       "updatedAt": "2026-08-31",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -873,6 +869,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/soundspace.svg",
@@ -883,12 +883,8 @@
       "label": "punkcubes",
       "ledgerEligible": true,
       "language": "TypeScript",
-      "updatedAt": "2026-08-29",
+      "updatedAt": "2026-09-06",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -996,6 +992,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/punkcubes.svg",
@@ -1008,10 +1008,6 @@
       "language": "Jupyter Notebook",
       "updatedAt": "2026-08-22",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -1119,6 +1115,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/physics.svg",
@@ -1131,10 +1131,6 @@
       "language": "JavaScript",
       "updatedAt": "2026-08-25",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 0
@@ -1242,6 +1238,10 @@
         {
           "date": "2026-09-04",
           "commits": 0
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 0
         }
       ],
       "visual": "/project-state/agent.svg",
@@ -1254,10 +1254,6 @@
       "language": "Jupyter Notebook",
       "updatedAt": "2026-08-13",
       "activity": [
-        {
-          "date": "2026-08-08",
-          "commits": 0
-        },
         {
           "date": "2026-08-09",
           "commits": 2
@@ -1364,6 +1360,10 @@
         },
         {
           "date": "2026-09-04",
+          "commits": 0
+        },
+        {
+          "date": "2026-09-05",
           "commits": 0
         }
       ],
@@ -1378,10 +1378,6 @@
       "updatedAt": "2026-09-05",
       "activity": [
         {
-          "date": "2026-08-08",
-          "commits": 0
-        },
-        {
           "date": "2026-08-09",
           "commits": 0
         },
@@ -1488,6 +1484,10 @@
         {
           "date": "2026-09-04",
           "commits": 2
+        },
+        {
+          "date": "2026-09-05",
+          "commits": 11
         }
       ],
       "visual": "/project-state/flowers.svg",
