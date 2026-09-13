@@ -81,7 +81,7 @@ source: [13418bb](https://github.com/haidmoham/test-bench/tree/13418bbe7dcda7ad4
 
 ### faltone — corrected for precision
 
-source inspected: tracked files in the local `voidpulsev2` checkout at `a63be2e93276bae8c6a2a9678c9d1b7f94538c41`. the portfolio already notes that a public source URL is not verified. untracked duplicate files were not used as evidence or modified.
+source initially inspected: tracked files in the local `voidpulsev2` checkout at `a63be2e93276bae8c6a2a9678c9d1b7f94538c41`. the pre-push refresh also inspected fetched `origin/main` revision `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0`: `main.ts`, `core/reactivity-model.ts`, and `world/FallWorld.ts`. the revised claims remain supported; the newer entry point additionally wires local-file playback and pause controls. the portfolio already notes that a public source URL is not verified. untracked duplicate files were not used as evidence or modified.
 
 | claim | disposition and evidence |
 | --- | --- |
@@ -90,7 +90,7 @@ source inspected: tracked files in the local `voidpulsev2` checkout at `a63be2e9
 | frequency bands drive polygon layers | corrected to shape the visual field. `core/reactivity-model.ts` maps low/mid/high to gravity/current/dust, chroma, and light rather than promising one polygon layer per band. |
 | stereo width and note attacks control expansion/decay | supported, clarified as stereo width expansion and detected attacks triggering decaying pulses; `advanceReactivity` computes `soundstagePresence`, onset wake energy, and transient attack/release smoothing. |
 | tab capture or sample audio | corrected: `DisplayAudioSignal` implements capture; `LicensedDemoAudioSignal` requires a configured sample URL. no unconditional working-sample claim. |
-| Spotify sign-in separate from visual response | supported by `SpotifyAuth.ts` and `main.ts:updateSignalRoute`, which routes procedural, display, demo, or licensed signals rather than Spotify playback audio. live OAuth and capture permissions were not exercised. |
+| Spotify sign-in separate from visual response | supported by `SpotifyAuth.ts` and `main.ts:updateSignalRoute`, which routes procedural, display, demo, licensed, or (in the refreshed revision) local-file signals rather than Spotify playback audio. live OAuth and capture permissions were not exercised. |
 
 ### C-1N — supported recorded boundary
 
@@ -250,3 +250,9 @@ boundary: public technical claims and their evidence projection. contract: [comm
 ## pocket placement
 
 at the user’s request, pocket is now the final section in the homepage main content, after contact and before the footer. its description is reused verbatim from the existing `/pocket/` page. the section and link remain static HTML, and the 320px browser check showed no horizontal overflow.
+
+## pre-push reconciliation — september 13, 2026
+
+before landing the recurring reconciliation rule, fresh fetches confirmed that all 16 public GitHub project revisions recorded above are still current. their claim evidence is reused without repeating unchanged implementation checks. faltone's fetched revision changed; the relevant signal routing, reactivity, and renderer code were inspected as noted above. mural's source fetch remains unavailable because authentication is missing; its earlier local-source and live-read evidence remain explicitly bounded.
+
+the published homepage, project index, creative and production work pages, archive pages, and active homepage JavaScript/CSS were verified byte-for-byte against `f00a3a3`. the live browser showed the corrected tiramisu description and pocket as the final main-content section, without console errors. pocket's existing page contains project links and the same descriptive introduction, with no additional implementation claims. no site copy or runtime has changed since those checks. previously documented provider, employer, and physical-device verification gaps remain open.

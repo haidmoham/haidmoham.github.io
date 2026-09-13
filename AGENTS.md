@@ -40,6 +40,15 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Keep observations, interpretations, rejected explanations, and deferred tests distinct.
 - For notebooks, export with `jupyter nbconvert --to html --embed-images` into `notebooks/`.
 
+## reconcile projects before every push to main
+
+- before every Codex push to `main`, reconcile the entire site's project descriptions and factual claims against the current canonical projects, even when the intended change is unrelated to portfolio copy.
+- cover the homepage, supporting project and work pages, pocket, previews, captions, labels, and repeated blurbs. check what each project actually implements; do not infer functionality from its name, appearance, roadmap, or an older description.
+- refresh canonical repository revisions and inspect changes since the last audit. reuse earlier evidence only after confirming that the relevant implementation and claim remain unchanged. check live behavior where a claim depends on runtime functionality or deployment state.
+- correct stale or unsupported claims everywhere they appear, keeping authoring source and exported site content consistent. distinguish current features from historical results, prototypes, and planned work; preserve historical evidence and stable URLs.
+- update `docs/portfolio-claim-audit.md` with the review date, inspected revisions, evidence, corrections, and explicit verification gaps. unavailable evidence is unverified, not a passing check; narrow or remove unsupported copy, or ask the user when an honest correction requires their judgment.
+- complete this reconciliation and the applicable site validation before pushing. do not change the underlying projects, invent results, or expand their functionality merely to make a portfolio claim true.
+
 ## C-1N
 
 - The public robot identity is **C-1N**. The old name Spider is legacy only.
