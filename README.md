@@ -4,6 +4,19 @@ Personal portfolio for Mohammad Haider, a software engineer working across produ
 
 🌐 **live at:** [mhaider.dev](https://mhaider.dev)
 
+## a few places to start
+
+| Project | Open the source |
+| --- | --- |
+| Indigo Circuit | [indigo-circuit](https://github.com/haidmoham/indigo-circuit) |
+| C-1N | [spider](https://github.com/haidmoham/spider) · [robotics-test-bench](https://github.com/haidmoham/robotics-test-bench) |
+| Tiramisu | [tiramisu](https://github.com/haidmoham/tiramisu) |
+| Fourier Drawing | [fourier-drawing](https://github.com/haidmoham/fourier-drawing) |
+| Receipts | [political-receipts](https://github.com/haidmoham/political-receipts) |
+| LM Lab | [lmlab](https://github.com/haidmoham/lmlab) |
+
+The [project archive](https://mhaider.dev/projects.html) includes the older experiments and other work. The [résumé downloads](https://mhaider.dev/resume.html) are the public reference copies.
+
 ## delivery
 
 - Static HTML, CSS, and JavaScript; no runtime framework or build requirement.
