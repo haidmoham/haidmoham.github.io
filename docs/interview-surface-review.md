@@ -1,5 +1,6 @@
 # interview and collaboration surface review
 
+> claim-review correction, 2026-09-13: the earlier claim assessment below is historical. see [the functionality audit](portfolio-claim-audit.md) for corrected project descriptions and explicit verification gaps; repeated prior copy is not independent evidence.
 ## objective and scope
 
 make the same body of work understandable to several kinds of hiring teams and technical peers, then learn from substantive responses. this revision does not infer a winning career lane or claim improved hiring outcomes.

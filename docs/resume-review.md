@@ -1,5 +1,6 @@
 # resume revision review
 
+> claim-review correction, 2026-09-13: the earlier claim assessment below is historical. see [the functionality audit](portfolio-claim-audit.md) for corrected project descriptions and explicit verification gaps; repeated prior copy is not independent evidence.
 ## purpose
 
 the two public resumes now make recent independent work visible without changing the professional record or asserting outcomes that have not been observed.
