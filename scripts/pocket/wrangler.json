@@ -1,0 +1,49 @@
+{
+  "name": "mhaider-pocket-mirrors",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-13",
+  "account_id": "7ccfdec2aec5b063d5c1a1a476e4ca83",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "astrsk.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "blog.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "flowers.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "fog.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "kristin.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "mural.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "punkcubes.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "tiramisu.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "pattern": "wulfboi.mhaider.dev",
+      "custom_domain": true
+    },
+    {
+      "custom_domain": true,
+      "pattern": "jellyfish.mhaider.dev"
+    }
+  ]
+}
