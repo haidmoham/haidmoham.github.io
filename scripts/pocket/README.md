@@ -21,7 +21,12 @@ There is no scheduled Railway job. Existing mirror content follows its source
 without a copying job; add new project domains during their publication.
 
 The home page is a static export with a hydrated runtime. Its pocket footer and
-Tiramisu link are present in both HTML and the versioned page chunk. The new
-runtime index references that chunk. Old chunks remain available to open tabs.
+Tiramisu link are present in both HTML and the versioned page chunk. The v2 entry,
+page, layout context, and prefetch policy form one consistent module graph.
+Never rename only the entry: its dependencies can import the former entry and
+initialize a second navigation runtime. Run
+`node --test scripts/pocket/runtime-graph.test.mjs` to catch that regression.
+Old chunks remain available to open tabs. Verify both reload and navigation back
+from the pocket in a browser; HTTP and asset checks do not test hydration.
 
 The Vercel alias universe.shin86.dev has no public DNS record. It is not a live source and is excluded. The active soundspace destination serves that project.
