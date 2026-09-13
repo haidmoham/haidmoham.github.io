@@ -1,0 +1,64 @@
+/* Resume downloads remain legible and tappable on a 320px phone. */
+.resume-page .resume-download-card {
+  min-height: 176px;
+  padding: 1.5rem;
+  background: #343d31;
+  border-color: #88917d;
+  color: #f3f0e7;
+}
+
+.resume-page .resume-download-card strong {
+  color: #f3f0e7;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.resume-page .resume-download-card span {
+  color: #f3f0e7;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.resume-page .resume-download-card em {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: #f3f0e7;
+  font-size: 16px;
+  padding-top: .8rem;
+}
+
+.resume-page .resume-download-card:hover {
+  border-color: #f3f0e7;
+}
+
+.resume-page .resume-download-card:focus-visible {
+  outline: 3px solid #343d31;
+  outline-offset: 4px;
+}
+
+.resume-page .resume-block-title {
+  text-transform: none;
+}
+
+@media (max-width: 420px) {
+  .resume-page .portfolio-nav,
+  .resume-page .page-hero,
+  .resume-page main.resume-section {
+    padding-inline: 24px;
+  }
+
+  .resume-page .resume-download-grid {
+    grid-template-columns: 1fr;
+    gap: .75rem;
+  }
+
+  .resume-page .resume-download-card {
+    min-height: 0;
+    padding: 24px;
+  }
+
+  .resume-page .resume-block {
+    padding: 1.5rem;
+  }
+}
