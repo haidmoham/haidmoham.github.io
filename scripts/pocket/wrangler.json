@@ -44,6 +44,38 @@
     {
       "custom_domain": true,
       "pattern": "jellyfish.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "wintery.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "revolt2.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "falling.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "newflowers.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "faltone.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "portfolio.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "soundspace.mhaider.dev"
+    },
+    {
+      "custom_domain": true,
+      "pattern": "nebvis.mhaider.dev"
     }
   ]
 }

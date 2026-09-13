@@ -1,5 +1,5 @@
 // Public project mirrors. Keep the upstream deployment as the content authority.
-export const projects = ['astrsk', 'blog', 'flowers', 'fog', 'jellyfish', 'sketch', 'kristin', 'mural', 'punkcubes', 'tiramisu', 'wulfboi'];
+export const projects = ['astrsk', 'blog', 'flowers', 'fog', 'jellyfish', 'kristin', 'mural', 'punkcubes', 'tiramisu', 'wulfboi', 'wintery', 'revolt2', 'falling', 'newflowers', 'faltone', 'portfolio', 'soundspace', 'nebvis'];
 export function rewrite(text) {
   return text.replace(/\b([a-z0-9-]+)\.shin86\.dev\b/gi, '$1.mhaider.dev')
     .replace(/(?<![a-z0-9.-])shin86\.dev\b\/?/gi, 'mhaider.dev/pocket/');

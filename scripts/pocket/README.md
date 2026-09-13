@@ -1,8 +1,8 @@
 # Pocket mirrors
 
-`/pocket/` lists eleven personal projects under matching `mhaider.dev` subdomains.
-The footer links to that page. Ten domains use `mhaider-pocket-mirrors` on
-Cloudflare; `sketch.mhaider.dev` keeps its existing Vercel deployment.
+`/pocket/` lists 23 personal project destinations under matching `mhaider.dev` subdomains.
+The footer links to that page. Eighteen domains use `mhaider-pocket-mirrors` on
+Cloudflare; `sketch`, `sunnie`, `little-hungers`, and `voidpulse` keep their Vercel deployments. `astralflowers` keeps its existing Worker.
 
 The gateway fetches the corresponding live project on each request. HTML,
 JavaScript, CSS, JSON, redirects, and CSP hostnames are rewritten to the matching
@@ -23,3 +23,5 @@ without a copying job; add new project domains during their publication.
 The home page is a static export with a hydrated runtime. Its pocket footer and
 Tiramisu link are present in both HTML and the versioned page chunk. The new
 runtime index references that chunk. Old chunks remain available to open tabs.
+
+The Vercel alias universe.shin86.dev has no public DNS record. It is not a live source and is excluded. The active soundspace destination serves that project.

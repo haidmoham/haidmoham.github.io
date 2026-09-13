@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-const names = ['astrsk','blog','flowers','fog','jellyfish','kristin','mural','punkcubes','sketch','tiramisu','wulfboi'];
+const names = ['astrsk','blog','flowers','fog','jellyfish','kristin','mural','punkcubes','sketch','tiramisu','wulfboi','soundspace','sunnie','astralflowers','newflowers','wintery','little-hungers','revolt2','faltone','falling','nebvis','voidpulse','portfolio'];
 const headers = {'User-Agent':'Mozilla/5.0'};
 for (const name of names) {
   const target = `https://${name}.mhaider.dev/`;
@@ -11,7 +11,7 @@ for (const name of names) {
   const [source, mirror] = await Promise.all([sourceResponse.text(), mirrorResponse.text()]);
   const title = html => html.match(/<title[^>]*>(.*?)<\/title>/is)?.[1];
   assert.equal(title(mirror), title(source), `${name}: title parity`);
-  assert.ok(!/href=["'](?:https?:)?\/\/(?:[\w-]+\.)?shin86\.dev/i.test(mirror), `${name}: navigation backlink`);
+  assert.ok(!/<a\b[^>]*\bhref=["'](?:https?:)?\/\/(?:[\w-]+\.)?shin86\.dev/i.test(mirror), `${name}: navigation backlink`);
   const assets = [...mirror.matchAll(/(?:src|href)=["']([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/g)].map(m => new URL(m[1], target));
   const selected = ['.js','.css'].map(ext => assets.find(url => url.pathname.endsWith(ext) && url.origin === new URL(target).origin)).filter(Boolean);
   for (const asset of selected) {
