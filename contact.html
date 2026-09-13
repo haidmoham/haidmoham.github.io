@@ -15,73 +15,126 @@
 <meta content="Contact — Mohammad Haider" name="twitter:title"/>
 <meta content="Applied mathematics and software engineering portfolio. Open to software engineering roles spanning data, analytics, simulation, and scientific computing." name="twitter:description"/>
 <link href="/favicon.svg?v=2" rel="icon" type="image/svg+xml"/>
-<link href="https://mhaider.dev/contact.html" rel="canonical"/><link href="/portfolio-page-base.css" rel="stylesheet"/><link href="/portfolio-pages.css" rel="stylesheet"/></head>
+<link href="https://mhaider.dev/contact.html" rel="canonical"/><link href="/portfolio-page-base.css" rel="stylesheet"/><link href="/portfolio-pages.css" rel="stylesheet"/><link href="/contact.css" rel="stylesheet"/></head>
 <body class="portfolio-page contact-page">
-<nav aria-label="main" class="portfolio-nav"><a class="portfolio-name" href="/">mohammad haider <span> / software engineer</span></a><div><a href="/projects.html">work</a><a href="/about.html">about</a><a href="/notes.html">notes</a><a href="/resumes/Mohammad_Haider_Production_Software_Engineering_Resume.pdf">resume pdf ↗</a><a href="/contact.html">contact ↗</a></div></nav>
+<nav aria-label="main" class="portfolio-nav"><a class="portfolio-name" href="/">mohammad haider <span> / software engineer</span></a><div><a href="/projects.html">work</a><a href="/about.html">about</a><a href="/notes.html">notes</a><a href="/resume.html">resumes ↗</a><a href="/contact.html">contact ↗</a></div></nav>
 <div class="page-hero">
-<p class="section-eyebrow">Get in touch</p>
-<h1>Contact</h1>
-<p>i’m looking for software engineering work. i’m also open to data and analytics roles.</p>
+<p class="section-eyebrow">get in touch</p>
+<h1>contact</h1>
+<p>i’m pursuing full-time software engineering roles. i also welcome specific conversations about scientific computing, robotics, and creative engineering.</p>
 </div>
 <div class="contact-layout">
 <div class="contact-info-block">
-<h3>Contact Info</h3>
+<h3>contact info</h3>
 <div class="contact-detail">
-<span>Email</span>
+<span>email</span>
 <a href="mailto:hi@mhaider.dev">hi@mhaider.dev</a>
 </div>
 <div class="contact-detail">
-<span>Currently Based In</span>
+<span>currently based in</span>
 <strong>Charlottesville, VA</strong>
 </div>
 <div class="contact-detail">
-<span>LinkedIn</span>
+<span>linkedin</span>
 <a href="https://linkedin.com/in/haidmoham" target="_blank">linkedin.com/in/haidmoham</a>
 </div>
 <div class="contact-detail">
-<span>GitHub</span>
+<span>github</span>
 <a href="https://github.com/haidmoham" target="_blank">github.com/haidmoham</a>
 </div>
-<div style="margin-top:2rem; padding:1.25rem; background:var(--navy-card); border:1px solid var(--border); border-radius:var(--radius-lg);">
-<div style="font-size:0.78rem; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.6rem;">Currently Open To</div>
-<div style="font-size:0.88rem; color:var(--text-muted); line-height:1.8; margin-bottom:1rem;">
-          Data Engineering<br/>
-          Analytics Engineering<br/>
-          Data Platform Engineering<br/>
-          Backend and Full Stack Engineering
+<div class="contact-conversation-card">
+<div class="contact-card-label">conversations i welcome</div>
+<div class="contact-card-copy">
+          full-time software engineering<br/>
+          scientific computing and robotics<br/>
+          data and analytics systems<br/>
+          creative engineering collaborations
         </div>
 </div>
 </div>
 <div class="contact-form-card">
-<div style="margin-bottom:1.5rem;">
-<h3 style="color:#fff; margin-bottom:0.3rem;">Send a Message</h3>
+<div class="contact-form-heading">
+<h3>send a message</h3>
+<p>email works too: <a href="mailto:hi@mhaider.dev">hi@mhaider.dev</a></p>
 </div>
-<div data-fs-success="" style="display:none; color:var(--teal); font-weight:600; text-align:center; padding:1rem 0;">✓ Message sent.</div>
-<div data-fs-error="" role="alert" style="display:none; color:#f87171; font-size:0.85rem; margin-bottom:1rem;"></div>
+<div aria-live="polite" class="form-success" data-fs-success="" hidden="" tabindex="-1">message sent. thanks for getting in touch.</div>
+<div class="form-error" data-fs-error="" hidden="" role="alert" tabindex="-1"></div>
 <form action="https://formspree.io/f/xykowgkw" id="contact-form" method="POST">
 <div class="form-group">
-<label for="name">Your Name</label>
-<input data-fs-field="" id="name" name="name" placeholder="Jane Smith" required="" type="text"/>
-<span data-fs-error="name" style="color:#f87171; font-size:0.8rem;"></span>
+<label for="name">your name</label>
+<input autocomplete="name" data-fs-field="" id="name" name="name" placeholder="jane smith" required="" type="text"/>
+<span class="field-error" data-fs-error="name"></span>
 </div>
 <div class="form-group">
-<label for="email">Email Address</label>
-<input data-fs-field="" id="email" name="email" placeholder="jane@company.com" required="" type="email"/>
-<span data-fs-error="email" style="color:#f87171; font-size:0.8rem;"></span>
+<label for="email">email address</label>
+<input autocomplete="email" data-fs-field="" id="email" name="email" placeholder="jane@company.com" required="" type="email"/>
+<span class="field-error" data-fs-error="email"></span>
 </div>
 <div class="form-group">
-<label for="subject">Subject</label>
-<input id="subject" name="subject" placeholder="Engineering role / Technical conversation / ..." type="text"/>
+<label for="subject">subject</label>
+<input id="subject" name="subject" placeholder="engineering role / technical conversation / ..." type="text"/>
 </div>
 <div class="form-group">
-<label for="message">Message</label>
-<textarea data-fs-field="" id="message" name="message" placeholder="Tell me about the role, team, or technical conversation..." required=""></textarea>
-<span data-fs-error="message" style="color:#f87171; font-size:0.8rem;"></span>
+<label for="message">message</label>
+<textarea data-fs-field="" id="message" name="message" placeholder="tell me about the role, team, or technical conversation..." required=""></textarea>
+<span class="field-error" data-fs-error="message"></span>
 </div>
-<button class="btn btn-primary form-submit" data-fs-submit-btn="" type="submit">Send Message</button>
+<details class="contact-context" data-contact-context>
+<summary>about this work (optional)</summary>
+<div class="contact-context-body">
+<p>these details help connect your note to the work that brought you here.</p>
+<div class="contact-context-grid">
+<div class="form-group">
+<label for="interest">what are you reaching out about?</label>
+<select id="interest" name="interest">
+<option value="">choose an interest</option>
+<option value="full-time-software-engineering">full-time software engineering</option>
+<option value="research-scientific-computing">research or scientific computing</option>
+<option value="creative-engineering-collaboration">creative engineering collaboration</option>
+<option value="technical-conversation">a technical conversation</option>
+</select>
+</div>
+<div class="form-group">
+<label for="project">project or interest</label>
+<select id="project" name="project">
+<option value="">choose a project or interest</option>
+<option value="c-1n">C-1N</option>
+<option value="robotics-test-bench">robotics test bench</option>
+<option value="lmlab">LMLab</option>
+<option value="indigo">indigo circuit</option>
+<option value="fourier">fourier drawing</option>
+<option value="jelly">voidpulse / jellyfish</option>
+<option value="tiramisu">tiramisu</option>
+<option value="magnet">magnet</option>
+<option value="creative-engineering">creative engineering work</option>
+<option value="portfolio">the portfolio itself</option>
+</select>
+</div>
+<div class="form-group">
+<label for="entry-surface">this page was reached via</label>
+<select id="entry-surface" name="entry_surface">
+<option value="">choose an entry surface</option>
+<option value="portfolio">portfolio</option>
+<option value="project">a project page</option>
+<option value="notes">a note or write-up</option>
+<option value="resume">resume</option>
+<option value="github">GitHub</option>
+<option value="linkedin">LinkedIn</option>
+<option value="referral">a referral</option>
+</select>
+</div>
+<div class="form-group">
+<label for="discovery-source">how did you first find this work?</label>
+<input id="discovery-source" maxlength="80" name="discovery_source" placeholder="github, a referral, a write-up…" type="text"/>
+</div>
+</div>
+</div>
+</details>
+<button class="btn btn-primary form-submit" data-fs-submit-btn="" type="submit">send message</button>
+<p class="form-note">optional work context travels with your message.</p>
 </form>
 </div>
 </div>
 <footer class="portfolio-footer"><a href="/">← portfolio home</a><a href="/available.html">availability</a><a href="https://x.com/mhaider_dev">twitter ↗</a><a href="https://github.com/haidmoham">github ↗</a></footer>
-<script defer="True" src="/contact-form.js"></script></body>
+<script defer="" src="/contact-context.js"></script><script defer="" src="/contact-form.js"></script></body>
 </html>

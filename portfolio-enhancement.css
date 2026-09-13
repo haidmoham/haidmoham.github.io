@@ -1,0 +1,27 @@
+.portfolio-lightweight .margin-aura {
+  display: none !important;
+}
+
+.portfolio-lightweight .pigment-margin {
+  background: linear-gradient(145deg, #140817, #402349 56%, #140817);
+}
+
+.portfolio-lightweight .organism-specimen .artwork [role="img"] {
+  background: #020309 url("/work/projects/jelly.svg") center / cover no-repeat;
+}
+
+.portfolio-lightweight .organism-specimen .artwork button,
+.portfolio-lightweight .instrument-controls,
+.portfolio-lightweight .token-line {
+  opacity: .72;
+}
+
+.portfolio-lightweight [data-portfolio-disabled] {
+  cursor: default;
+}
+
+@media (max-width: 44rem) {
+  .portfolio-lightweight .organism-specimen .artwork {
+    min-height: 15rem !important;
+  }
+}

@@ -16,6 +16,14 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
 - If a required skill or policy tool is unavailable, resolve that dependency from its canonical source before the gated action when authorization allows; then run the required check. Do not silently substitute for a publish or semantic-review gate.
 
+## mobile and performance
+
+- design and verify the portfolio mobile first, including a 320px-wide viewport. readable text, useful touch targets, resume access, project evidence, and contact must work without desktop interaction assumptions.
+- use an older, lower-powered phone (roughly the 2017 device class) as the performance baseline. this is a usability constraint, not a promise of support for every historical OS/browser version.
+- serve the essential reading and contact paths as usable static HTML. interactive previews default on in capable browsers and have a small header switch. switching them off must stop their rendering work and retain useful static previews.
+- preserve meaningful static content when JavaScript, WebGL, modern syntax, motion, or network capacity is unavailable. controls must not appear usable before their enhancement is ready.
+- verify responsive layout, keyboard access, fallback content, and that the preview switch stops graphics work. distinguish measured browser checks from physical-device testing; do not claim old-phone verification from a desktop resize alone.
+
 ## Position and copy
 
 - Write for engineering hiring teams, technical peers, and collaborators.
@@ -70,3 +78,5 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Keep the lab subordinate to the software engineering portfolio.
 - Give the Robotics entry in Working Notes the same scoped treatment.
 - Scope this system to test-bench work.
+
+- Featured previews must show the actual product, a source-derived visual specimen, or an attributed capture. Architecture/process explanations belong in supporting copy, never as substitutes for a representative preview. Preserve historical project URLs when changing featured selections.
