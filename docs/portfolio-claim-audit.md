@@ -267,3 +267,39 @@ The account inventory covers 43 public repositories. The prior claim audit was u
 Remaining reconciliation work: `nebvis.shin86.dev` currently serves Faltone while repository metadata still associates it with NEBVIS. Faltone's public source is now discoverable at `haidmoham/voidpulsev2`, although the earlier site audit recorded an unverified source URL. The historical social-analysis notebook retains captions inconsistent with its saved 78,815-row join; its repository README now makes that explicit. The public résumé's Indigo claims remain broader than the documented direct-write fallback and approximate interval assumptions. The website PDFs are authoritative for this task; résumé factual claims were not silently changed.
 
 Verification limits: no production pipeline was triggered; no live database freshness, Chrome extension installation, Windows desktop runtime, Spotify OAuth, GPU performance, or new research experiment was certified. HTTP availability alone is not a functional test. Ecosim verification was blocked by the local package-build policy.
+
+## Resume-source pre-push reconciliation — 2026-09-14
+
+Scope: the full project surface from the prior audit, including homepage, project index, work pages, archive, notebook captions, previews, pocket, and repeated blurbs. Baseline: portfolio `9a234b98946e42cbc23392d90c2ba2858324fcc3`. A comparison with the inspected `f00a3a3` confirms that these project descriptions and rendering assets did not change; intervening project-state changes only advance the explicitly dated activity window to September 12. Activity counts are not capability evidence. This review does not alter notebook results, checkpoint identities, or experiment order.
+
+Fresh GitHub default-branch comparisons against the earlier inspected revisions returned the following heads:
+
+| project | inspected current revision | change since prior evidence |
+| --- | --- | --- |
+| tiramisu | `e70ab74ca18627792284b9016c93eca9d4a7ce44` | README only |
+| indigo circuit | `4acad7e461af7696971f06e1fdd2b2b0694562c9` | README, CONTEXT, empty environment example |
+| social impact analysis | `30f39bce815fcbd30cb003aff4b71f092e164ec8` | README only |
+| fourier drawing | `07c5c5911737bd980bcc183d6e5c05d5a1f2d2f3` | README only |
+| flowers | `0b9d95b186bc93f5a001625aedac23345bbf8464` | unchanged |
+| test bench | `a65e3316404fd66cdfc080eddbaadb6c8fbffa29` | README only |
+| C-1N | `56f904a67dcde2f8db65e9d6eca671423b5eceb9` | package/runtime refactor, policy notebooks, CI |
+| robotics test bench | `f8ef41572246bdfcc473e69a082002845e34fa8e` | README only |
+| lm lab | `3758d6624153cfd8435bcab4423c91b3cfc256dc` | unchanged |
+| voidpulse / jellyfish | `f9b863ab4aae6bfcf738cdf4211b705098fed2e2` | unchanged |
+| magnet | `700a968926a4ec9ff78eb071be8964e84d286e69` | unchanged |
+| ecosim lab | `d02e9343b77b13381436d9954b815f7db8e669ad` | README only |
+| nebvis | `ece544bfa58a61b0b3d72fd5b60462afe93d03a7` | unchanged |
+| soundspace | `1a8814f16abdde2e9b13e09104b3ac4274730d4a` | unchanged |
+| agent physics lab | `06682833602b6da4c5f2083e7457bc7963d46438` | unchanged |
+| punkcubes | `be963e869bb705f557399039061629468c8ced09` | README only |
+| faltone (`voidpulsev2`) | `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0` | unchanged |
+
+All listed documentation diffs were inspected. They clarify existing limits and entry points; they do not add implementation evidence or contradict the corrected portfolio descriptions. Prior code/output evidence is reused only for unchanged implementations and unchanged claims. Indigo's direct-write fallback and approximate model intervals remain explicit. Social-analysis captions remain historical records with the documented count inconsistency. Punkcubes remains a bounded structural view, not a complete dependency graph.
+
+C-1N received separate current-source inspection after fetching `origin/master`: `README.md`, `c1n/simulation.py`, `c1n/controllers.py`, `c1n/runtime.py`, and the simulation regression-test contract. The model files did not change. The new package retains 18 joint targets, deterministic reset, measured contacts/torso/joint/effort state, and a shared `advance` path through the canonical physics step. The README still records the ten-second six-contact STAND result and explicitly excludes disturbance recovery and earned STRIDE. Notebook policy work does not establish learned walking. The current commit's **Headless C-1N simulation** GitHub check is completed/success. This is a reported CI result, not a new local experiment or native-display test. The public C-1N route returned HTTP 200 with the C-1N title.
+
+Correction: removed the pocket link labelled “nebvis” at `https://nebvis.mhaider.dev/`. A fresh HTTPS curl request returned HTTP 200 and the title **Faltone**; the shin86 counterpart also served Faltone. The correctly labelled Faltone pocket entry remains, and its destination returned the Faltone title. NEBVIS homepage/project links already lead to canonical source and remain valid. No domain or underlying application was changed. Faltone's public GitHub source is now verified at `haidmoham/voidpulsev2`; the earlier audit's unavailable-source statement is historical. No current authored HTML/TS/TSX copy asserting an unavailable Faltone source was found.
+
+Verification gaps: mural's canonical Sites revision could not be freshly resolved in this environment. Its previous local revision `4a654de8994ab9ab7232a70535c3350bcac0e9c1`, SQLite tests, and live MCP read checks remain historical evidence only; this pass does not certify current remote implementation or external write persistence. A fresh curl request confirms that its public route serves the mural title, not its storage behavior. Employer metrics remain user-authored and unverified against private records. Provider permissions, database freshness, physical-device performance, and new research results were not retested. Resume bytes, Drive permissions, sync execution, site validation, and publication are verified separately by the task that owns the resume update.
+
+Resume release verification: all three new PDFs match the September 14 revision 2 hashes in `resumes/README.md`. Each is one page with readable text and an inspected render. The chooser is usable at 320px without horizontal overflow. The source PDF claims retain independent-work attribution, Indigo direct-write fallback and approximate intervals, recorded LM comparisons, and C-1N recovery limits. This is a byte-preserving release import, not new experimental evidence. Site integrity, 67 field tests, and three sync failure/endpoint tests passed. The subsequent upstream `3e24308` changes only dated project activity; no authored capability claims changed.

@@ -24,6 +24,8 @@ jobs:
         run: node --test scripts/field-*.test.mjs
       - name: Validate static routes and deployment contract
         run: python scripts/validate_site.py
+      - name: Test resume sync failure handling
+        run: python -m unittest discover -s scripts -p test_sync_resumes.py
       - name: Build the Railway image
         run: docker build --tag portfolio-site:test .
       - name: Smoke-test the Railway image

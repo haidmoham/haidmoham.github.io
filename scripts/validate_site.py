@@ -64,12 +64,13 @@ def validate_integrated_portfolio() -> None:
         target = local_target(href, ROOT / "index.html")
         if target is not None:
             require(target.is_file(), f"homepage has a missing local target: {href}")
-    for filename in (
-        "Mohammad_Haider_Production_Software_Engineering_Resume.pdf",
-        "Mohammad_Haider_Simulation_and_Scientific_Computing_Resume.pdf",
-    ):
-        pdf = ROOT / "resumes" / filename
-        require(pdf.is_file() and pdf.read_bytes().startswith(b"%PDF-"), f"missing or invalid synced resume: {filename}")
+    from sync_resumes import RESUMES
+    resume_page = AssetParser()
+    resume_page.feed((ROOT / "resume.html").read_text(encoding="utf-8"))
+    for resume in RESUMES:
+        pdf = ROOT / "resumes" / resume.filename
+        require(pdf.is_file() and pdf.read_bytes().startswith(b"%PDF-"), f"missing or invalid synced resume: {resume.filename}")
+        require(f"/resumes/{resume.filename}" in resume_page.links, f"resume chooser must link to {resume.filename}")
     for relative_path in ("about.html", "available.html", "projects.html", "notes.html", "resume.html", "contact.html", "robotics/index.html"):
         require((ROOT / relative_path).is_file(), f"published route must remain available: {relative_path}")
     require((ROOT / "legacy/field/index.html").is_file(), "preserve the historical field route")
