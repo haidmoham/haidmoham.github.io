@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "robot": "C-1N",
-  "release": "C-1N // 02 · STAND",
-  "checkpoint": "C-1N // 02 · STAND",
-  "legacy_release": "v0.2",
+  "release": "C-1N // 03 · STRIDE",
+  "checkpoint": "C-1N // 03 · STRIDE",
+  "legacy_release": "v0.3",
   "canonical_repository": "https://github.com/haidmoham/spider",
   "canonical_repository_note": "Legacy repository slug; public robot identity is C-1N.",
   "spider_commit": "a6cf1cb47461ea150ff85c1d23b00a760ba0b519",
@@ -25,6 +25,15 @@
       "model": "model/stand.xml",
       "source_commit": "a6cf1cb47461ea150ff85c1d23b00a760ba0b519",
       "model_sha256": "c31e919013f310f553a91fc9bfc0e27f48c4080883f6b8aa01dd96721ad5cf3b"
+    },
+    "v0.3": {
+      "label": "C-1N // 03 · STRIDE",
+      "kind": "recorded-native-policy",
+      "policy": "walk_fast_500",
+      "source_commit": "14808d5dd08af8f003f1e445e039c588c1f55bd1",
+      "video": "/assets/c1n/walk-fast-500.mp4",
+      "video_sha256": "cd964e00e9fb7cc7907308c3eebdae540ccc26c62e4cf1e41bb3d95e4275e6f7",
+      "evidence": "https://github.com/haidmoham/spider/blob/14808d5dd08af8f003f1e445e039c588c1f55bd1/docs/checkpoints/stride.md"
     }
   },
   "runtime": {
