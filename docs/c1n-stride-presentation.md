@@ -28,3 +28,9 @@ The canonical robot repository publishes `public/checkpoint.json` with the selec
 This site's `Refresh canonical C-1N checkpoint` workflow checks hourly, at minute 37, and supports manual dispatch. `scripts/sync-c1n-checkpoint.py` validates the record and downloads/hash-checks both media files before publishing `assets/c1n/checkpoint.json` and the marked homepage content. Bad feeds retain the last verified content. The browser uses local synchronized media, so the site's same-origin policy remains intact. The static homepage remains readable without JavaScript. This is a publication feed, not a live display of incomplete training runs.
 
 Future checkpoint publication must include its matching demo and accurate scope in the canonical selection. The current STRIDE explorer entry intentionally stays tied to the preserved `walk_fast_500` native replay; historical dropdown entries are not renamed when a later checkpoint becomes the homepage feature.
+
+## live STRIDE integration
+
+The checkpoint explorer defaults to the real `walk_fast_500` mean policy in MuJoCo WASM. Source: `haidmoham/spider-web/stride`. The comparison film stays separate. The full saved model includes six legs, black armor, red breathing lights, and gravity-aware cosmetic pupils. Browser inference runs every ten 2 ms physics steps, independent of rendering. Reset restores the exported initial state and controller memory.
+
+Validation: 250 native control states (five seconds), maximum target error 1.19e-7 rad, WASM qpos error 1.21e-6 and qvel error 5.46e-5, no fall, repeatable reset. These are implementation checks, not new population robustness evidence.
