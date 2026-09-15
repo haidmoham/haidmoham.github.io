@@ -58,7 +58,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - `C-1N // 00 · SPAWN` is the historical deterministic six-foot spawn baseline.
 - `C-1N // 01 · SHUFFLE` is the preserved locomotion-failure baseline.
 - `C-1N // 02 · STAND` remains the historical stationary-stance checkpoint.
-- The current checkpoint is `C-1N // 03 · STRIDE`, accepted as `walk_fast_500` on 2026-09-15. Link the canonical `spider/docs/checkpoints/stride.md` evidence. Preserve foot-slip and contact-fragmentation limits. The browser runtime still exposes the earlier SPAWN/SHUFFLE/STAND models; STRIDE is a recorded native policy.
+- The current checkpoint is `C-1N // 03 · STRIDE`, accepted as `walk_fast_500` on 2026-09-15. Link the canonical `spider/docs/checkpoints/stride.md` evidence. Preserve foot-slip and contact-fragmentation limits. The browser runtime still exposes the earlier SPAWN/SHUFFLE/STAND models; STRIDE runs the saved mean policy and cadence generator in MuJoCo WASM, ported in `haidmoham/spider-web/stride`. Preserve its exported weights, native parity fixture, and WASM regression check.
 - Task-space instrumentation may integrate between checkpoints; `FRAME` is not a checkpoint name.
 - Preserve prior checkpoints in the browser artifact when possible so behavior, instrumentation, and control changes remain directly comparable over time.
 

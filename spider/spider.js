@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import loadMujoco from './vendor/mujoco/mujoco.js';
+import { CadencePolicy } from './stride/cadence-policy.js';
+import { StrideVisual } from './stride/visual.js';
 
 const root = document.querySelector('[data-spider-artifact]');
 const stage = root.querySelector('[data-spider-stage]');
@@ -29,7 +31,7 @@ const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-m
 const FOOT_NAMES = ['front_left', 'front_right', 'middle_left', 'middle_right', 'rear_left', 'rear_right'];
 const TRIPOD_A = new Set([0, 3, 4]);
 const RELEASES = {
-  'v0.3': {label: 'C-1N // 03 · STRIDE', kind: 'recorded', description: 'Recorded native walk_fast_500 policy. Mean speed 0.888 m/s; 0/24 falls in fixed flat-ground evaluation. Foot slip and contact fragmentation remain.'},
+  'v0.3': {label: 'C-1N // 03 · STRIDE', model: './stride/model.xml', source: 'walk_fast_500', description: 'live MuJoCo WASM · walk_fast_500 mean policy. the saved network controls joint corrections and gait cadence. native evidence: 0.888 m/s, 0/24 falls; browser trajectories can differ. foot slip and contact fragmentation remain.'},
   'v0.0': {
     label: 'C-1N // 00 · SPAWN',
     model: './model/spider.xml',
@@ -93,6 +95,10 @@ const CAMERA_TARGET = new THREE.Vector3(0, 0, 0.22);
 const LOCAL_Y = new THREE.Vector3(0, 1, 0);
 
 let mujoco;
+let stridePolicy;
+let stridePayload;
+let strideVisual;
+let strideControlStep = 0;
 let model;
 let data;
 let bodyAccessors;
@@ -229,12 +235,29 @@ function applyStandControl() {
 }
 
 function applyReleaseControl() {
+  if (currentRelease === 'v0.3') {
+    // Inference follows simulation steps, never animation frame frequency.
+    if (data.time + 1e-10 >= strideControlStep * 0.02) {
+      data.ctrl.set(stridePolicy.targets(data));
+      strideControlStep += 1;
+    }
+    const [roll, pitch] = bodyErrors();
+    return { contacts: contactStates(), roll, pitch };
+  }
   if (currentRelease === 'v0.2') return applyStandControl();
   if (currentRelease === 'v0.0') return { contacts: contactStates(), roll: 0, pitch: 0 };
   return applyGaitControl();
 }
 
 function setReleasePose() {
+  if (currentRelease === 'v0.3') {
+    stridePolicy.reset();
+    strideControlStep = 0;
+    data.qpos.set(stridePayload.initial.qpos);
+    data.ctrl.set(stridePayload.initial.ctrl);
+    mujoco.mj_forward(model, data);
+    return;
+  }
   const targets = currentRelease === 'v0.2' ? STAND_TARGETS : Array.from({ length: 6 }, () => [0, 0.8]).flat();
   const jointCount = currentRelease === 'v0.2' ? 3 : 2;
   data.qpos.set([0, 0, currentRelease === 'v0.2' ? 0.45 : 0.5, 1, 0, 0, 0]);
@@ -540,6 +563,14 @@ function setSegment(segment, start, end) {
 }
 
 function updateRobotVisual(contacts) {
+  const isStride = currentRelease === 'v0.3';
+  robotVisual.torso.visible = !isStride;
+  robotVisual.legs.forEach(leg => Object.values(leg).forEach(mesh => { mesh.visible = !isStride; }));
+  if (strideVisual) strideVisual.group.visible = isStride;
+  if (isStride) {
+    strideVisual.update(data);
+    return;
+  }
   const torso = bodyAccessors.torso;
   positionFrom(torso, robotVisual.torso.position);
   setMuJoCoRotation(robotVisual.torso, torso.xmat);
@@ -856,7 +887,9 @@ function drawTelemetryGlyphs() {
 }
 
 function render() {
-  const state = applyReleaseControl();
+  // Rendering must not consume a policy action or advance controller state.
+  const [roll, pitch] = bodyErrors();
+  const state = currentRelease === 'v0.3' ? { contacts: contactStates(), roll, pitch } : applyReleaseControl();
   updateRobotVisual(state.contacts);
   updateFollowCamera();
   controls.update();
@@ -903,20 +936,6 @@ async function loadRelease(release) {
   const definition = RELEASES[release];
   if (!definition) return;
   stop();
-  const replayPanel = root.querySelector('[data-stride-replay]');
-  const recorded = definition.kind === 'recorded';
-  root.classList.toggle('is-recorded', recorded);
-  if (replayPanel) {
-    replayPanel.hidden = !recorded;
-    if (!recorded) replayPanel.querySelector('video').pause();
-  }
-  if (recorded) {
-    currentRelease = release;
-    clearPerturbationPulse();
-    releaseDescription.textContent = definition.description;
-    status.textContent = 'Recorded native policy · C-1N // 03 · STRIDE';
-    return;
-  }
   status.textContent = `Loading ${definition.label}…`;
   let modelXml;
   try {
@@ -929,6 +948,12 @@ async function loadRelease(release) {
     throw error;
   }
   if (loadId !== releaseLoadId) return;
+  if (release === 'v0.3' && !stridePayload) {
+    const response = await fetch('./stride/walk_fast_500.json');
+    if (!response.ok) throw new Error('STRIDE policy could not load.');
+    stridePayload = await response.json();
+    if (loadId !== releaseLoadId) return;
+  }
   releaseAccessors();
   if (data) {
     data.delete();
@@ -940,7 +965,12 @@ async function loadRelease(release) {
   }
   currentRelease = release;
   standRunMode = 'idle';
+  if (release === 'v0.3' && modelXml !== stridePayload.modelXml) throw new Error('STRIDE model and policy export do not match.');
   model = mujoco.MjModel.from_xml_string(modelXml);
+  if (release === 'v0.3') {
+    stridePolicy = new CadencePolicy(stridePayload);
+    if (!strideVisual) strideVisual = new StrideVisual(scene, stridePayload);
+  }
   updateModelConstants();
   const torso = model.body('torso');
   torsoBodyId = torso.id;

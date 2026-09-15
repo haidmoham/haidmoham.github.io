@@ -26,6 +26,10 @@ jobs:
         run: python scripts/validate_site.py
       - name: Test resume sync failure handling
         run: python -m unittest discover -s scripts -p test_sync_resumes.py
+      - name: Verify STRIDE policy and WASM parity
+        run: |
+          node spider/stride/parity.test.mjs
+          node spider/stride/wasm.test.mjs
       - name: Test checkpoint feed safeguards
         run: python -m unittest discover -s scripts -p test_sync_c1n_checkpoint.py
       - name: Build the Railway image

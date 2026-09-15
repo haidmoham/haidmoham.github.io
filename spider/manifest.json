@@ -1,39 +1,41 @@
 {
   "schema_version": 2,
   "robot": "C-1N",
-  "release": "C-1N // 03 · STRIDE",
-  "checkpoint": "C-1N // 03 · STRIDE",
+  "release": "C-1N // 03 \u00c2\u00b7 STRIDE",
+  "checkpoint": "C-1N // 03 \u00c2\u00b7 STRIDE",
   "legacy_release": "v0.3",
   "canonical_repository": "https://github.com/haidmoham/spider",
   "canonical_repository_note": "Legacy repository slug; public robot identity is C-1N.",
   "spider_commit": "a6cf1cb47461ea150ff85c1d23b00a760ba0b519",
   "checkpoints": {
     "v0.0": {
-      "label": "C-1N // 00 · SPAWN",
+      "label": "C-1N // 00 \u00c2\u00b7 SPAWN",
       "model": "model/spider.xml",
       "source_commit": "4766490910bf81ed8c216d52a1fe2be0c976e208",
       "model_sha256": "a0571f004b3974ac2c02d26560c9daaa0dc354195f88232a13756ce9b38a3e5c"
     },
     "v0.1": {
-      "label": "C-1N // 01 · SHUFFLE",
+      "label": "C-1N // 01 \u00c2\u00b7 SHUFFLE",
       "model": "model/shuffle.xml",
       "source_commit": "79033cd3166ee19f53c09b7e5999b53379ba55f8",
       "model_sha256": "3ca25536a199d52ea5e0324f9018d9be02af114eb1060a9f55b85a7a166ab083"
     },
     "v0.2": {
-      "label": "C-1N // 02 · STAND",
+      "label": "C-1N // 02 \u00c2\u00b7 STAND",
       "model": "model/stand.xml",
       "source_commit": "a6cf1cb47461ea150ff85c1d23b00a760ba0b519",
       "model_sha256": "c31e919013f310f553a91fc9bfc0e27f48c4080883f6b8aa01dd96721ad5cf3b"
     },
     "v0.3": {
-      "label": "C-1N // 03 · STRIDE",
-      "kind": "recorded-native-policy",
+      "label": "C-1N // 03 \u00c2\u00b7 STRIDE",
+      "kind": "live-wasm-mean-policy",
       "policy": "walk_fast_500",
       "source_commit": "14808d5dd08af8f003f1e445e039c588c1f55bd1",
-      "video": "/assets/c1n/walk-fast-500.mp4",
-      "video_sha256": "cd964e00e9fb7cc7907308c3eebdae540ccc26c62e4cf1e41bb3d95e4275e6f7",
-      "evidence": "https://github.com/haidmoham/spider/blob/14808d5dd08af8f003f1e445e039c588c1f55bd1/docs/checkpoints/stride.md"
+      "evidence": "https://github.com/haidmoham/spider/blob/14808d5dd08af8f003f1e445e039c588c1f55bd1/docs/checkpoints/stride.md",
+      "policy_asset": "stride/walk_fast_500.json",
+      "browser_source": "https://github.com/haidmoham/spider-web",
+      "policy_sha256": "e411e89f8cb90058d06442211ee94ede9a6bff050a9c059ed0bce06db966b856",
+      "browser_source_commit": "71c141d"
     }
   },
   "runtime": {
