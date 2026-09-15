@@ -303,3 +303,36 @@ Correction: removed the pocket link labelled “nebvis” at `https://nebvis.mha
 Verification gaps: mural's canonical Sites revision could not be freshly resolved in this environment. Its previous local revision `4a654de8994ab9ab7232a70535c3350bcac0e9c1`, SQLite tests, and live MCP read checks remain historical evidence only; this pass does not certify current remote implementation or external write persistence. A fresh curl request confirms that its public route serves the mural title, not its storage behavior. Employer metrics remain user-authored and unverified against private records. Provider permissions, database freshness, physical-device performance, and new research results were not retested. Resume bytes, Drive permissions, sync execution, site validation, and publication are verified separately by the task that owns the resume update.
 
 Resume release verification: all three new PDFs match the September 14 revision 2 hashes in `resumes/README.md`. Each is one page with readable text and an inspected render. The chooser is usable at 320px without horizontal overflow. The source PDF claims retain independent-work attribution, Indigo direct-write fallback and approximate intervals, recorded LM comparisons, and C-1N recovery limits. This is a byte-preserving release import, not new experimental evidence. Site integrity, 67 field tests, and three sync failure/endpoint tests passed. The subsequent upstream `3e24308` changes only dated project activity; no authored capability claims changed.
+
+
+## 2026-09-15 — STRIDE film and C-1N page
+
+Fresh GitHub default-branch revisions were resolved for all 17 publicly accessible canonical repositories below. Fifteen match the previous review exactly, so the unchanged implementation and claim evidence above is reused. C-1N and robotics-test-bench changed and were inspected separately. No underlying project was modified for this publication.
+
+| repository | inspected revision |
+| --- | --- |
+| tiramisu | `e70ab74ca18627792284b9016c93eca9d4a7ce44` |
+| indigo-circuit | `4acad7e461af7696971f06e1fdd2b2b0694562c9` |
+| social-impact-analysis | `30f39bce815fcbd30cb003aff4b71f092e164ec8` |
+| fourier-drawing | `07c5c5911737bd980bcc183d6e5c05d5a1f2d2f3` |
+| flowers | `0b9d95b186bc93f5a001625aedac23345bbf8464` |
+| test-bench | `a65e3316404fd66cdfc080eddbaadb6c8fbffa29` |
+| spider | `14808d5dd08af8f003f1e445e039c588c1f55bd1` |
+| robotics-test-bench | `f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469` |
+| lmlab | `3758d6624153cfd8435bcab4423c91b3cfc256dc` |
+| voidpulse-jellyfish | `f9b863ab4aae6bfcf738cdf4211b705098fed2e2` |
+| magnet | `700a968926a4ec9ff78eb071be8964e84d286e69` |
+| ecosimlab | `d02e9343b77b13381436d9954b815f7db8e669ad` |
+| nebvis | `ece544bfa58a61b0b3d72fd5b60462afe93d03a7` |
+| soundspace | `1a8814f16abdde2e9b13e09104b3ac4274730d4a` |
+| agent-physics-lab | `06682833602b6da4c5f2083e7457bc7963d46438` |
+| punkcubes | `be963e869bb705f557399039061629468c8ced09` |
+| voidpulsev2 | `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0` |
+
+C-1N: inspected the accepted STRIDE record, checkpoint manifests, cadence policy implementation, and recorded mean-policy states. The four film trajectories cover the same five seconds. Speeds are 0.378827, 0.317506, 0.701920, and 0.887987 m/s; the side view repeats the same recordings. `walk_fast_500` has 0/24 fixed-evaluation falls and sampled mean speed 0.821139 m/s. The video is not a browser policy port or a new experiment. Different chassis/action spaces prevent attributing the entire progression to update count. Slip and contact fragmentation remain; no terrain/push robustness or energy-efficiency claim is made. Homepage, project listing, simulation work page, about, available, robotics index, and C-1N destination now reflect that accepted boundary. Earlier notebook exports and dated audit statements remain historical records.
+
+Robotics-test-bench: the new commit changes README, AGENTS, practice guidance and its retired sync script to record consolidation into `spider/lab`. Its six published experiments and recorded outputs are unchanged. The public index now points readers to the consolidated source while retaining historical experiment URLs/provenance.
+
+Other scope: checked featured/supporting entries, three work pages, pocket links, captions and repeated authored blurbs against the prior claim dispositions. Current revisions are unchanged except as listed. Mural remains supported by the previously inspected local source and prior SQLite/read-interface evidence; current remote source and external write persistence remain unverified, so no new claim is added. Employer metrics remain user-authored. No private employer metrics, provider behavior, physical phone performance, or new research experiment was tested.
+
+The automatic homepage refresh reads the explicitly published canonical checkpoint feed. It validates required copy, finite metrics, source SHA, approved media paths and media hashes before changing the published files. Failures keep the last verified content. This publishes an accepted checkpoint; it does not infer capability from training update counts.

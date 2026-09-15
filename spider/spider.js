@@ -29,6 +29,7 @@ const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-m
 const FOOT_NAMES = ['front_left', 'front_right', 'middle_left', 'middle_right', 'rear_left', 'rear_right'];
 const TRIPOD_A = new Set([0, 3, 4]);
 const RELEASES = {
+  'v0.3': {label: 'C-1N // 03 · STRIDE', kind: 'recorded', description: 'Recorded native walk_fast_500 policy. Mean speed 0.888 m/s; 0/24 falls in fixed flat-ground evaluation. Foot slip and contact fragmentation remain.'},
   'v0.0': {
     label: 'C-1N // 00 · SPAWN',
     model: './model/spider.xml',
@@ -115,6 +116,7 @@ let cameraFollow = false;
 let telemetryHistory = [];
 let lastTelemetrySampleTime = -Infinity;
 let currentRelease = 'v0.2';
+let releaseLoadId = 0;
 let currentPerturbationIndex = 0;
 let perturbationPulse = { force: [0, 0, 0], startsAt: Infinity, remainingSteps: 0 };
 let standRunMode = 'idle';
@@ -897,14 +899,36 @@ function updatePlayButton() {
 }
 
 async function loadRelease(release) {
+  const loadId = ++releaseLoadId;
   const definition = RELEASES[release];
   if (!definition) return;
   stop();
+  const replayPanel = root.querySelector('[data-stride-replay]');
+  const recorded = definition.kind === 'recorded';
+  root.classList.toggle('is-recorded', recorded);
+  if (replayPanel) {
+    replayPanel.hidden = !recorded;
+    if (!recorded) replayPanel.querySelector('video').pause();
+  }
+  if (recorded) {
+    currentRelease = release;
+    clearPerturbationPulse();
+    releaseDescription.textContent = definition.description;
+    status.textContent = 'Recorded native policy · C-1N // 03 · STRIDE';
+    return;
+  }
   status.textContent = `Loading ${definition.label}…`;
-  const modelXml = await fetch(definition.model).then((response) => {
-    if (!response.ok) throw new Error(`The ${definition.label} model could not load.`);
-    return response.text();
-  });
+  let modelXml;
+  try {
+    modelXml = await fetch(definition.model).then((response) => {
+      if (!response.ok) throw new Error(`The ${definition.label} model could not load.`);
+      return response.text();
+    });
+  } catch (error) {
+    if (loadId !== releaseLoadId) return;
+    throw error;
+  }
+  if (loadId !== releaseLoadId) return;
   releaseAccessors();
   if (data) {
     data.delete();
@@ -1020,6 +1044,7 @@ function disposeRenderer() {
 async function initialise() {
   try {
     setupRenderer();
+    releaseSelect.disabled = true;
     const [loadedMujoco, manifest] = await Promise.all([
       loadMujoco(),
       fetch('./manifest.json').then((response) => {
@@ -1028,6 +1053,8 @@ async function initialise() {
       }),
     ]);
     mujoco = loadedMujoco;
+    releaseSelect.disabled = false;
+    currentRelease = releaseSelect.value;
     playButton.disabled = false;
     resetButton.disabled = false;
     cameraResetButton.disabled = false;

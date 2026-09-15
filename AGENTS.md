@@ -57,8 +57,8 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Public checkpoints use `C-1N // NN · CODENAME`.
 - `C-1N // 00 · SPAWN` is the historical deterministic six-foot spawn baseline.
 - `C-1N // 01 · SHUFFLE` is the preserved locomotion-failure baseline.
-- The current checkpoint is `C-1N // 02 · STAND`.
-- `C-1N // 03 · STRIDE` is a reserved future boundary. Do not present it as completed before the canonical evidence exists.
+- `C-1N // 02 · STAND` remains the historical stationary-stance checkpoint.
+- The current checkpoint is `C-1N // 03 · STRIDE`, accepted as `walk_fast_500` on 2026-09-15. Link the canonical `spider/docs/checkpoints/stride.md` evidence. Preserve foot-slip and contact-fragmentation limits. The browser runtime still exposes the earlier SPAWN/SHUFFLE/STAND models; STRIDE is a recorded native policy.
 - Task-space instrumentation may integrate between checkpoints; `FRAME` is not a checkpoint name.
 - Preserve prior checkpoints in the browser artifact when possible so behavior, instrumentation, and control changes remain directly comparable over time.
 
@@ -89,3 +89,9 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Scope this system to test-bench work.
 
 - Featured previews must show the actual product, a source-derived visual specimen, or an attributed capture. Architecture/process explanations belong in supporting copy, never as substitutes for a representative preview. Preserve historical project URLs when changing featured selections.
+
+## C-1N homepage synchronization
+
+- The homepage C-1N feature follows the canonical robot repository's `public/checkpoint.json`, synchronized hourly by `.github/workflows/c1n-checkpoint.yml`. Keep its name, copy, metrics, limits and matching media together.
+- Preserve the bounded `data-c1n-*` content markers and usable static fallback. Failed feed validation or media hashes must leave the last verified publication intact.
+- A training iteration is not automatically a public checkpoint. Publication is explicit in the canonical robot repository. Keep historical explorer options and their evidence pinned when the homepage advances.
