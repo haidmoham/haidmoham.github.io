@@ -35,12 +35,6 @@
       "ledgerEligible": false
     },
     {
-      "id": "ecosim",
-      "label": "ecosim lab",
-      "repository": "haidmoham/ecosimlab",
-      "ledgerEligible": true
-    },
-    {
       "id": "tiramisu",
       "label": "tiramisu",
       "repository": "haidmoham/tiramisu",
@@ -50,18 +44,6 @@
       "id": "nebvis",
       "label": "nebvis",
       "repository": "haidmoham/nebvis",
-      "ledgerEligible": true
-    },
-    {
-      "id": "soundspace",
-      "label": "soundspace",
-      "repository": "haidmoham/soundspace",
-      "ledgerEligible": true
-    },
-    {
-      "id": "punkcubes",
-      "label": "punkcubes",
-      "repository": "haidmoham/punkcubes",
       "ledgerEligible": true
     },
     {
@@ -80,12 +62,6 @@
       "id": "social",
       "label": "social vulnerability & health",
       "repository": "haidmoham/social-impact-analysis",
-      "ledgerEligible": true
-    },
-    {
-      "id": "flowers",
-      "label": "flowers",
-      "repository": "haidmoham/flowers",
       "ledgerEligible": true
     }
   ]

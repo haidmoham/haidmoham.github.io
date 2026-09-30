@@ -26,6 +26,8 @@ jobs:
           python scripts/test_lab_notebooks.py
       - name: Test the typography field
         run: node --test scripts/field-*.test.mjs
+      - name: Test homepage curation and enhancement
+        run: node --test scripts/portfolio-*.test.mjs
       - name: Validate static routes and deployment contract
         run: python scripts/validate_site.py
       - name: Test resume sync failure handling
