@@ -1,19 +1,25 @@
-// The checkpoint WebAssembly simulation loads only when the reader opens it.
-const history = document.querySelector('.c1n-history');
+// Load the real simulator immediately, while retaining the recorded fallback.
+const explorer = document.querySelector('.c1n-history');
 let started = false;
-history.addEventListener('toggle', () => {
-  if (history.open && !started) {
-    started = true;
-    import('/spider/spider.js?v=13').catch(() => {
-      document.querySelector('[data-status]').textContent = 'Simulation could not load. The recorded walk and source evidence remain available.';
-    });
-  }
-  if (!history.open) {
-    const play = document.querySelector('[data-play]');
-    if (play?.getAttribute('aria-pressed') === 'true') play.click();
-    history.querySelectorAll('video').forEach(video => video.pause());
-  }
+function pauseSimulation() {
+  const play = document.querySelector('[data-play]');
+  if (play?.getAttribute('aria-pressed') === 'true') play.click();
+}
+function loadSimulation() {
+  if (started || !explorer.open) return;
+  started = true;
+  import('/spider/spider.js?v=live-first-2').catch(() => {
+    document.querySelector('[data-status]').textContent = 'Simulation could not load. The recorded walk and source evidence remain available below.';
+  });
+}
+explorer.addEventListener('toggle', () => {
+  if (explorer.open) loadSimulation();
+  else pauseSimulation();
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) document.querySelectorAll('video').forEach(video => video.pause());
+  if (document.hidden) {
+    pauseSimulation();
+    document.querySelectorAll('video').forEach(video => video.pause());
+  }
 });
+loadSimulation();

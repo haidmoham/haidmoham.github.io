@@ -1099,6 +1099,10 @@ async function initialise() {
     cameraResetButton.addEventListener('click', resetCamera);
     cameraFollowButton.addEventListener('click', () => setCameraFollow(!cameraFollow));
     await loadRelease(currentRelease);
+    // Auto-open is presentation behavior, never a change to the policy or physics.
+    if (stage.dataset.autoplay === 'true' && !document.hidden &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        document.querySelector('.c1n-history')?.open) start();
   } catch (error) {
     disposeRenderer();
     status.textContent = 'Live simulation unavailable';

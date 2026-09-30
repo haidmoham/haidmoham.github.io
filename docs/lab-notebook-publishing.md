@@ -5,9 +5,9 @@ The portfolio is a static projection of canonical notebooks, not another researc
 ## current preview
 
 - `/notes.html` is the entry point; `/labs/lmlab/` and `/labs/robotics/` are dedicated spaces.
-- Six public lmlab notebooks are pinned to commit `7e31866dc2ed1e921f19cb30fed713d54afed2e4` and exact SHA-256 hashes in `labs/lmlab/publication.json`.
+- Four public lmlab notebooks are pinned to commit `7e31866dc2ed1e921f19cb30fed713d54afed2e4` and exact SHA-256 hashes in `labs/lmlab/publication.json`.
 - Code is folded. Retained output blocks are preserved and labeled. Export never executes a notebook.
-- Robotics keeps its existing six experiment records and stable notebook URLs; no public experiment ordinal changes.
+- Robotics adds three source-pinned readers, including the explicitly incomplete Ant scaffold, while keeping its existing six experiment records and stable notebook URLs; no public experiment ordinal changes.
 - The reader borrows the question/evidence/provenance presentation from MyST-style research articles, without adding a second website framework.
 
 ## update boundary
@@ -24,7 +24,7 @@ python scripts/test_lab_notebooks.py
 python scripts/validate_site.py
 ```
 
-This preview does not activate a scheduled sync on production. A source-owned publication manifest and an automated pull workflow remain to be connected before calling automatic updates live.
+The hourly `lmlab-publication.yml` workflow reads lmlab’s `public/portfolio-notebooks.json`, fetches only explicitly publishable pinned inputs, verifies their hashes, renders without execution, validates, and commits the public projection. Failed checks leave the previously committed site intact. CUDA entries are editorially excluded. No cross-repository write token is used. Activation requires this workflow on the portfolio default branch and the manifest on lmlab main.
 
 ## preview hosting
 
