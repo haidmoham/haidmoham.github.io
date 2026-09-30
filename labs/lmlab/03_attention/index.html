@@ -1,0 +1,975 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>attention · lmlab · Mohammad Haider</title><meta name="description" content="authored implementation and comparison notes. this revision does not contain saved cell outputs."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 03_attention</p><h1>attention</h1><p class="lab-deck">building and comparing context-dependent models</p><p>authored implementation and comparison notes. this revision does not contain saved cell outputs.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">attention language model </a></li><li><a href="#section-2">prepare token streams and batches </a></li><li><a href="#section-3">embed the current batch </a></li><li><a href="#section-4">multi-head causal self-attention </a></li><li><a href="#section-5">position-wise feed-forward network </a></li><li><a href="#section-6">attention shape check </a></li><li><a href="#section-7">block shape check </a></li><li><a href="#section-8">train a one-block language model </a></li><li><a href="#section-9">compare bigram and one-block outputs </a></li><li><a href="#section-10">paired control and treatment experiment </a></li><li><a href="#section-11">text at 1k, 2.5k, 5k, and 10k updates </a></li><li><a href="#section-12">compose transformer blocks </a></li><li><a href="#section-13">all treatments: matched 10k-update comparison </a></li><li><a href="#section-14">extending depth to 4, 6, and 8 blocks </a></li><li><a href="#section-15">10k treatment samples, side by side </a></li><li><a href="#section-16">context training and cross-evaluation </a></li><li><a href="#section-17">reflection: context and loss </a></li><li><a href="#section-18">sinusoidal positional encoding </a></li><li><a href="#section-19">bigram → six-block transformer → sinusoidal encoding </a></li><li><a href="#section-20">matched text samples: bigram, six blocks, and positional encoding </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/03_attention.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=attention-goal"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-1">attention language model<a class="anchor-link" href="#attention-language-model">¶</a></h1><p>Start from the same Tiny Shakespeare token stream as the bigram model, then run explicit multi-head causal self-attention on the embedded batch.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=setup">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.notebook_theme</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_notebook_theme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_batch</span><span class="p">,</span> <span class="n">load_tiny_shakespeare_tokens</span><span class="p">,</span> <span class="n">split_token_stream</span>
+
+<span class="n">apply_notebook_theme</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=prepare-data"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-2">prepare token streams and batches<a class="anchor-link" href="#prepare-token-streams-and-batches">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=load-data">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tokens</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_tiny_shakespeare_tokens</span><span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span>
+<span class="n">train_tokens</span><span class="p">,</span> <span class="n">validation_tokens</span> <span class="o">=</span> <span class="n">split_token_stream</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
+<span class="n">block_size</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">n_embd</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">num_heads</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">head_size</span> <span class="o">=</span> <span class="n">n_embd</span> <span class="o">//</span> <span class="n">num_heads</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="n">train_tokens</span><span class="p">,</span> <span class="n">validation_tokens</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+<span class="n">x_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x_batch</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+<span class="n">y_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">y_batch</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=model-scaffold"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-3">embed the current batch<a class="anchor-link" href="#embed-the-current-batch">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=define-model">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">token_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">token_embedding_table</span><span class="p">(</span><span class="n">x_batch</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e20f2f0e"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-4">multi-head causal self-attention<a class="anchor-link" href="#multi-head-causal-self-attention">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=1d526b49">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MultiHeadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_head</span> <span class="o">=</span> <span class="n">n_head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_k</span> <span class="o">=</span> <span class="n">d_k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_v</span> <span class="o">=</span> <span class="n">d_v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_qs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span> <span class="o">*</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_ks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span> <span class="o">*</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_vs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span> <span class="o">*</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_head</span> <span class="o">*</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">n_head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_head</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">len_q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">len_k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">len_v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_qs</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">len_q</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_k</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_ks</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">len_k</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_k</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_vs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">len_v</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_v</span><span class="p">)</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># scaled dot-product attention</span>
+        <span class="c1"># q @ k^T: (B, h, T, d_k) @ (B, h, d_k, T)</span>
+        <span class="c1">#          -&gt; (B, h, T, T)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">q</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span> <span class="o">/</span> <span class="p">(</span><span class="n">d_k</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1"># causal mask</span>
+        <span class="n">causal_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">len_q</span><span class="p">,</span> <span class="n">len_k</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">),</span> <span class="n">diagonal</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">causal_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-inf"</span><span class="p">))</span>
+
+        <span class="c1"># normalize, then retrieve values</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, h, T, T)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">@</span> <span class="n">v</span>  <span class="c1"># (B, h, T, d_v)</span>
+
+        <span class="c1"># put heads beside each other again</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>  <span class="c1"># (B, T, h, d_v)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">len_q</span><span class="p">,</span> <span class="n">n_head</span> <span class="o">*</span> <span class="n">d_v</span><span class="p">)</span>  <span class="c1"># (B, T, h*d_v)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_projection</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>  <span class="c1"># (B, T, C)</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">weights</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=feed-forward-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-5">position-wise feed-forward network<a class="anchor-link" href="#position-wise-feed-forward-network">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=feed-forward">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PositionWiseFeedForward</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_ff</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_2</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w_1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=attention-check-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-6">attention shape check<a class="anchor-link" href="#attention-shape-check">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=attention-check">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="n">mha</span> <span class="o">=</span> <span class="n">MultiHeadAttention</span><span class="p">(</span><span class="n">n_head</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span> <span class="n">d_model</span><span class="o">=</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">d_k</span><span class="o">=</span><span class="n">head_size</span><span class="p">,</span> <span class="n">d_v</span><span class="o">=</span><span class="n">head_size</span><span class="p">)</span>
+<span class="n">out</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">mha</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+<span class="nb">tuple</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=next-step"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>combine attention and feed-forward transformations with post-normalization: <code>LayerNorm(x + Sublayer(x))</code>, matching section 3.1.</p>
+<p>the saved experiment results below were produced with the earlier pre-norm block. they have not been retrained after this change; use source revision <code>27127de</code> to replay those checkpoints faithfully.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=c1ec0310">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TransformerBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">MultiHeadAttention</span><span class="p">(</span><span class="n">n_head</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ff</span> <span class="o">=</span> <span class="n">PositionWiseFeedForward</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># Normalize after adding the attention update to the residual stream.</span>
+        <span class="n">attn_out</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">attn_out</span><span class="p">)</span>
+
+        <span class="c1"># Normalize after the feed-forward residual addition as well.</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ff</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">weights</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=block-check-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-7">block shape check<a class="anchor-link" href="#block-shape-check">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=f284ad5f">
+<details class="source-cell"><summary>inspect code · cell 08</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">block</span> <span class="o">=</span> <span class="n">TransformerBlock</span><span class="p">(</span>
+    <span class="n">d_model</span><span class="o">=</span><span class="n">n_embd</span><span class="p">,</span>
+    <span class="n">n_head</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span>
+    <span class="n">d_k</span><span class="o">=</span><span class="n">head_size</span><span class="p">,</span>
+    <span class="n">d_v</span><span class="o">=</span><span class="n">head_size</span><span class="p">,</span>
+    <span class="n">d_ff</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">out</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=single-block-training"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-8">train a one-block language model<a class="anchor-link" href="#train-a-one-block-language-model">¶</a></h2><p>the shared next-token loss trains all registered model parameters together. this notebook uses BPE tokens, not individual characters. define the loop here; the implemented one-block wrapper is in <code>src/language_models.py</code>. plain minibatch SGD exposes the update rule directly; the optimizer and learning rate are experimental choices.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=training-loop">
+<details class="source-cell"><summary>inspect code · cell 09</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_language_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">eval_every</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">eval_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Train a model mapping token ids [B, T] to raw vocabulary logits [B, T, V]."""</span>
+    <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="n">eval_every</span><span class="p">,</span> <span class="n">eval_batches</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">learning_rate</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"steps, evaluation counts, and learning rate must be positive"</span><span class="p">)</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span>
+    <span class="c1"># plain minibatch SGD makes the update rule we discussed explicit.</span>
+    <span class="c1"># construct once: every registered trainable component shares this objective.</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">batch_loss</span><span class="p">(</span><span class="n">split</span><span class="p">):</span>
+        <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">train_tokens</span><span class="p">,</span> <span class="n">validation_tokens</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="c1"># one prediction per position; flatten B and T without mixing vocabulary scores.</span>
+        <span class="c1"># cross_entropy takes raw logits, so do not apply softmax first.</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">(</span><span class="n">set_to_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># discard the previous batch's gradients</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">batch_loss</span><span class="p">(</span><span class="s2">"train"</span><span class="p">)</span>  <span class="c1"># forward pass and shared next-token objective</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># chain rule: calculate gradients throughout the model</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># SGD: change parameters using those gradients</span>
+
+        <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">step</span> <span class="o">%</span> <span class="n">eval_every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">step</span> <span class="o">==</span> <span class="n">steps</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>  <span class="c1"># evaluation behavior; this alone does not disable gradients</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">validation_loss</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="nb">sum</span><span class="p">(</span><span class="n">batch_loss</span><span class="p">(</span><span class="s2">"validation"</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_batches</span><span class="p">))</span> <span class="o">/</span> <span class="n">eval_batches</span>
+                <span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="c1"># training loss is this update's batch loss, measured before the update.</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">"step"</span><span class="p">:</span> <span class="n">step</span><span class="p">,</span> <span class="s2">"train_batch_loss"</span><span class="p">:</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="s2">"validation_loss"</span><span class="p">:</span> <span class="n">validation_loss</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: train batch </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, validation </span><span class="si">{</span><span class="n">validation_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">history</span>
+
+
+<span class="c1"># the implemented wrapper lives in src/language_models.py:</span>
+<span class="c1"># token ids -&gt; token + position embeddings -&gt; TransformerBlock (unpack its pair)</span>
+<span class="c1">#           -&gt; final layer norm -&gt; vocabulary projection -&gt; raw logits.</span>
+<span class="c1"># all components are registered so model.parameters() includes them.</span>
+<span class="c1"># TODO: choose steps and learning_rate explicitly, then call train_language_model.</span>
+<span class="c1"># rerunning the function continues the supplied model's current weights.</span>
+<span class="c1"># TODO: inspect both losses; a lower training batch loss alone is not generalization.</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=compare-models-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-9">compare bigram and one-block outputs<a class="anchor-link" href="#compare-bigram-and-one-block-outputs">¶</a></h2><p>evaluate both trained models on identical sampled training and validation windows, then generate from the same prompt. delta means transformer minus bigram cross-entropy (nats per BPE token); negative favors the transformer. this is a between-model gap, not a before/after training change.</p>
+<p>record each training budget and optimizer when interpreting results: the bigram notebook uses AdamW, while the loop above uses SGD. these models also have different parameter counts; this comparison alone does not isolate architecture.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=compare-models">
+<details class="source-cell"><summary>inspect code · cell 10</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compare_language_models</span><span class="p">(</span>
+    <span class="n">bigram_model</span><span class="p">,</span> <span class="n">transformer_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prompt_ids</span><span class="p">,</span> <span class="n">new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">loss_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compare trained models using shared BPE ids and identical loss-evaluation batches."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">src.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe_decode</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prompt_ids</span> <span class="ow">or</span> <span class="n">new_tokens</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">loss_batches</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"provide a nonempty prompt and valid generation/evaluation counts"</span><span class="p">)</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"bigram"</span><span class="p">:</span> <span class="n">bigram_model</span><span class="p">,</span> <span class="s2">"single transformer"</span><span class="p">:</span> <span class="n">transformer_model</span><span class="p">}</span>
+    <span class="c1"># use a local RNG so comparison does not change future training batch sampling.</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">split</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">"train"</span><span class="p">,</span> <span class="n">train_tokens</span><span class="p">),</span> <span class="p">(</span><span class="s2">"validation"</span><span class="p">,</span> <span class="n">validation_tokens</span><span class="p">)]:</span>
+        <span class="n">batches</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">loss_batches</span><span class="p">):</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="p">[</span><span class="n">rng</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">-</span> <span class="n">block_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)]</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">stream</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">block_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">]</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">stream</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">block_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">]</span>
+            <span class="n">batches</span><span class="p">[</span><span class="n">split</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_logits</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+        <span class="c1"># the existing bigram returns (logits, loss); the new wrapper returns logits.</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="n">result</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">was_training</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">training</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">losses</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">split</span><span class="p">,</span> <span class="n">shared_batches</span> <span class="ow">in</span> <span class="n">batches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">shared_batches</span><span class="p">:</span>
+                        <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                        <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                        <span class="n">logits</span> <span class="o">=</span> <span class="n">get_logits</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+                        <span class="n">total</span> <span class="o">+=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span>
+                            <span class="n">logits</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                    <span class="n">losses</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="n">total</span> <span class="o">/</span> <span class="n">loss_batches</span>
+
+                <span class="n">ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">prompt_ids</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">sampler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_tokens</span><span class="p">):</span>
+                    <span class="c1"># keep the transformer inside its context window; bigram uses the last token.</span>
+                    <span class="n">logits</span> <span class="o">=</span> <span class="n">get_logits</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ids</span><span class="p">[:,</span> <span class="o">-</span><span class="n">block_size</span><span class="p">:])[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+                    <span class="n">probabilities</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+                    <span class="n">next_id</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">sampler</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">ids</span><span class="p">,</span> <span class="n">next_id</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"train_loss"</span><span class="p">:</span> <span class="n">losses</span><span class="p">[</span><span class="s2">"train"</span><span class="p">],</span>
+                    <span class="s2">"validation_loss"</span><span class="p">:</span> <span class="n">losses</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">],</span>
+                    <span class="s2">"text"</span><span class="p">:</span> <span class="n">bpe_decode</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">),</span>
+                    <span class="s2">"parameters"</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
+                <span class="p">}</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">was_training</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"same prompt, temperature 1, same sampling seed; one sample is qualitative evidence"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'parameters'</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> parameters):</span><span class="se">\n</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"train loss: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'train_loss'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">; validation loss: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'validation_loss'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"train_loss"</span><span class="p">,</span> <span class="s2">"validation_loss"</span><span class="p">):</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">"single transformer"</span><span class="p">][</span><span class="n">metric</span><span class="p">]</span> <span class="o">-</span> <span class="n">results</span><span class="p">[</span><span class="s2">"bigram"</span><span class="p">][</span><span class="n">metric</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2"> delta (transformer - bigram): </span><span class="si">{</span><span class="n">delta</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span><span class="s2"> nats/token"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="c1"># the next cell loads both trained models and calls this comparison.</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=paired-experiment-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-10">paired control and treatment experiment<a class="anchor-link" href="#paired-control-and-treatment-experiment">¶</a></h2><p>three paired seeds; identical batches and shared-component initialization; 10,000 uninterrupted AdamW updates each, rerun from the same initial seeds. the treatment adds learned positions, one transformer block, and final normalization. equal updates are not equal compute or parameter counts. validation loss is the primary outcome; these exploratory runs are not evidence of universal superiority. generated weights and results stay local under <code>artifacts/</code>.</p>
+<p>only the training budget changed from the 1,000-update run. compare both budgets below: a widening, stable, or closing gap are all informative outcomes. full checkpoints include optimizer and random-generator state; the original short-run artifacts remain available.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=paired-experiment-results">
+<details class="source-cell"><summary>inspect code · cell 11</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.language_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigramLanguageModel</span><span class="p">,</span> <span class="n">SingleTransformerLanguageModel</span>
+
+<span class="c1"># reproduce all three paired runs from the repository root with:</span>
+<span class="c1"># uv run python -m experiments.compare_bigram_transformer --steps 10000 \</span>
+<span class="c1">#     --output artifacts/bigram-vs-transformer-10k</span>
+<span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span> <span class="o">/</span> <span class="s2">"bigram-vs-transformer-10k"</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">experiment_dir</span> <span class="o">/</span> <span class="s2">"results.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="s2">"config"</span><span class="p">])</span>
+<span class="c1"># compare fixed evaluation windows at the two preselected training budgets.</span>
+<span class="k">for</span> <span class="n">budget</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"validation"</span><span class="p">):</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"bigram"</span><span class="p">,</span> <span class="s2">"transformer"</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">h</span><span class="p">[</span><span class="n">split</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">report</span><span class="p">[</span><span class="s2">"runs"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span>
+                <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">run</span><span class="p">[</span><span class="s2">"history"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">h</span><span class="p">[</span><span class="s2">"step"</span><span class="p">]</span> <span class="o">==</span> <span class="n">budget</span>
+            <span class="p">]</span>
+            <span class="n">means</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">budget</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> updates, </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">: "</span>
+            <span class="sa">f</span><span class="s2">"bigram=</span><span class="si">{</span><span class="n">means</span><span class="p">[</span><span class="s1">'bigram'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, transformer=</span><span class="si">{</span><span class="n">means</span><span class="p">[</span><span class="s1">'transformer'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"delta=</span><span class="si">{</span><span class="n">means</span><span class="p">[</span><span class="s1">'transformer'</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">means</span><span class="p">[</span><span class="s1">'bigram'</span><span class="p">]</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span><span class="s2"> nats/token"</span>
+        <span class="p">)</span>
+
+<span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">report</span><span class="p">[</span><span class="s2">"config"</span><span class="p">][</span><span class="s2">"seeds"</span><span class="p">]:</span>
+    <span class="n">pair</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]:</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">report</span><span class="p">[</span><span class="s2">"runs"</span><span class="p">]</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">==</span> <span class="n">seed</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"validation"</span><span class="p">):</span>
+        <span class="n">control</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="s2">"bigram"</span><span class="p">][</span><span class="s2">"history"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">split</span><span class="p">]</span>
+        <span class="n">treatment</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="s2">"transformer"</span><span class="p">][</span><span class="s2">"history"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">split</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">: bigram=</span><span class="si">{</span><span class="n">control</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, transformer=</span><span class="si">{</span><span class="n">treatment</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"delta=</span><span class="si">{</span><span class="n">treatment</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">control</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span><span class="s2"> nats/token"</span>
+        <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.compare_bigram_transformer</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_loss_report</span>
+
+<span class="n">plot_loss_report</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">experiment_dir</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">experiment_dir</span> <span class="o">/</span> <span class="s2">"loss.png"</span><span class="p">)))</span>
+
+<span class="c1"># inspect the first preselected seed, rather than selecting the best-looking run.</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s2">"config"</span><span class="p">][</span><span class="s2">"seeds"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">bigram_model</span> <span class="o">=</span> <span class="n">BigramLanguageModel</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="n">single_transformer_model</span> <span class="o">=</span> <span class="n">SingleTransformerLanguageModel</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">)</span>
+<span class="n">bigram_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">experiment_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"bigram-</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">.pt"</span><span class="p">,</span> <span class="n">weights_only</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">single_transformer_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">experiment_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"transformer-</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">.pt"</span><span class="p">,</span> <span class="n">weights_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">compare_language_models</span><span class="p">(</span>
+    <span class="n">bigram_model</span><span class="p">,</span> <span class="n">single_transformer_model</span><span class="p">,</span> <span class="n">prompt_ids</span><span class="o">=</span><span class="n">train_tokens</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=text-milestones-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-11">text at 1k, 2.5k, 5k, and 10k updates<a class="anchor-link" href="#text-at-1k,-2.5k,-5k,-and-10k-updates">¶</a></h2><p>same prompt and sampling seed at each checkpoint, with 100 new BPE tokens. compare changes within each model as well as between models; the samples illustrate behavior, while the loss curves provide broader evidence.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=text-milestones">
+<details class="source-cell"><summary>inspect code · cell 12</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">experiments.plot_checkpoint_text</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_checkpoint_text</span>
+
+<span class="c1"># reproduce the preselected seed's checkpoints, without selecting attractive samples:</span>
+<span class="c1"># from experiments.compare_bigram_transformer import run</span>
+<span class="c1"># run(steps=10000, seeds=(42,), output=str(repo_root / "artifacts/bigram-vs-transformer-milestones"))</span>
+<span class="n">milestone_dir</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span> <span class="o">/</span> <span class="s2">"bigram-vs-transformer-milestones"</span>
+<span class="n">figure_path</span> <span class="o">=</span> <span class="n">plot_checkpoint_text</span><span class="p">(</span><span class="n">milestone_dir</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">figure_path</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=stack-guidance"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-12">compose transformer blocks<a class="anchor-link" href="#compose-transformer-blocks">¶</a></h2><p>each block refines the preceding representation with separate parameters. depth and block dimensions are configurable. the stack returns final embeddings and a list of attention maps in layer order; vocabulary projection remains the language-model wrapper’s responsibility. the reusable version is in <code>src/language_models.py</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=stack-todos">
+<details class="source-cell"><summary>inspect code · cell 13</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TransformerStack</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compose independent blocks; return embeddings and attention maps in layer order."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">n_layers</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"n_layers must be positive"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">TransformerBlock</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_head</span><span class="p">,</span> <span class="n">d_k</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">)]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># x stays [batch, tokens, d_model] throughout the stack.</span>
+        <span class="n">attention_weights</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">attention_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">attention_weights</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=stack-composition-check">
+<details class="source-cell"><summary>inspect code · cell 14</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># use the same block objects to verify sequential composition.</span>
+<span class="n">stack</span> <span class="o">=</span> <span class="n">TransformerStack</span><span class="p">(</span>
+    <span class="n">n_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">d_model</span><span class="o">=</span><span class="n">n_embd</span><span class="p">,</span>
+    <span class="n">n_head</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span>
+    <span class="n">d_k</span><span class="o">=</span><span class="n">head_size</span><span class="p">,</span>
+    <span class="n">d_v</span><span class="o">=</span><span class="n">head_size</span><span class="p">,</span>
+    <span class="n">d_ff</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># dummy embeddings let us check the wiring without loading text.</span>
+<span class="n">stack_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="n">stack_output</span><span class="p">,</span> <span class="n">layer_weights</span> <span class="o">=</span> <span class="n">stack</span><span class="p">(</span><span class="n">stack_input</span><span class="p">)</span>
+<span class="n">first_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">stack_input</span><span class="p">)</span>
+<span class="n">explicit_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">](</span><span class="n">first_output</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span><span class="n">stack_output</span><span class="p">,</span> <span class="n">explicit_output</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">stack_output</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">stack_input</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">layer_weights</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+<span class="c1"># compare object identities, not parameter values: each layer learns independently.</span>
+<span class="n">first_block_parameter_ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">stack</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">()}</span>
+<span class="n">second_block_parameter_ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">stack</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">()}</span>
+<span class="n">shared_parameter_ids</span> <span class="o">=</span> <span class="n">first_block_parameter_ids</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">second_block_parameter_ids</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">shared_parameter_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"blocks must have separate parameters"</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"stack output:"</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">stack_output</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="n">attention_shapes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">weights</span> <span class="ow">in</span> <span class="n">layer_weights</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"attention per layer:"</span><span class="p">,</span> <span class="n">attention_shapes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"composition and independent-parameter checks passed"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=all-treatments-protocol"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-13">all treatments: matched 10k-update comparison<a class="anchor-link" href="#all-treatments:-matched-10k-update-comparison">¶</a></h2><p>compare bigram, one transformer block, and two transformer blocks across seeds 42, 43, and 44. all models see the same batches and fixed evaluation windows. width 32, context 8, batch size 32; AdamW at 0.001 with weight decay 0.01. shared components start at identical values, with separate parameter objects. the second block adds parameters and compute.</p>
+<p>question and pre-run hypothesis, controls, checkpoints, and reproduction command are in <code>experiments/depth-comparison.md</code>. validation loss is primary. the curves show the mean and full seed range, not confidence intervals. samples use the first preselected seed and are qualitative. full optimizer/RNG checkpoints and source hashes are saved locally.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=all-treatments-results">
+<details class="source-cell"><summary>inspect code · cell 15</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">comparison_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">comparison_root</span> <span class="o">=</span> <span class="n">comparison_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">all_treatments_directory</span> <span class="o">=</span> <span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span> <span class="o">/</span> <span class="s2">"all-treatments-10k"</span>
+<span class="n">all_treatments_report</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">all_treatments_directory</span> <span class="o">/</span> <span class="s2">"results.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">treatment_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"bigram"</span><span class="p">,</span> <span class="s2">"transformer"</span><span class="p">,</span> <span class="s2">"two_blocks"</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"final cross-entropy: nats per BPE token; update time excludes evaluation"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">treatment_name</span> <span class="ow">in</span> <span class="n">treatment_names</span><span class="p">:</span>
+    <span class="n">treatment_runs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">run</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">all_treatments_report</span><span class="p">[</span><span class="s2">"runs"</span><span class="p">]</span> <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]</span> <span class="o">==</span> <span class="n">treatment_name</span>
+    <span class="p">]</span>
+    <span class="n">training_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">run</span><span class="p">[</span><span class="s2">"history"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">"train"</span><span class="p">]</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">treatment_runs</span><span class="p">]</span>
+    <span class="n">validation_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">run</span><span class="p">[</span><span class="s2">"history"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">"validation"</span><span class="p">]</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">treatment_runs</span><span class="p">]</span>
+    <span class="n">update_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">run</span><span class="p">[</span><span class="s2">"update_seconds"</span><span class="p">]</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">treatment_runs</span><span class="p">]</span>
+    <span class="n">parameter_count</span> <span class="o">=</span> <span class="n">treatment_runs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"parameters"</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">treatment_name</span><span class="si">}</span><span class="s2">: parameters=</span><span class="si">{</span><span class="n">parameter_count</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"train=</span><span class="si">{</span><span class="n">mean</span><span class="p">(</span><span class="n">training_losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, validation=</span><span class="si">{</span><span class="n">mean</span><span class="p">(</span><span class="n">validation_losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"validation range=[</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">validation_losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">validation_losses</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">], "</span>
+        <span class="sa">f</span><span class="s2">"mean update seconds=</span><span class="si">{</span><span class="n">mean</span><span class="p">(</span><span class="n">update_times</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">paired validation losses and depth differences"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">all_treatments_report</span><span class="p">[</span><span class="s2">"config"</span><span class="p">][</span><span class="s2">"seeds"</span><span class="p">]:</span>
+    <span class="n">losses_by_treatment</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">all_treatments_report</span><span class="p">[</span><span class="s2">"runs"</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">==</span> <span class="n">seed</span><span class="p">:</span>
+            <span class="n">losses_by_treatment</span><span class="p">[</span><span class="n">run</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"history"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">"validation"</span><span class="p">]</span>
+    <span class="n">depth_difference</span> <span class="o">=</span> <span class="n">losses_by_treatment</span><span class="p">[</span><span class="s2">"two_blocks"</span><span class="p">]</span> <span class="o">-</span> <span class="n">losses_by_treatment</span><span class="p">[</span><span class="s2">"transformer"</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">losses_by_treatment</span><span class="si">}</span><span class="s2">; two minus one=</span><span class="si">{</span><span class="n">depth_difference</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.compare_bigram_transformer</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_loss_report</span>
+
+<span class="n">plot_loss_report</span><span class="p">(</span><span class="n">all_treatments_report</span><span class="p">,</span> <span class="n">all_treatments_directory</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">all_treatments_directory</span> <span class="o">/</span> <span class="s2">"loss.png"</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">seed 42 samples: same prompt, temperature 1, sampling seed 123"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">all_treatments_report</span><span class="p">[</span><span class="s2">"runs"</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">run</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">42</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">run</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">run</span><span class="p">[</span><span class="s1">'sample'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=extended-depth-protocol"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-14">extending depth to 4, 6, and 8 blocks<a class="anchor-link" href="#extending-depth-to-4,-6,-and-8-blocks">¶</a></h2><p>same three seeds, 10,000 updates, width 32, context 8, data, AdamW settings, and fixed evaluation windows. new models start from matching shared components and overlapping block prefixes. prior bigram/1/2-block runs are retained and loaded alongside these results; source and control compatibility are checked before combining.</p>
+<p>the pre-run question is whether validation improvements flatten or reverse with additional depth. more blocks add parameters and compute. timings across the two runs are approximate. the plots show means and seed ranges, not confidence intervals. see <code>experiments/depth-comparison.md</code> for the experimental record and reproduction command.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=extended-depth-results">
+<details class="source-cell"><summary>inspect code · cell 16</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">comparison_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">comparison_root</span> <span class="o">=</span> <span class="n">comparison_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">comparison_root</span><span class="p">))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.plot_depth_comparison</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_depth_reports</span><span class="p">,</span>
+    <span class="n">plot_depth_comparison</span><span class="p">,</span>
+    <span class="n">summarize_depths</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">depth_runs</span> <span class="o">=</span> <span class="n">load_depth_reports</span><span class="p">(</span><span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span><span class="p">)</span>
+<span class="n">depth_summary</span> <span class="o">=</span> <span class="n">summarize_depths</span><span class="p">(</span><span class="n">depth_runs</span><span class="p">)</span>
+<span class="n">table_lines</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"| treatment | parameters | train loss | validation loss | seed range | update seconds |"</span><span class="p">,</span>
+    <span class="s2">"|---|---:|---:|---:|---|---:|"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">depth_summary</span><span class="p">:</span>
+    <span class="n">table_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"| </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'treatment'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'parameters'</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'train_loss'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'validation_loss'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'validation_min'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">–</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'validation_max'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'update_seconds'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> |"</span>
+    <span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_lines</span><span class="p">)))</span>
+<span class="n">display</span><span class="p">(</span>
+    <span class="n">Markdown</span><span class="p">(</span>
+        <span class="s2">"losses are means over three seeds, in nats per BPE token. update time excludes evaluation and checkpointing."</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">depth_figure_path</span> <span class="o">=</span> <span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span> <span class="o">/</span> <span class="s2">"depth-4-6-8-10k"</span> <span class="o">/</span> <span class="s2">"combined-depths.png"</span>
+<span class="n">plot_depth_comparison</span><span class="p">(</span><span class="n">depth_runs</span><span class="p">,</span> <span class="n">depth_figure_path</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">depth_figure_path</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=treatment-text-grid-heading"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-15">10k treatment samples, side by side<a class="anchor-link" href="#10k-treatment-samples,-side-by-side">¶</a></h2><p>same prompt and preselected training seed 42, sampling seed 123, temperature 1, and 100 generated BPE tokens. each panel shows its individual seed's validation loss; the table above reports three-seed means. spelling and line breaks are retained. these samples illustrate behavior, not overall quality.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=treatment-text-grid">
+<details class="source-cell"><summary>inspect code · cell 17</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">experiments.plot_depth_comparison</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_treatment_text</span>
+
+<span class="n">treatment_text_path</span> <span class="o">=</span> <span class="n">plot_treatment_text</span><span class="p">(</span><span class="n">comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">treatment_text_path</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=context-experiment-protocol"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-16">context training and cross-evaluation<a class="anchor-link" href="#context-training-and-cross-evaluation">¶</a></h2><p>four blocks, width 32, contexts 8/32/128/256; three seeds and 10,000 updates. each update uses the same 256 target tokens, split at different sequence boundaries. evaluation scores the same 128 positions per split using the requested preceding history. loss units are nats per BPE token. these metrics use a different protocol from the earlier depth comparison.</p>
+<p>at completion, each model is evaluated at every supported context length. weights stay fixed during cross-evaluation; cropped inputs use learned positions starting at zero. native-context curves show mean and seed range, not confidence intervals. tables retain each seed. generated samples use training seed 42, sampling seed 123, temperature 1, and a shared 256-token prompt truncated to the evaluation context.</p>
+<p>experiment record: <code>experiments/context-comparison.md</code>. the cell below runs the experiment if the output directory has no results, or loads completed results. to rerun from scratch, choose a fresh output directory. results and interpretation will be walked through together; no conclusions are supplied here.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=context-experiment-run">
+<details class="source-cell"><summary>inspect code · cell 18</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">context_repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">context_repo_root</span> <span class="o">/</span> <span class="s2">"src"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">context_repo_root</span> <span class="o">=</span> <span class="n">context_repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">context_repo_root</span><span class="p">))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.compare_context_lengths</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span> <span class="k">as</span> <span class="n">run_context_comparison</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.plot_context_comparison</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cross_evaluation_table</span><span class="p">,</span>
+    <span class="n">plot_measurements</span><span class="p">,</span>
+    <span class="n">plot_text_panels</span><span class="p">,</span>
+    <span class="n">read_report</span><span class="p">,</span>
+    <span class="n">summary_table</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">context_output_directory</span> <span class="o">=</span> <span class="n">context_repo_root</span> <span class="o">/</span> <span class="s2">"artifacts"</span> <span class="o">/</span> <span class="s2">"context-comparison-10k"</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">context_output_directory</span> <span class="o">/</span> <span class="s2">"results.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="c1"># The runner loads data relative to the repository root.</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="n">previous_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">context_repo_root</span><span class="p">)</span>
+        <span class="n">run_context_comparison</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">seeds</span><span class="o">=</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">44</span><span class="p">),</span> <span class="n">output</span><span class="o">=</span><span class="n">context_output_directory</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">previous_directory</span><span class="p">)</span>
+<span class="n">context_report</span> <span class="o">=</span> <span class="n">read_report</span><span class="p">(</span><span class="n">context_output_directory</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"### native-context results: three-seed means"</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">summary_table</span><span class="p">(</span><span class="n">context_report</span><span class="p">)))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"### cross-evaluation: validation means"</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">cross_evaluation_table</span><span class="p">(</span><span class="n">context_report</span><span class="p">)))</span>
+<span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">context_report</span><span class="p">[</span><span class="s2">"config"</span><span class="p">][</span><span class="s2">"seeds"</span><span class="p">]:</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"### cross-evaluation: seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">cross_evaluation_table</span><span class="p">(</span><span class="n">context_report</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)))</span>
+<span class="n">context_measurement_figure</span> <span class="o">=</span> <span class="n">plot_measurements</span><span class="p">(</span><span class="n">context_report</span><span class="p">,</span> <span class="n">context_output_directory</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">context_measurement_figure</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=context-experiment-text">
+<details class="source-cell"><summary>inspect code · cell 19</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">native_context_text</span> <span class="o">=</span> <span class="n">plot_text_panels</span><span class="p">(</span><span class="n">context_report</span><span class="p">,</span> <span class="n">context_output_directory</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">native_context_text</span><span class="p">)))</span>
+<span class="n">frozen_model_text</span> <span class="o">=</span> <span class="n">plot_text_panels</span><span class="p">(</span>
+    <span class="n">context_report</span><span class="p">,</span> <span class="n">context_output_directory</span><span class="p">,</span> <span class="n">frozen_long_model</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">frozen_model_text</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=context-loss-reflection"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-17">reflection: context and loss<a class="anchor-link" href="#reflection:-context-and-loss">¶</a></h2><p>i expected the loss to go down as context increased, but it didn’t. my first thought was that there isn’t a tidy linear relationship between context and loss. more specifically, though, i realized i don’t yet understand what that relationship actually is.</p>
+<p>the connection that makes sense to me is that you can have memories and still be wrong about how you apply them. having more information available doesn’t necessarily mean using it correctly. that gives me a way to think about the result, even if it doesn’t yet explain what happened in this experiment.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=sinusoidal-position-notes"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-18">sinusoidal positional encoding<a class="anchor-link" href="#sinusoidal-positional-encoding">¶</a></h2><p>implementation companion (assistant): <a href="https://arxiv.org/pdf/1706.03762#page=6">attention is all you need, section 3.5, page 6</a>.</p>
+<p>for position <code>pos</code> and feature pair <code>i</code>, even features use <code>sin(pos / 10000**(2*i/d_model))</code> and odd features use <code>cos(pos / 10000**(2*i/d_model))</code>. the position vector has the same width as the token embedding, so the wrapper adds them before the transformer stack.</p>
+<p>the module below computes fixed vectors on demand. its frequency scales are a registered buffer, not trainable parameters. both language-model wrappers accept <code>position_encoding="sinusoidal"</code>; <code>"learned"</code> remains the default for existing runs and checkpoints. select the same encoding when reconstructing a model for checkpoint loading.</p>
+<p>this implements section 3.5 only: token-embedding scaling and the then-current pre-norm blocks were unchanged in that experiment. position ids still restart at zero when inputs are cropped. computing positions beyond the training length is possible; good predictions at those lengths are not guaranteed. the demonstration below is an untrained wiring check, not a new treatment result.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=sinusoidal-position-source">
+<details class="source-cell"><summary>inspect code · cell 20</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">position_repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">position_repo_root</span> <span class="o">/</span> <span class="s2">"src"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">position_repo_root</span> <span class="o">=</span> <span class="n">position_repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">position_repo_root</span><span class="p">))</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">src.language_models</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">position_models</span>
+
+<span class="c1"># Refresh the reusable implementation in an already-running notebook kernel.</span>
+<span class="n">position_models</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">position_models</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=sinusoidal-position-demo">
+<details class="source-cell"><summary>inspect code · cell 21</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">position_encoder</span> <span class="o">=</span> <span class="n">position_models</span><span class="o">.</span><span class="n">SinusoidalPositionalEncoding</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">position_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">position_vectors</span> <span class="o">=</span> <span class="n">position_encoder</span><span class="p">(</span><span class="n">position_ids</span><span class="p">)</span>
+
+<span class="c1"># Show the first four sine/cosine pairs at positions 0 through 3.</span>
+<span class="n">position_table</span> <span class="o">=</span> <span class="s2">"| position | "</span> <span class="o">+</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"feature </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span> <span class="o">+</span> <span class="s2">" |</span><span class="se">\n</span><span class="s2">"</span>
+<span class="n">position_table</span> <span class="o">+=</span> <span class="s2">"| --- | "</span> <span class="o">+</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"---"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" |</span><span class="se">\n</span><span class="s2">"</span>
+<span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">vector</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">position_ids</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">position_vectors</span><span class="p">):</span>
+    <span class="n">feature_values</span> <span class="o">=</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">vector</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">position_table</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"| </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">feature_values</span><span class="si">}</span><span class="s2"> |</span><span class="se">\n</span><span class="s2">"</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">position_table</span><span class="p">))</span>
+
+<span class="c1"># Synthetic token ids check the full path without loading data or training.</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">fork_rng</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+    <span class="n">sinusoidal_model</span> <span class="o">=</span> <span class="n">position_models</span><span class="o">.</span><span class="n">StackedTransformerLanguageModel</span><span class="p">(</span>
+        <span class="n">vocab_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">n_layers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">n_embd</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">block_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">position_encoding</span><span class="o">=</span><span class="s2">"sinusoidal"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">sinusoidal_logits</span> <span class="o">=</span> <span class="n">sinusoidal_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="k">assert</span> <span class="n">sinusoidal_logits</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sinusoidal_logits</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">position_parameter_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+    <span class="n">parameter</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">sinusoidal_model</span><span class="o">.</span><span class="n">position_embedding_table</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span>
+    <span class="n">Markdown</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"fixed position parameters: **</span><span class="si">{</span><span class="n">position_parameter_count</span><span class="si">}</span><span class="s2">**. "</span>
+        <span class="sa">f</span><span class="s2">"untrained logits shape: **</span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">sinusoidal_logits</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">** "</span>
+        <span class="s2">"(batch, tokens, vocabulary)."</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=position-comparison-protocol"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-19">bigram → six-block transformer → sinusoidal encoding<a class="anchor-link" href="#bigram-%E2%86%92-six-block-transformer-%E2%86%92-sinusoidal-encoding">¶</a></h2><p>three paired arms: bigram; six transformer blocks without explicit positions; the same six blocks with sinusoidal positional encoding. context 32, width 32, two heads, seeds 42/43/44, 10,000 updates. each update uses the same 256 targets in eight sequences of 32 for every arm. token embeddings and vocabulary heads start identically; the transformers also share initial block and final-norm weights, with independent parameters.</p>
+<p>the first contrast adds the transformer architecture, parameters, and access to history. the second isolates adding sinusoidal position vectors, with equal trainable parameter counts. causal masks remain in both transformers. the bigram uses only the final input token when scoring each target.</p>
+<p>loss is cross-entropy in nats per BPE token on the same 1,024 sampled targets per split. tables show means, seed ranges (not confidence intervals), and paired validation differences. negative differences mean lower loss for the first named treatment. no figures or performance interpretation supplied. full methods and checkpoint schedule: <a href="../experiments/position-encoding-comparison.md">experiment record</a>.</p>
+<p>run from the repository root:</p>
+<div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>experiments.compare_position_encodings<span class="w"> </span>--steps<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--output<span class="w"> </span>artifacts/position-encoding-six-blocks-10k
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=position-comparison-results">
+<details class="source-cell"><summary>inspect code · cell 22</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">position_comparison_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">position_comparison_root</span> <span class="o">/</span> <span class="s2">"src"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">position_comparison_root</span> <span class="o">=</span> <span class="n">position_comparison_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">position_comparison_root</span><span class="p">))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.compare_position_encodings</span><span class="w"> </span><span class="kn">import</span> <span class="n">result_tables</span>
+
+<span class="n">position_result_path</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">position_comparison_root</span> <span class="o">/</span> <span class="s2">"artifacts/position-encoding-six-blocks-10k/results.json"</span>
+<span class="p">)</span>
+<span class="n">position_comparison_report</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">position_result_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">position_summary</span><span class="p">,</span> <span class="n">position_paired</span> <span class="o">=</span> <span class="n">result_tables</span><span class="p">(</span><span class="n">position_comparison_report</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"three-seed mean losses (nats per BPE token)</span><span class="se">\n\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">position_summary</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"paired validation losses and planned contrasts</span><span class="se">\n\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">position_paired</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=position-samples-notes"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-20">matched text samples: bigram, six blocks, and positional encoding<a class="anchor-link" href="#matched-text-samples:-bigram,-six-blocks,-and-positional-encoding">¶</a></h2><p>same 32-token prompt, training seed 42, sampling seed 123, temperature 1, and 100 new BPE tokens from each 10,000-update checkpoint. labels show the individual seed's validation loss, not the three-seed mean. continuations are preserved verbatim with visual wrapping. raw samples and checkpoint references are saved beside the figure in <code>artifacts/position-encoding-six-blocks-10k/text-samples.json</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=position-samples-figure">
+<details class="source-cell"><summary>inspect code · cell 23</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="n">sample_repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">sample_repo_root</span> <span class="o">/</span> <span class="s2">"src"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">sample_repo_root</span> <span class="o">=</span> <span class="n">sample_repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sample_repo_root</span><span class="p">))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">experiments.plot_position_samples</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_position_samples</span>
+
+<span class="n">position_sample_figure</span> <span class="o">=</span> <span class="n">plot_position_samples</span><span class="p">(</span>
+    <span class="n">sample_repo_root</span> <span class="o">/</span> <span class="s2">"artifacts/position-encoding-six-blocks-10k"</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">position_sample_figure</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/lmlab/">← all lmlab notebooks</a><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/03_attention.ipynb">source provenance ↗</a></footer></body></html>

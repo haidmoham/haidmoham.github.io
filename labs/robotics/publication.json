@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "repository": "haidmoham/robotics-test-bench",
+  "revision": "f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469",
+  "notebooks": [
+    {
+      "slug": "static_support_boundary",
+      "title": "static support boundary",
+      "subtitle": "where does static support end?",
+      "description": "a recorded ballast sweep comparing signed support margin with measured contact loads.",
+      "path": "experiments/2026-08-13-static-support-boundary/static_support_boundary.ipynb",
+      "sha256": "83d023ee541ae64548869ac2a0956ca5596937c6c4b33f4201c364f0d830380b",
+      "publishable": true
+    },
+    {
+      "slug": "c1n_leg_workspace",
+      "title": "leg workspace",
+      "subtitle": "what can this leg reach?",
+      "description": "a gravity-free kinematic study. reachability does not establish torque capability or controller performance.",
+      "path": "experiments/2026-08-13-c1n-leg-workspace/c1n_leg_workspace.ipynb",
+      "sha256": "c4b4e9ad37bd4b80ee7d9d5cd7500af9aa61e8b16b83116647b618054a4ae5ce",
+      "publishable": true
+    },
+    {
+      "slug": "ant_policy_learning",
+      "title": "ant policy learning",
+      "subtitle": "objective \u2192 policy \u2192 behavior",
+      "description": "an explicitly incomplete learning scaffold with TODO cells and no saved outputs. not a completed experiment.",
+      "path": "experiments/2026-08-27-ant-policy-learning/ant_policy_learning.ipynb",
+      "sha256": "62484ec6b4913d3a0583fd093c8436fd85987f3b3f911b344327ab33f3e38f69",
+      "publishable": true
+    }
+  ]
+}

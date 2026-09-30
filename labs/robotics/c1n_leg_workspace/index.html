@@ -1,0 +1,601 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>leg workspace · robotics test bench · Mohammad Haider</title><meta name="description" content="a gravity-free kinematic study. reachability does not establish torque capability or controller performance."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/robotics/">← robotics test bench</a><p class="section-eyebrow">research notebook / c1n_leg_workspace</p><h1>leg workspace</h1><p class="lab-deck">what can this leg reach?</p><p>a gravity-free kinematic study. reachability does not establish torque capability or controller performance.</p><div class="lab-meta"><span>3 saved output blocks</span><span>source f15f8a1</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">C-1N front-left leg workspace — analysis companion </a></li><li><a href="#section-2">tl;dr </a></li><li><a href="#section-3">Context &amp; Methods </a></li><li><a href="#section-4">Key assumptions </a></li><li><a href="#section-5">Data </a></li><li><a href="#section-6">1. Load current C-1N kinematics </a></li><li><a href="#section-7">Results </a></li><li><a href="#section-8">2. Sample the two-joint workspace </a></li><li><a href="#section-9">Geometry preview before the experimental DOF test </a></li><li><a href="#section-10">Your next prediction </a></li><li><a href="#section-11">Experiment log </a></li><li><a href="#section-12">Experimental orthogonal-hinge comparison </a></li><li><a href="#section-13">Recorded prediction </a></li><li><a href="#section-14">3. Add one candidate proximal axis only in this fixture </a></li><li><a href="#section-15">4. Measure the immediate positive-axis motion </a></li><li><a href="#section-16">5. Coarse sweep, then local refinement </a></li><li><a href="#section-17">Constrained inverse-kinematics analysis </a></li><li><a href="#section-18">Try the solve </a></li><li><a href="#section-19">Read the result after you run it </a></li><li><a href="#section-20">Grid comparison </a></li><li><a href="#section-21">Your conclusion </a></li></ol><a href="https://github.com/haidmoham/robotics-test-bench/blob/f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469/experiments/2026-08-13-c1n-leg-workspace/c1n_leg_workspace.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=8c5950d5"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-1">C-1N front-left leg workspace — analysis companion<a class="anchor-link" href="#C-1N-front-left-leg-workspace-%E2%80%94-analysis-companion">¶</a></h1><h2 id="section-2">tl;dr<a class="anchor-link" href="#tl;dr">¶</a></h2><p>The current two-joint leg does <strong>not</strong> reach the target within the 1 cm grid tolerance. Its nearest sampled position is <code>[+0.341, +0.267, -0.301] m</code>, <code>0.067 m</code> from <code>[+0.30, +0.32, -0.30] m</code>.</p>
+<p>This is a gravity-free kinematic result. It identifies missing lateral placement freedom; it does not make a torque or controller claim.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e6e1313d"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-3">Context &amp; Methods<a class="anchor-link" href="#Context-&amp;-Methods">¶</a></h2><h3 id="section-4">Key assumptions<a class="anchor-link" href="#Key-assumptions">¶</a></h3><ul>
+<li>Source model: <code>spider/model/spider.xml</code> at the current workspace revision.</li>
+<li>Torso is fixed at the body-frame origin.</li>
+<li>Gravity is disabled.</li>
+<li>Only <code>front_left_hip</code> and <code>front_left_knee</code> vary within their declared limits.</li>
+<li>Target foot position is <code>[+0.30, +0.32, -0.30] m</code> in the torso frame.</li>
+<li>A nearest-sample distance of at most <code>0.01 m</code> counts as reached for this 1° grid probe.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=2ec4b82f"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-5">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="section-6">1. Load current C-1N kinematics<a class="anchor-link" href="#1.-Load-current-C-1N-kinematics">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=810fe013">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mujoco</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">c1n_leg_workspace</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MODEL_PATH</span><span class="p">,</span>
+    <span class="n">REACH_TOLERANCE_M</span> <span class="k">as</span> <span class="n">TOLERANCE_M</span><span class="p">,</span>
+    <span class="n">TARGET</span><span class="p">,</span>
+    <span class="n">load_fixed_model</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">load_fixed_model</span><span class="p">()</span>
+<span class="n">torso_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="s1">'torso'</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="n">site_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">site</span><span class="p">(</span><span class="s1">'front_left_contact_site'</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="n">hip</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="s1">'front_left_hip'</span><span class="p">)</span>
+<span class="n">knee</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="s1">'front_left_knee'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">),</span> <span class="s1">'hip_axis'</span><span class="p">:</span> <span class="n">hip</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="s1">'knee_axis'</span><span class="p">:</span> <span class="n">knee</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="s1">'hip_range_deg'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">hip</span><span class="o">.</span><span class="n">range</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="s1">'knee_range_deg'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">knee</span><span class="o">.</span><span class="n">range</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{'model': 'C:\\Users\\haidm\\Desktop\\robotics\\spider\\model\\spider.xml', 'hip_axis': [0.0, 1.0, 0.0], 'knee_axis': [0.0, 1.0, 0.0], 'hip_range_deg': [-45.0, 45.0], 'knee_range_deg': [-80.0, 80.0]}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=64fbf429"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-7">Results<a class="anchor-link" href="#Results">¶</a></h2><h3 id="section-8">2. Sample the two-joint workspace<a class="anchor-link" href="#2.-Sample-the-two-joint-workspace">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=c8c6a3e6">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">hip_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">hip</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">91</span><span class="p">)</span>
+<span class="n">knee_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">knee</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">161</span><span class="p">)</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">hip_angle</span> <span class="ow">in</span> <span class="n">hip_samples</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">knee_angle</span> <span class="ow">in</span> <span class="n">knee_samples</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">hip</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">hip_angle</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">knee</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">knee_angle</span>
+        <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_forward</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">foot_body</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">site_xpos</span><span class="p">[</span><span class="n">site_id</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">xpos</span><span class="p">[</span><span class="n">torso_id</span><span class="p">]</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">,</span> <span class="o">*</span><span class="n">foot_body</span><span class="p">))</span>
+<span class="n">workspace</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'hip_rad'</span><span class="p">,</span> <span class="s1">'knee_rad'</span><span class="p">,</span> <span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">])</span>
+<span class="n">workspace</span><span class="p">[</span><span class="s1">'distance_to_target_m'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">workspace</span><span class="p">[[</span><span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nearest</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'distance_to_target_m'</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">reached</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">nearest</span><span class="o">.</span><span class="n">distance_to_target_m</span> <span class="o">&lt;=</span> <span class="n">TOLERANCE_M</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'grid samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'target reached within </span><span class="si">{</span><span class="n">TOLERANCE_M</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> m: </span><span class="si">{</span><span class="n">reached</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">nearest</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=b491c076">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">x_m</span><span class="p">,</span> <span class="n">workspace</span><span class="o">.</span><span class="n">y_m</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#2f69ad'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">TARGET</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#c43c3c'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'target'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">'body X (m)'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">'body Y (m)'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Top view: reachable foot positions'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">x_m</span><span class="p">,</span> <span class="n">workspace</span><span class="o">.</span><span class="n">z_m</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#2f69ad'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">TARGET</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">TARGET</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#c43c3c'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'target'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">'body X (m)'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">'body Z (m)'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Side view: reachable foot positions'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=324798af"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-9">Geometry preview before the experimental DOF test<a class="anchor-link" href="#Geometry-preview-before-the-experimental-DOF-test">¶</a></h2><p>This section does <strong>not</strong> sample a modified leg or answer whether a third DOF reaches the target. It only draws the current front-left hip frame at the neutral pose.</p>
+<ul>
+<li><strong>Blue</strong> is the current hinge axis. Both existing joints use this local axis, so they bend in the same plane.</li>
+<li><strong>Orange</strong> is one hypothetical, perpendicular proximal axis. It is shown only as a candidate experimental direction.</li>
+<li>The translucent blue disk is the current bending plane.</li>
+<li>The red point is the outward-and-down target.</li>
+</ul>
+<p>Read the picture as geometry: which motion can each axis create at the foot? Before advancing a changed-workspace sweep, discuss your own first attempt; a prediction form or log entry is not required.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=9609038f">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Draw the neutral hip frame in torso coordinates; no modified model is sampled here.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># registers the 3D projection</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">mujoco</span><span class="o">.</span><span class="n">mj_forward</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">hip_body</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="s1">'front_left'</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="n">hip_origin</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">xpos</span><span class="p">[</span><span class="n">hip_body</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">xpos</span><span class="p">[</span><span class="n">torso_id</span><span class="p">]</span>
+<span class="n">hip_rotation</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">xmat</span><span class="p">[</span><span class="n">hip_body</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">current_axis</span> <span class="o">=</span> <span class="n">hip_rotation</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="n">hypothetical_axis</span> <span class="o">=</span> <span class="n">hip_rotation</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">link_direction</span> <span class="o">=</span> <span class="n">hip_rotation</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">axis</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">'3d'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">vector</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">current_axis</span><span class="p">,</span> <span class="s1">'#2f69ad'</span><span class="p">,</span> <span class="s1">'current shared hinge axis'</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">hypothetical_axis</span><span class="p">,</span> <span class="s1">'#e6822d'</span><span class="p">,</span> <span class="s1">'hypothetical perpendicular axis'</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">link_direction</span><span class="p">,</span> <span class="s1">'#555555'</span><span class="p">,</span> <span class="s1">'neutral upper-link direction'</span><span class="p">),</span>
+<span class="p">]:</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="o">*</span><span class="n">hip_origin</span><span class="p">,</span> <span class="o">*</span><span class="n">vector</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.16</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+<span class="c1"># The current bend plane is orthogonal to the current hinge axis.</span>
+<span class="n">plane_u</span> <span class="o">=</span> <span class="n">link_direction</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">link_direction</span><span class="p">)</span>
+<span class="n">plane_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">current_axis</span><span class="p">,</span> <span class="n">plane_u</span><span class="p">);</span> <span class="n">plane_v</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">plane_v</span><span class="p">)</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ring</span> <span class="o">=</span> <span class="n">hip_origin</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.14</span> <span class="o">*</span> <span class="p">(</span><span class="n">plane_u</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">+</span> <span class="n">plane_v</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">))</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ring</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ring</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ring</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#2f69ad'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'current bend plane'</span><span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">hip_origin</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'front-left hip'</span><span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">TARGET</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#c43c3c'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'support target'</span><span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">'body X (m)'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">'body Y (m)'</span><span class="p">,</span> <span class="n">zlabel</span><span class="o">=</span><span class="s1">'body Z (m)'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Neutral hip geometry in torso coordinates'</span><span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=b7fdfe6a"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-10">Your next prediction<a class="anchor-link" href="#Your-next-prediction">¶</a></h3><p>Use the picture to make your own prediction. Do not look for a right answer from the notebook yet.</p>
+<ol>
+<li>If the orange axis were enabled at the hip, which direction do you think the foot would first move when that joint turns positive?</li>
+</ol>
+<ul>
+<li>orthogonal to the body of the robot?</li>
+</ul>
+<ol>
+<li>Would that motion help, hurt, or leave unchanged the miss between the nearest current foot point and the red target?</li>
+</ol>
+<ul>
+<li>it would help</li>
+</ul>
+<ol>
+<li>What observation in the next workspace sweep would make you revise that prediction?</li>
+</ol>
+<ul>
+<li>a different angular direction of the foot when the joint turns positive -&gt; finding out that the motion pulled us further from the red target</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=5db48083"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-11">Experiment log<a class="anchor-link" href="#Experiment-log">¶</a></h2><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial prediction</td>
+<td>The target should be reachable. Joint-axis orientation is the uncertainty.</td>
+</tr>
+<tr>
+<td>Current-model result</td>
+<td>Target is not reached within 1 cm. Nearest sample is 6.7 cm away, chiefly 5.3 cm short in body-Y outward placement.</td>
+</tr>
+<tr>
+<td>Interpretation</td>
+<td>The two existing hinges share local axis <code>[0, 1, 0]</code>, so the leg lacks an independent yaw-like placement direction. This is a kinematic result; gravity and torque were disabled.</td>
+</tr>
+<tr>
+<td>Experimental-DOF prediction</td>
+<td>User predicts the added orthogonal proximal axis helps. Falsifier: a positive turn moves the foot farther from the target.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=6e61f4c9"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-12">Experimental orthogonal-hinge comparison<a class="anchor-link" href="#Experimental-orthogonal-hinge-comparison">¶</a></h2><h3 id="section-13">Recorded prediction<a class="anchor-link" href="#Recorded-prediction">¶</a></h3><p>The user predicts that enabling the orange proximal axis will help the foot approach the red target. They would revise this if the actual positive rotation moves the foot in a direction that increases its target distance.</p>
+<h3 id="section-14">3. Add one candidate proximal axis only in this fixture<a class="anchor-link" href="#3.-Add-one-candidate-proximal-axis-only-in-this-fixture">¶</a></h3><p>The code below changes an in-memory copy of the current XML. It adds a <code>front_left_coxa_experimental</code> hinge with local axis <code>[0, 0, 1]</code> immediately before the existing front-left hip. It does <strong>not</strong> edit <code>spider.xml</code> or claim a morphology decision. We hold gravity off and repeat the same target comparison.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=28ba9ab5">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+
+<span class="n">xml_text</span> <span class="o">=</span> <span class="n">MODEL_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span>
+<span class="n">needle</span> <span class="o">=</span> <span class="s1">'&lt;joint name="front_left_hip" type="hinge" axis="0 1 0" range="-45 45"/&gt;'</span>
+<span class="n">replacement</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">'&lt;joint name="front_left_coxa_experimental" type="hinge" axis="0 0 1" range="-45 45"/&gt;'</span>
+    <span class="o">+</span> <span class="n">needle</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">xml_text</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">needle</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">experimental_model</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjModel</span><span class="o">.</span><span class="n">from_xml_string</span><span class="p">(</span><span class="n">xml_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">needle</span><span class="p">,</span> <span class="n">replacement</span><span class="p">))</span>
+<span class="n">experimental_model</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">gravity</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">experimental_data</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjData</span><span class="p">(</span><span class="n">experimental_model</span><span class="p">)</span>
+<span class="n">experimental_torso</span> <span class="o">=</span> <span class="n">experimental_model</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="s1">'torso'</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="n">experimental_site</span> <span class="o">=</span> <span class="n">experimental_model</span><span class="o">.</span><span class="n">site</span><span class="p">(</span><span class="s1">'front_left_contact_site'</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+<span class="n">coxa</span> <span class="o">=</span> <span class="n">experimental_model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="s1">'front_left_coxa_experimental'</span><span class="p">)</span>
+<span class="n">experimental_hip</span> <span class="o">=</span> <span class="n">experimental_model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="s1">'front_left_hip'</span><span class="p">)</span>
+<span class="n">experimental_knee</span> <span class="o">=</span> <span class="n">experimental_model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="s1">'front_left_knee'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">({</span>
+    <span class="s1">'added_axis_local'</span><span class="p">:</span> <span class="n">coxa</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="s1">'added_range_deg'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">coxa</span><span class="o">.</span><span class="n">range</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="s1">'current_hip_axis_local'</span><span class="p">:</span> <span class="n">experimental_hip</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{'added_axis_local': [0.0, 0.0, 1.0], 'added_range_deg': [-45.0, 45.0], 'current_hip_axis_local': [0.0, 1.0, 0.0]}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=48f8c69d"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-15">4. Measure the immediate positive-axis motion<a class="anchor-link" href="#4.-Measure-the-immediate-positive-axis-motion">¶</a></h3><p>This is the direct check for the direction part of the prediction. It holds the old nearest hip and knee angles fixed, then applies a small positive experimental angle. It reports the foot displacement in torso coordinates and whether that step reduces target distance.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=b5dc3719">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">foot_position</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">):</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">coxa</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">coxa_angle</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">experimental_hip</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">hip_angle</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">experimental_knee</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">knee_angle</span>
+    <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_forward</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">site_xpos</span><span class="p">[</span><span class="n">experimental_site</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">xpos</span><span class="p">[</span><span class="n">experimental_torso</span><span class="p">]</span>
+
+<span class="n">base</span> <span class="o">=</span> <span class="n">foot_position</span><span class="p">(</span><span class="n">experimental_model</span><span class="p">,</span> <span class="n">experimental_data</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">nearest</span><span class="o">.</span><span class="n">hip_rad</span><span class="p">,</span> <span class="n">nearest</span><span class="o">.</span><span class="n">knee_rad</span><span class="p">)</span>
+<span class="n">positive</span> <span class="o">=</span> <span class="n">foot_position</span><span class="p">(</span><span class="n">experimental_model</span><span class="p">,</span> <span class="n">experimental_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">5.0</span><span class="p">),</span> <span class="n">nearest</span><span class="o">.</span><span class="n">hip_rad</span><span class="p">,</span> <span class="n">nearest</span><span class="o">.</span><span class="n">knee_rad</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">({</span>
+    <span class="s1">'base_foot_m'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">'positive_5deg_foot_m'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">positive</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">'positive_displacement_m'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">positive</span> <span class="o">-</span> <span class="n">base</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">'base_target_distance_m'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">base</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">)),</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">'positive_target_distance_m'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">positive</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">)),</span> <span class="mi">4</span><span class="p">),</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=d44837fa"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-16">5. Coarse sweep, then local refinement<a class="anchor-link" href="#5.-Coarse-sweep,-then-local-refinement">¶</a></h3><p>The target and gravity setting remain fixed. The first grid maps the added degree of freedom at a readable cost. The second grid refines only around the nearest coarse sample. This is a sampling strategy, not an additional model change.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=510ad907">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Coarse workspace map.</span>
+<span class="n">coxa_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">coxa</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">experimental_hip_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">experimental_hip</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">experimental_knee_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">experimental_knee</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="mi">41</span><span class="p">)</span>
+<span class="n">experimental_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">coxa_samples</span><span class="p">,</span> <span class="n">experimental_hip_samples</span><span class="p">,</span> <span class="n">experimental_knee_samples</span><span class="p">):</span>
+    <span class="n">foot_body</span> <span class="o">=</span> <span class="n">foot_position</span><span class="p">(</span><span class="n">experimental_model</span><span class="p">,</span> <span class="n">experimental_data</span><span class="p">,</span> <span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">)</span>
+    <span class="n">experimental_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">,</span> <span class="o">*</span><span class="n">foot_body</span><span class="p">))</span>
+<span class="n">experimental_workspace</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">experimental_rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'coxa_rad'</span><span class="p">,</span> <span class="s1">'hip_rad'</span><span class="p">,</span> <span class="s1">'knee_rad'</span><span class="p">,</span> <span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">])</span>
+<span class="n">experimental_workspace</span><span class="p">[</span><span class="s1">'distance_to_target_m'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">experimental_workspace</span><span class="p">[[</span><span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">coarse_nearest</span> <span class="o">=</span> <span class="n">experimental_workspace</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'distance_to_target_m'</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Refine one coarse-grid interval on each side of the nearest sample.</span>
+<span class="n">coxa_step</span> <span class="o">=</span> <span class="n">coxa_samples</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">coxa_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">hip_step</span> <span class="o">=</span> <span class="n">experimental_hip_samples</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">experimental_hip_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">knee_step</span> <span class="o">=</span> <span class="n">experimental_knee_samples</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">experimental_knee_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">refined_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">coarse_nearest</span><span class="o">.</span><span class="n">coxa_rad</span> <span class="o">-</span> <span class="n">coxa_step</span><span class="p">,</span> <span class="n">coarse_nearest</span><span class="o">.</span><span class="n">coxa_rad</span> <span class="o">+</span> <span class="n">coxa_step</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">coarse_nearest</span><span class="o">.</span><span class="n">hip_rad</span> <span class="o">-</span> <span class="n">hip_step</span><span class="p">,</span> <span class="n">coarse_nearest</span><span class="o">.</span><span class="n">hip_rad</span> <span class="o">+</span> <span class="n">hip_step</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">coarse_nearest</span><span class="o">.</span><span class="n">knee_rad</span> <span class="o">-</span> <span class="n">knee_step</span><span class="p">,</span> <span class="n">coarse_nearest</span><span class="o">.</span><span class="n">knee_rad</span> <span class="o">+</span> <span class="n">knee_step</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">coxa</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">coxa_angle</span> <span class="o">&lt;=</span> <span class="n">coxa</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">experimental_hip</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hip_angle</span> <span class="o">&lt;=</span> <span class="n">experimental_hip</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">experimental_knee</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">knee_angle</span> <span class="o">&lt;=</span> <span class="n">experimental_knee</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">continue</span>
+    <span class="n">foot_body</span> <span class="o">=</span> <span class="n">foot_position</span><span class="p">(</span><span class="n">experimental_model</span><span class="p">,</span> <span class="n">experimental_data</span><span class="p">,</span> <span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">)</span>
+    <span class="n">refined_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">coxa_angle</span><span class="p">,</span> <span class="n">hip_angle</span><span class="p">,</span> <span class="n">knee_angle</span><span class="p">,</span> <span class="o">*</span><span class="n">foot_body</span><span class="p">))</span>
+<span class="n">refined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">refined_rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'coxa_rad'</span><span class="p">,</span> <span class="s1">'hip_rad'</span><span class="p">,</span> <span class="s1">'knee_rad'</span><span class="p">,</span> <span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">])</span>
+<span class="n">refined</span><span class="p">[</span><span class="s1">'distance_to_target_m'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">refined</span><span class="p">[[</span><span class="s1">'x_m'</span><span class="p">,</span> <span class="s1">'y_m'</span><span class="p">,</span> <span class="s1">'z_m'</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">experimental_nearest</span> <span class="o">=</span> <span class="n">refined</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'distance_to_target_m'</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">experimental_reached</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">experimental_nearest</span><span class="o">.</span><span class="n">distance_to_target_m</span> <span class="o">&lt;=</span> <span class="n">TOLERANCE_M</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'coarse grid samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">experimental_workspace</span><span class="p">)</span><span class="si">}</span><span class="s1">; refinement samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">refined</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'target reached within </span><span class="si">{</span><span class="n">TOLERANCE_M</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> m: </span><span class="si">{</span><span class="n">experimental_reached</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">experimental_nearest</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=6ae9dcf6">
+<details class="source-cell"><summary>inspect code · cell 08</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">frame</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">workspace</span><span class="p">,</span> <span class="s1">'#a7bdd3'</span><span class="p">,</span> <span class="s1">'current 2-DOF'</span><span class="p">),</span> <span class="p">(</span><span class="n">experimental_workspace</span><span class="p">,</span> <span class="s1">'#2f69ad'</span><span class="p">,</span> <span class="s1">'experimental 3-DOF'</span><span class="p">)]:</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">x_m</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">y_m</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">x_m</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">z_m</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">TARGET</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="s1">'Top view'</span><span class="p">),</span> <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">TARGET</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="s1">'Side view'</span><span class="p">)]:</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#c43c3c'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'target'</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">'body X (m)'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">);</span> <span class="n">axis</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">);</span> <span class="n">axis</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">markerscale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'body Y (m)'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'body Z (m)'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=b29ded8e"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-17">Constrained inverse-kinematics analysis<a class="anchor-link" href="#Constrained-inverse-kinematics-analysis">¶</a></h2><p>The workspace grid shows shape, but it estimates the nearest point at its chosen resolution. This section sets up the more precise reachability question:</p>
+<p>$$
+q^* = \operatorname*{arg\,min}_{q_{\min} \leq q \leq q_{\max}} \frac{1}{2}\lVert p(q)-p^*\rVert^2
+$$</p>
+<p><code>p(q)</code> is the foot position in torso coordinates. MuJoCo supplies the analytic position Jacobian $J(q) = \partial p / \partial q$. At an interior optimum, $J(q)^T (p(q)-p^*) = 0$. At a joint limit, a bound can also prevent further improvement.</p>
+<p>This is a kinematic analysis only. It cannot establish contact force, static support, or dynamic stability.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=2f7b5959">
+<details class="source-cell"><summary>inspect code · cell 09</summary><div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">differential_evolution</span><span class="p">,</span> <span class="n">least_squares</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foot_and_jacobian</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="n">joint_names</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return torso-frame foot position and analytic translational Jacobian."""</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">dof_addresses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">joint_name</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">joint_names</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+        <span class="n">joint</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">joint_name</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">joint</span><span class="o">.</span><span class="n">qposadr</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">angle</span>
+        <span class="n">dof_addresses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint</span><span class="o">.</span><span class="n">dofadr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_forward</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">torso_rotation</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">xmat</span><span class="p">[</span><span class="n">torso_id</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">foot_body</span> <span class="o">=</span> <span class="n">torso_rotation</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">site_xpos</span><span class="p">[</span><span class="n">site_id</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">xpos</span><span class="p">[</span><span class="n">torso_id</span><span class="p">])</span>
+    <span class="n">world_jacobian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">nv</span><span class="p">))</span>
+    <span class="n">rotation_jacobian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">nv</span><span class="p">))</span>
+    <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_jacSite</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">world_jacobian</span><span class="p">,</span> <span class="n">rotation_jacobian</span><span class="p">,</span> <span class="n">site_id</span><span class="p">)</span>
+    <span class="n">body_jacobian</span> <span class="o">=</span> <span class="n">torso_rotation</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">world_jacobian</span><span class="p">[:,</span> <span class="n">dof_addresses</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">foot_body</span><span class="p">,</span> <span class="n">body_jacobian</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_target</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="n">joint_names</span><span class="p">):</span>
+    <span class="n">joints</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">joint_names</span><span class="p">]</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">joint</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">])</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">joint</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">angles</span><span class="p">):</span>
+        <span class="n">foot</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">foot_and_jacobian</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="n">joint_names</span><span class="p">,</span> <span class="n">angles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">foot</span> <span class="o">-</span> <span class="n">TARGET</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">jacobian</span><span class="p">(</span><span class="n">angles</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">jacobian_value</span> <span class="o">=</span> <span class="n">foot_and_jacobian</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="n">joint_names</span><span class="p">,</span> <span class="n">angles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jacobian_value</span>
+
+    <span class="c1"># Deterministic global search selects a basin; analytic-Jacobian least</span>
+    <span class="c1"># squares then refines its local optimum under the same joint bounds.</span>
+    <span class="n">global_result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">angles</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">residual</span><span class="p">(</span><span class="n">angles</span><span class="p">),</span> <span class="n">residual</span><span class="p">(</span><span class="n">angles</span><span class="p">)),</span>
+        <span class="n">bounds</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">polish</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">local_result</span> <span class="o">=</span> <span class="n">least_squares</span><span class="p">(</span>
+        <span class="n">residual</span><span class="p">,</span> <span class="n">global_result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jacobian</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">),</span>
+        <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">max_nfev</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">foot</span><span class="p">,</span> <span class="n">jacobian_value</span> <span class="o">=</span> <span class="n">foot_and_jacobian</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="n">joint_names</span><span class="p">,</span> <span class="n">local_result</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">'joint_names'</span><span class="p">:</span> <span class="n">joint_names</span><span class="p">,</span>
+        <span class="s1">'angles_rad'</span><span class="p">:</span> <span class="n">local_result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="s1">'angles_deg'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">local_result</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+        <span class="s1">'foot_m'</span><span class="p">:</span> <span class="n">foot</span><span class="p">,</span>
+        <span class="s1">'residual_m'</span><span class="p">:</span> <span class="n">foot</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">,</span>
+        <span class="s1">'residual_norm_m'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">foot</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">)),</span>
+        <span class="s1">'jacobian_m_per_rad'</span><span class="p">:</span> <span class="n">jacobian_value</span><span class="p">,</span>
+        <span class="s1">'gradient'</span><span class="p">:</span> <span class="n">jacobian_value</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">foot</span> <span class="o">-</span> <span class="n">TARGET</span><span class="p">),</span>
+        <span class="s1">'active_lower_bounds'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">local_result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span>
+        <span class="s1">'active_upper_bounds'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">local_result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span>
+        <span class="s1">'optimizer_status'</span><span class="p">:</span> <span class="n">local_result</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=1d7bf86f"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-18">Try the solve<a class="anchor-link" href="#Try-the-solve">¶</a></h3><p>Before advancing the solve, discuss your own first attempt. Written notes are optional. Focus on the meaning of the optimization, not on guessing a preferred outcome.</p>
+<ol>
+<li>Do you expect the two-DOF solution to stop at a joint limit or at an interior closest point? Why?</li>
+</ol>
+<ul>
+<li>interior closest poiont; stopping at the actual joint limit sounds like it would cause the instability we're trying to address; from a calculus perspective it makes more sense to stop short as well, since the limit point is also an inflection point</li>
+</ul>
+<ol>
+<li>Do you expect the experimental three-DOF solution to leave a nonzero residual, or reach the target? Why?</li>
+</ol>
+<ul>
+<li>non-zero residual, relatively small in size. I don't think we WANT a residual of zero? we want a residual of espilon as epsilon approaches zero instead, because actually hitting 0 would put us at an instable critical/inflection point in the stability graph</li>
+</ul>
+<ol>
+<li>For the two-DOF solve, what would $J^T r \approx 0$ tell you about the remaining foot-target error?</li>
+</ol>
+<ul>
+<li>not sure, I think it tells you about the composed direction of movement required to minimize foot-target error; i'm treating it as analogous to a first order derivative in a canonical line of best fit problem, extended to vector calculus</li>
+</ul>
+<p><em>Your notes:</em></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=e9c225fd">
+<details class="source-cell"><summary>inspect code · cell 10</summary><div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">current_solution</span> <span class="o">=</span> <span class="n">solve_target</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">torso_id</span><span class="p">,</span> <span class="n">site_id</span><span class="p">,</span> <span class="p">[</span><span class="s1">'front_left_hip'</span><span class="p">,</span> <span class="s1">'front_left_knee'</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">experimental_solution</span> <span class="o">=</span> <span class="n">solve_target</span><span class="p">(</span>
+    <span class="n">experimental_model</span><span class="p">,</span> <span class="n">experimental_data</span><span class="p">,</span> <span class="n">experimental_torso</span><span class="p">,</span> <span class="n">experimental_site</span><span class="p">,</span>
+    <span class="p">[</span><span class="s1">'front_left_coxa_experimental'</span><span class="p">,</span> <span class="s1">'front_left_hip'</span><span class="p">,</span> <span class="s1">'front_left_knee'</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_solution</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">solution</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="se">\n</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'angles (deg):'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="s1">'angles_deg'</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'foot (m):'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="s1">'foot_m'</span><span class="p">],</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'residual (m):'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="s1">'residual_m'</span><span class="p">],</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'residual norm (m):'</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">solution</span><span class="p">[</span><span class="s1">'residual_norm_m'</span><span class="p">]</span><span class="si">:</span><span class="s2">.9f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'J^T residual:'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">solution</span><span class="p">[</span><span class="s1">'gradient'</span><span class="p">],</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'active lower bounds:'</span><span class="p">,</span> <span class="n">solution</span><span class="p">[</span><span class="s1">'active_lower_bounds'</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'active upper bounds:'</span><span class="p">,</span> <span class="n">solution</span><span class="p">[</span><span class="s1">'active_upper_bounds'</span><span class="p">])</span>
+
+<span class="n">summarize_solution</span><span class="p">(</span><span class="s1">'Current two-DOF leg'</span><span class="p">,</span> <span class="n">current_solution</span><span class="p">)</span>
+<span class="n">summarize_solution</span><span class="p">(</span><span class="s1">'Experimental three-DOF leg'</span><span class="p">,</span> <span class="n">experimental_solution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Current two-DOF leg
+angles (deg): [-41.6549  76.0841]
+foot (m): [ 0.341235  0.267222 -0.3     ]
+residual (m): [ 0.041235 -0.052778 -0.      ]
+residual norm (m): 0.066976422
+J^T residual: [-0. -0.]
+active lower bounds: [False False]
+active upper bounds: [False False]
+
+Experimental three-DOF leg
+angles (deg): [  9.6905  29.9221 -73.952 ]
+foot (m): [ 0.3   0.32 -0.3 ]
+residual (m): [-0.  0.  0.]
+residual norm (m): 0.000000000
+J^T residual: [0. 0. 0.]
+active lower bounds: [False False False]
+active upper bounds: [False False False]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=059ad7c1"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-19">Read the result after you run it<a class="anchor-link" href="#Read-the-result-after-you-run-it">¶</a></h3><ul>
+<li>A nonzero minimum residual means the target is not exactly reachable under the model and bounds.</li>
+<li>$J^T r$ near zero means the solver cannot reduce distance through any locally allowed infinitesimal joint change.</li>
+<li>An active bound identifies a joint limit as part of the restriction.</li>
+<li>A near-zero residual means this target is kinematically reachable. It is still not a claim about contact force, torque, or stability.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e74fb351"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-20">Grid comparison<a class="anchor-link" href="#Grid-comparison">¶</a></h3><p>The grid is a visual check. After you run the constrained inverse-kinematics section, compare its residual and bound status with the grid result. The comparison tells us whether the grid resolution was adequate for this target.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=9d8bec7a"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-21">Your conclusion<a class="anchor-link" href="#Your-conclusion">¶</a></h2><p>Use the measurements above. Write the interpretation in your own words.</p>
+<ol>
+<li><p><strong>Current mechanism:</strong> What does its best residual say about this target and its available foot-motion directions?</p>
+<p><em>Your answer:</em> That the target was unreachable with the old configuration, is reachable with the new configruation, and we have the foot-motion directions required of the problem as we've constructed it mathematically/physically</p>
+</li>
+<li><p><strong>Experimental mechanism:</strong> What changed when the orthogonal proximal hinge was available?</p>
+<p><em>Your answer:</em> The legs gained a new DOF that allowed them to minimize the task space residual in the correct dimensions.</p>
+</li>
+<li><p><strong>Meaning of the solve:</strong> What does a small $J^T r$ tell you here? What does it <strong>not</strong> tell you about a free, contacting robot?</p>
+<p><em>Your answer:</em> That we were able to successfully minimize the J^t*r value, which in conjunction with minimized residual values, is required to reach the ground. This doesn't tell us about the ENTIRE robot, only about this leg configuration in task-space.</p>
+</li>
+<li><p><strong>Morphology decision:</strong> Is this sufficient evidence to promote the experimental hinge into canonical C-1N morphology? State the evidence and the remaining uncertainty.</p>
+<p><em>Your answer:</em> Yes. We see that adding the 3rd DOF reduces the residual domain to include zero. This is an objective increase in performance compared to the old morphology.</p>
+</li>
+<li><p><strong>Next narrow claim:</strong> State one physical capability that must be established next before this workspace result can inform standing control. Name the measurement that would test only that capability.</p>
+<p><em>Your answer:</em> Whether the leg can, in this configuration, transmit the required ground reaction force without slipping. Measure the ground reaction force for a foot under load and verify that it can produce that force without slipping.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/robotics/">← all robotics test bench notebooks</a><a href="https://github.com/haidmoham/robotics-test-bench/blob/f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469/experiments/2026-08-13-c1n-leg-workspace/c1n_leg_workspace.ipynb">source provenance ↗</a></footer></body></html>

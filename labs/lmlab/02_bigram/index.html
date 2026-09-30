@@ -1,0 +1,294 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>the bigram baseline · lmlab · Mohammad Haider</title><meta name="description" content="token streams, training and validation splits, and a count-based starting point."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 02_bigram</p><h1>the bigram baseline</h1><p class="lab-deck">a first language model, with the data boundary visible</p><p>token streams, training and validation splits, and a count-based starting point.</p><div class="lab-meta"><span>5 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">Bigram language model </a></li><li><a href="#section-2">Load and encode Tiny Shakespeare </a></li><li><a href="#section-3">Split the token stream </a></li><li><a href="#section-4">Sanity check </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/02_bigram.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=bigram-goal"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-1">Bigram language model<a class="anchor-link" href="#Bigram-language-model">¶</a></h1><p>Prepare the Tiny Shakespeare token stream. The next step is to build context-window <code>(x, y)</code> samples.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=setup">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_batch</span><span class="p">,</span> <span class="n">load_tiny_shakespeare_tokens</span><span class="p">,</span> <span class="n">split_token_stream</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe_decode</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=load-data"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-2">Load and encode Tiny Shakespeare<a class="anchor-link" href="#Load-and-encode-Tiny-Shakespeare">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=encode-data">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tokens</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_tiny_shakespeare_tokens</span><span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=split-data"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-3">Split the token stream<a class="anchor-link" href="#Split-the-token-stream">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=split">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">train_tokens</span><span class="p">,</span> <span class="n">validation_tokens</span> <span class="o">=</span> <span class="n">split_token_stream</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=check-data"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-4">Sanity check<a class="anchor-link" href="#Sanity-check">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=sanity-check">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total tokens: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Training tokens: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_tokens</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation tokens: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">validation_tokens</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="c1"># print(bpe_decode(train_tokens[:100], vocab))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Total tokens: 590,498
+Training tokens: 531,448
+Validation tokens: 59,050
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=8590a86a">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+<span class="c1"># Set parameters for batching</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">block_size</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_batch</span><span class="p">(</span><span class="n">split</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_batch</span><span class="p">(</span>
+        <span class="n">split</span><span class="p">,</span>
+        <span class="n">train_tokens</span><span class="p">,</span>
+        <span class="n">validation_tokens</span><span class="p">,</span>
+        <span class="n">block_size</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=d9eeeccf">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+
+<span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
+<span class="n">n_embd</span> <span class="o">=</span> <span class="mi">32</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BigramLanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span> <span class="o">*</span> <span class="n">T</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_new_tokens</span><span class="p">):</span>
+            <span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">idx_next</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx_next</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">idx</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=5670bee5">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">BigramLanguageModel</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">sample_batch</span><span class="p">(</span><span class="s2">"train"</span><span class="p">)</span>
+    <span class="n">x_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x_batch</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    <span class="n">y_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">y_batch</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+    <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">(</span><span class="n">set_to_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Step </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">: loss = </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Step 0: loss = 6.4571
+Step 100: loss = 6.1014
+Step 200: loss = 5.7985
+Step 300: loss = 5.5250
+Step 400: loss = 5.2603
+Step 500: loss = 5.1149
+Step 600: loss = 4.8774
+Step 700: loss = 4.6288
+Step 800: loss = 4.5432
+Step 900: loss = 4.4973
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=4766adfe">
+<details class="source-cell"><summary>inspect code · cell 08</summary><div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">sample_batch</span><span class="p">(</span><span class="s2">"validation"</span><span class="p">)</span>
+
+    <span class="n">xb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    <span class="n">yb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">yb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">val_loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"validation loss:"</span><span class="p">,</span> <span class="n">val_loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"log vocab size:"</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)))</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>validation loss: 4.3758955001831055
+log vocab size: 6.238324625039508
+</pre>
+</div>
+</div>
+<div class="output_area">
+<div class="prompt output_prompt">Out[8]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>BigramLanguageModel(
+  (token_embedding_table): Embedding(512, 32)
+  (lm_head): Linear(in_features=32, out_features=512, bias=True)
+)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=cb719c2d">
+<details class="source-cell"><summary>inspect code · cell 09</summary><div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">bpe_decode</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>�d
+ookPAE:
+Oerhour,
+R:
+Tll on , and the e to to youPant shs ow, behoughghton neygmeweie emcyour aanour  and such'd I git my atOr ce, syspbuINGAORove:
+ut aupnoRLence:
+NG that sece �y bebla er 
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/lmlab/">← all lmlab notebooks</a><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/02_bigram.ipynb">source provenance ↗</a></footer></body></html>

@@ -1,0 +1,280 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>tokenization · lmlab · Mohammad Haider</title><meta name="description" content="naive, byte-level, and byte-pair tokenization in one inspectable notebook."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 01_tokenizer</p><h1>tokenization</h1><p class="lab-deck">from characters to bytes and learned merges</p><p>naive, byte-level, and byte-pair tokenization in one inspectable notebook.</p><div class="lab-meta"><span>6 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">Implementing a naive tokenizer </a></li><li><a href="#section-2">Byte-level tokenizer </a></li><li><a href="#section-3">BPE (byte-pair encoding) </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/01_tokenizer.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing code_cell rendered" id="cell-id=5702dffb">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">bpe_decode</span><span class="p">,</span>
+    <span class="n">bpe_encode</span><span class="p">,</span>
+    <span class="n">decode_unicode_tokens</span><span class="p">,</span>
+    <span class="n">encode_unicode_string</span><span class="p">,</span>
+    <span class="n">perform_merges</span><span class="p">,</span>
+    <span class="n">save_tokenizer</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Initial text</span>
+<span class="n">text</span> <span class="o">=</span> <span class="s2">"Hello, world! This is a sample text for testing."</span>
+<span class="n">torture_text</span> <span class="o">=</span> <span class="s2">"Hello, world! café پاکستان 日本語 🤖 ∇²ψ"</span>  <span class="c1"># Cursed unicode string as a stress test</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=050c38e3"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-1">Implementing a naive tokenizer<a class="anchor-link" href="#Implementing-a-naive-tokenizer">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=c80d45c8">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">chars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+<span class="n">char_to_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">char</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+<span class="n">index_to_char</span> <span class="o">=</span> <span class="p">{</span><span class="n">index</span><span class="p">:</span> <span class="n">char</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">naive_encode</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="c1"># This function encodes the input text into a list of tokens.</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">char_to_index</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">text</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">naive_decode</span><span class="p">(</span><span class="n">tokens</span><span class="p">):</span>
+    <span class="c1"># This function decodes the list of tokens back into the original text.</span>
+    <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">index_to_char</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">)</span>
+
+
+<span class="n">encoded_text</span> <span class="o">=</span> <span class="n">naive_encode</span><span class="p">(</span><span class="s2">"Hello world! This is a test."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Encoded:"</span><span class="p">,</span> <span class="n">encoded_text</span><span class="p">)</span>
+<span class="n">decoded_text</span> <span class="o">=</span> <span class="n">naive_decode</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Decoded:"</span><span class="p">,</span> <span class="n">decoded_text</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Encoded: [4, 8, 13, 13, 16, 0, 21, 16, 18, 13, 7, 1, 0, 5, 11, 12, 19, 0, 12, 19, 0, 6, 0, 20, 8, 19, 20, 3]
+Decoded: Hello world! This is a test.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=ad064106"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-2">Byte-level tokenizer<a class="anchor-link" href="#Byte-level-tokenizer">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=98c6fb61">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Unicode string → UTF-8 bytes → integer tokens</span>
+
+<span class="n">encoded_torture_text</span> <span class="o">=</span> <span class="n">encode_unicode_string</span><span class="p">(</span><span class="n">torture_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Encoded torture text:"</span><span class="p">,</span> <span class="n">encoded_torture_text</span><span class="p">)</span>
+<span class="n">decoded_torture_text</span> <span class="o">=</span> <span class="n">decode_unicode_tokens</span><span class="p">(</span><span class="n">encoded_torture_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Decoded torture text:"</span><span class="p">,</span> <span class="n">decoded_torture_text</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Encoded torture text: [72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33, 32, 99, 97, 102, 195, 169, 32, 217, 190, 216, 167, 218, 169, 216, 179, 216, 170, 216, 167, 217, 134, 32, 230, 151, 165, 230, 156, 172, 232, 170, 158, 32, 240, 159, 164, 150, 32, 226, 136, 135, 194, 178, 207, 136]
+Decoded torture text: Hello, world! café پاکستان 日本語 🤖 ∇²ψ
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=ed28fbbd"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-3">BPE (byte-pair encoding)<a class="anchor-link" href="#BPE-(byte-pair-encoding)">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=2adedab3">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">target_vocab_size</span> <span class="o">=</span> <span class="mi">512</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">encode_unicode_string</span><span class="p">(</span><span class="n">torture_text</span><span class="p">)</span>
+
+
+<span class="n">tokens</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">merges</span> <span class="o">=</span> <span class="n">perform_merges</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">target_vocab_size</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Final tokens:"</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Final tokens: [310]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=c4d8a1e6">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Tiny Shakespeare corpus</span>
+<span class="n">corpus</span> <span class="o">=</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"tiny_shakespeare.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">encode_unicode_string</span><span class="p">(</span>
+    <span class="n">corpus</span><span class="p">[:</span><span class="mi">100_000</span><span class="p">]</span>
+<span class="p">)</span>  <span class="c1"># Limit to first 100,000 characters for demonstration</span>
+
+<span class="n">fin_tokens</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">merges</span> <span class="o">=</span> <span class="n">perform_merges</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">target_vocab_size</span><span class="p">)</span>
+<span class="n">save_tokenizer</span><span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"tiny_shakespeare_bpe.json"</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">merges</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Encoded corpus into </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fin_tokens</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tokens"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Saved tokenizer to data/tiny_shakespeare_bpe.json"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Encoded corpus into 47,586 tokens
+Saved tokenizer to data/tiny_shakespeare_bpe.json
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=267cbc2e">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="s2">"To be, or not to be 🤖"</span>
+
+<span class="n">encoded</span> <span class="o">=</span> <span class="n">bpe_encode</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">merges</span><span class="p">)</span>
+<span class="n">decoded</span> <span class="o">=</span> <span class="n">bpe_decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Original:"</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Encoded:"</span><span class="p">,</span> <span class="n">encoded</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Decoded:"</span><span class="p">,</span> <span class="n">decoded</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">test</span> <span class="o">==</span> <span class="n">decoded</span><span class="p">,</span> <span class="s2">"Decoded text does not match the original!"</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Original: To be, or not to be 🤖
+Encoded: [84, 274, 317, 261, 470, 331, 294, 353, 240, 159, 164, 150]
+Decoded: To be, or not to be 🤖
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=a16ab95b">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"hello world"</span><span class="p">,</span>
+    <span class="s2">"To be, or not to be"</span><span class="p">,</span>
+    <span class="s2">"aaaaaaaaaaaa"</span><span class="p">,</span>
+    <span class="s2">"hello</span><span class="se">\n</span><span class="s2">world"</span><span class="p">,</span>
+    <span class="s2">"🐸"</span><span class="p">,</span>
+    <span class="s2">"پاکستان"</span><span class="p">,</span>
+    <span class="s2">"hello 🐸 پاکستان"</span><span class="p">,</span>
+    <span class="s2">""</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">bpe_encode</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">merges</span><span class="p">)</span>
+    <span class="n">decoded</span> <span class="o">=</span> <span class="n">bpe_decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Original:"</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Encoded:"</span><span class="p">,</span> <span class="n">encoded</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Decoded:"</span><span class="p">,</span> <span class="n">decoded</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">test</span> <span class="o">==</span> <span class="n">decoded</span><span class="p">,</span> <span class="s2">"Decoded text does not match the original!"</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Original: hello world
+Encoded: [323, 276, 274, 414, 108, 100]
+Decoded: hello world
+Original: To be, or not to be
+Encoded: [84, 274, 317, 261, 470, 331, 294, 317]
+Decoded: To be, or not to be
+Original: aaaaaaaaaaaa
+Encoded: [97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97]
+Decoded: aaaaaaaaaaaa
+Original: hello
+world
+Encoded: [323, 276, 111, 10, 414, 108, 100]
+Decoded: hello
+world
+Original: 🐸
+Encoded: [240, 159, 144, 184]
+Decoded: 🐸
+Original: پاکستان
+Encoded: [217, 190, 216, 167, 218, 169, 216, 179, 216, 170, 216, 167, 217, 134]
+Decoded: پاکستان
+Original: hello 🐸 پاکستان
+Encoded: [323, 276, 274, 240, 159, 144, 184, 32, 217, 190, 216, 167, 218, 169, 216, 179, 216, 170, 216, 167, 217, 134]
+Decoded: hello 🐸 پاکستان
+Original: 
+Encoded: []
+Decoded: 
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/lmlab/">← all lmlab notebooks</a><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/01_tokenizer.ipynb">source provenance ↗</a></footer></body></html>
