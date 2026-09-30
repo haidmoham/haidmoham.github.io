@@ -1,8 +1,7 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>the bigram baseline · lmlab · Mohammad Haider</title><meta name="description" content="token streams, training and validation splits, and a count-based starting point."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 02_bigram</p><h1>the bigram baseline</h1><p class="lab-deck">a first language model, with the data boundary visible</p><p>token streams, training and validation splits, and a count-based starting point.</p><div class="lab-meta"><span>5 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#notebook">implementation &amp; outputs</a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/02_bigram.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=bigram-goal"><div class="prompt input_prompt">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>the bigram baseline · lmlab · Mohammad Haider</title><meta name="description" content="token streams, training and validation splits, and a count-based starting point."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 02_bigram</p><h1>the bigram baseline</h1><p class="lab-deck">a first language model, with the data boundary visible</p><p>token streams, training and validation splits, and a count-based starting point.</p><div class="lab-meta"><span>5 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">Bigram language model </a></li><li><a href="#section-2">Load and encode Tiny Shakespeare </a></li><li><a href="#section-3">Split the token stream </a></li><li><a href="#section-4">Sanity check </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/02_bigram.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=bigram-goal"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="Bigram-language-model"&gt;Bigram language model<a class="anchor-link" href="#Bigram-language-model">¶</a>&lt;/h1&gt;&lt;p&gt;Prepare the Tiny Shakespeare token stream. The next step is to build context-window <code>(x, y)</code> samples.&lt;/p&gt;
-
+<h1 id="section-1">Bigram language model<a class="anchor-link" href="#Bigram-language-model">¶</a></h1><p>Prepare the Tiny Shakespeare token stream. The next step is to build context-window <code>(x, y)</code> samples.</p>
 </div>
 </div>
 </div>
@@ -29,7 +28,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=load-data"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="Load-and-encode-Tiny-Shakespeare"&gt;Load and encode Tiny Shakespeare<a class="anchor-link" href="#Load-and-encode-Tiny-Shakespeare">¶</a>&lt;/h2&gt;
+<h2 id="section-2">Load and encode Tiny Shakespeare<a class="anchor-link" href="#Load-and-encode-Tiny-Shakespeare">¶</a></h2>
 </div>
 </div>
 </div>
@@ -47,7 +46,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=split-data"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="Split-the-token-stream"&gt;Split the token stream<a class="anchor-link" href="#Split-the-token-stream">¶</a>&lt;/h2&gt;
+<h2 id="section-3">Split the token stream<a class="anchor-link" href="#Split-the-token-stream">¶</a></h2>
 </div>
 </div>
 </div>
@@ -65,7 +64,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=check-data"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="Sanity-check"&gt;Sanity check<a class="anchor-link" href="#Sanity-check">¶</a>&lt;/h2&gt;
+<h2 id="section-4">Sanity check<a class="anchor-link" href="#Sanity-check">¶</a></h2>
 </div>
 </div>
 </div>
@@ -279,7 +278,7 @@ log vocab size: 6.238324625039508
 <div class="output_area">
 <div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre> �d
+<pre>�d
 ookPAE:
 Oerhour,
 R:

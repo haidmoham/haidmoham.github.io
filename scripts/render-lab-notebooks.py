@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import shutil
 
+import bleach
 import nbformat
 from bs4 import BeautifulSoup
 from nbconvert import HTMLExporter
@@ -37,7 +38,7 @@ def render(source, manifest_path):
             raise ValueError(f"publication hash mismatch: {item['path']}")
         notebook = nbformat.reads(raw.decode(), as_version=4)
         exporter = HTMLExporter(template_name='basic')
-        exporter.sanitize_html = True
+        exporter.sanitize_html = False
         exporter.embed_images = True
         body, _ = exporter.from_notebook_node(notebook)
         soup = BeautifulSoup(body, 'html.parser')
@@ -54,6 +55,8 @@ def render(source, manifest_path):
                     del tag[attr]
             if tag.name == 'img' and not str(tag.get('src','')).startswith('data:image/'):
                 tag.replace_with(soup.new_string('[external image omitted from the pinned export]'))
+        safe = bleach.clean(str(soup), tags={'div','span','p','br','hr','pre','code','h1','h2','h3','h4','h5','h6','strong','em','b','i','u','s','sub','sup','blockquote','ul','ol','li','a','img','table','thead','tbody','tr','td','th','caption','dl','dt','dd'}, attributes={'*':['class','id','title'], 'a':['href'], 'img':['src','alt','width','height'], 'td':['colspan','rowspan'], 'th':['colspan','rowspan']}, protocols={'https','http','data'}, strip=True)
+        soup = BeautifulSoup(safe, 'html.parser')
         for i, cell in enumerate(soup.select('.code_cell'), 1):
             code = cell.select_one('.input')
             if code:

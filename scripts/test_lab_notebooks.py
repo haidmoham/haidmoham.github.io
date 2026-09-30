@@ -19,7 +19,7 @@ class PublicationTests(unittest.TestCase):
         self.source.mkdir()
         self.output=self.root/'site'
         self.output.mkdir()
-        self.raw=nbformat.writes(nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell('raise RuntimeError("must never execute")',outputs=[nbformat.v4.new_output('display_data',data={'text/html':'<script>alert(1)</script><p>saved evidence</p>'})])])).encode()
+        self.raw=nbformat.writes(nbformat.v4.new_notebook(cells=[nbformat.v4.new_markdown_cell('# actual heading'),nbformat.v4.new_code_cell('raise RuntimeError("must never execute")',outputs=[nbformat.v4.new_output('display_data',data={'text/html':'<script>alert(1)</script><p>saved evidence</p>'})])])).encode()
         (self.source/'test.ipynb').write_bytes(self.raw)
         self.manifest={'schema_version':1,'repository':'haidmoham/lmlab','revision':'a'*40,'notebooks':[{'slug':'test','path':'test.ipynb','title':'test','subtitle':'test','description':'test','publishable':True,'sha256':renderer.hashlib.sha256(self.raw).hexdigest()}]}
         self.path=self.root/'manifest.json'
@@ -31,6 +31,7 @@ class PublicationTests(unittest.TestCase):
         self.render()
         page=(self.output/'labs/lmlab/test/index.html').read_text()
         self.assertIn('saved evidence',page)
+        self.assertTrue(any('actual heading' in h.get_text() for h in BeautifulSoup(page,'html.parser').find_all('h1')))
         self.assertIn('must never execute',page)
         self.assertFalse(BeautifulSoup(page,'html.parser').select('script'))
         self.assertEqual((self.output/'labs/lmlab/test/source.ipynb').read_bytes(),self.raw)
