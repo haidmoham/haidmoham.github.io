@@ -1,8 +1,7 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cuda setup · lmlab · Mohammad Haider</title><meta name="description" content="an unexecuted environment setup notebook. commands are displayed, never run by this site."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / cuda_setup</p><h1>cuda setup</h1><p class="lab-deck">making the execution environment inspectable</p><p>an unexecuted environment setup notebook. commands are displayed, never run by this site.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#notebook">implementation &amp; outputs</a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/cuda_setup.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-00"><div class="prompt input_prompt">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cuda setup · lmlab · Mohammad Haider</title><meta name="description" content="an unexecuted environment setup notebook. commands are displayed, never run by this site."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / cuda_setup</p><h1>cuda setup</h1><p class="lab-deck">making the execution environment inspectable</p><p>an unexecuted environment setup notebook. commands are displayed, never run by this site.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">cuda setup smoke checks </a></li><li><a href="#section-2">compile the cuda c++ smoke </a></li><li><a href="#section-3">run the cuda c++ smoke </a></li><li><a href="#section-4">check memory access with compute sanitizer </a></li><li><a href="#section-5">optional triton smoke </a></li><li><a href="#section-6">observations </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/cuda_setup.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-00"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="cuda-setup-smoke-checks"&gt;cuda setup smoke checks<a class="anchor-link" href="#cuda-setup-smoke-checks">¶</a>&lt;/h1&gt;&lt;p&gt;Use this notebook to inspect and run the bounded CUDA setup checks. Select lmlab's <code>.venv</code> Python kernel first. Edit the CUDA program in <a href="../src/gpu_primitives/smoke_cuda.cu"><code>src/gpu_primitives/smoke_cuda.cu</code></a>; the notebook compiles that file directly rather than duplicating its source.&lt;/p&gt;
-
+<h1 id="section-1">cuda setup smoke checks<a class="anchor-link" href="#cuda-setup-smoke-checks">¶</a></h1><p>Use this notebook to inspect and run the bounded CUDA setup checks. Select lmlab's <code>.venv</code> Python kernel first. Edit the CUDA program in <a href="../src/gpu_primitives/smoke_cuda.cu"><code>src/gpu_primitives/smoke_cuda.cu</code></a>; the notebook compiles that file directly rather than duplicating its source.</p>
 </div>
 </div>
 </div>
@@ -43,7 +42,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-02"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="compile-the-cuda-c++-smoke"&gt;compile the cuda c++ smoke<a class="anchor-link" href="#compile-the-cuda-c++-smoke">¶</a>&lt;/h2&gt;
+<h2 id="section-2">compile the cuda c++ smoke<a class="anchor-link" href="#compile-the-cuda-c++-smoke">¶</a></h2>
 </div>
 </div>
 </div>
@@ -74,7 +73,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-04"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="run-the-cuda-c++-smoke"&gt;run the cuda c++ smoke<a class="anchor-link" href="#run-the-cuda-c++-smoke">¶</a>&lt;/h2&gt;
+<h2 id="section-3">run the cuda c++ smoke<a class="anchor-link" href="#run-the-cuda-c++-smoke">¶</a></h2>
 </div>
 </div>
 </div>
@@ -92,7 +91,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-06"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="check-memory-access-with-compute-sanitizer"&gt;check memory access with compute sanitizer<a class="anchor-link" href="#check-memory-access-with-compute-sanitizer">¶</a>&lt;/h2&gt;
+<h2 id="section-4">check memory access with compute sanitizer<a class="anchor-link" href="#check-memory-access-with-compute-sanitizer">¶</a></h2>
 </div>
 </div>
 </div>
@@ -121,8 +120,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-08"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="optional-triton-smoke"&gt;optional triton smoke<a class="anchor-link" href="#optional-triton-smoke">¶</a>&lt;/h2&gt;&lt;p&gt;This uses the notebook's Python environment so its PyTorch and Triton packages stay aligned.&lt;/p&gt;
-
+<h2 id="section-5">optional triton smoke<a class="anchor-link" href="#optional-triton-smoke">¶</a></h2><p>This uses the notebook's Python environment so its PyTorch and Triton packages stay aligned.</p>
 </div>
 </div>
 </div>
@@ -140,8 +138,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=cuda-setup-10"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="observations"&gt;observations<a class="anchor-link" href="#observations">¶</a>&lt;/h2&gt;&lt;p&gt;Record the machine, toolchain versions, observed output, and any follow-up question here after running the checks.&lt;/p&gt;
-
+<h2 id="section-6">observations<a class="anchor-link" href="#observations">¶</a></h2><p>Record the machine, toolchain versions, observed output, and any follow-up question here after running the checks.</p>
 </div>
 </div>
 </div>

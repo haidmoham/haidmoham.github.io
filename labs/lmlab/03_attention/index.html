@@ -1,8 +1,7 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>attention · lmlab · Mohammad Haider</title><meta name="description" content="authored implementation and comparison notes. this revision does not contain saved cell outputs."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 03_attention</p><h1>attention</h1><p class="lab-deck">building and comparing context-dependent models</p><p>authored implementation and comparison notes. this revision does not contain saved cell outputs.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#notebook">implementation &amp; outputs</a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/03_attention.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=attention-goal"><div class="prompt input_prompt">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>attention · lmlab · Mohammad Haider</title><meta name="description" content="authored implementation and comparison notes. this revision does not contain saved cell outputs."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 03_attention</p><h1>attention</h1><p class="lab-deck">building and comparing context-dependent models</p><p>authored implementation and comparison notes. this revision does not contain saved cell outputs.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">attention language model </a></li><li><a href="#section-2">prepare token streams and batches </a></li><li><a href="#section-3">embed the current batch </a></li><li><a href="#section-4">multi-head causal self-attention </a></li><li><a href="#section-5">position-wise feed-forward network </a></li><li><a href="#section-6">attention shape check </a></li><li><a href="#section-7">block shape check </a></li><li><a href="#section-8">train a one-block language model </a></li><li><a href="#section-9">compare bigram and one-block outputs </a></li><li><a href="#section-10">paired control and treatment experiment </a></li><li><a href="#section-11">text at 1k, 2.5k, 5k, and 10k updates </a></li><li><a href="#section-12">compose transformer blocks </a></li><li><a href="#section-13">all treatments: matched 10k-update comparison </a></li><li><a href="#section-14">extending depth to 4, 6, and 8 blocks </a></li><li><a href="#section-15">10k treatment samples, side by side </a></li><li><a href="#section-16">context training and cross-evaluation </a></li><li><a href="#section-17">reflection: context and loss </a></li><li><a href="#section-18">sinusoidal positional encoding </a></li><li><a href="#section-19">bigram → six-block transformer → sinusoidal encoding </a></li><li><a href="#section-20">matched text samples: bigram, six blocks, and positional encoding </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/03_attention.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=attention-goal"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="attention-language-model"&gt;attention language model<a class="anchor-link" href="#attention-language-model">¶</a>&lt;/h1&gt;&lt;p&gt;Start from the same Tiny Shakespeare token stream as the bigram model, then run explicit multi-head causal self-attention on the embedded batch.&lt;/p&gt;
-
+<h1 id="section-1">attention language model<a class="anchor-link" href="#attention-language-model">¶</a></h1><p>Start from the same Tiny Shakespeare token stream as the bigram model, then run explicit multi-head causal self-attention on the embedded batch.</p>
 </div>
 </div>
 </div>
@@ -36,7 +35,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=prepare-data"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="prepare-token-streams-and-batches"&gt;prepare token streams and batches<a class="anchor-link" href="#prepare-token-streams-and-batches">¶</a>&lt;/h2&gt;
+<h2 id="section-2">prepare token streams and batches<a class="anchor-link" href="#prepare-token-streams-and-batches">¶</a></h2>
 </div>
 </div>
 </div>
@@ -67,7 +66,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=model-scaffold"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="embed-the-current-batch"&gt;embed the current batch<a class="anchor-link" href="#embed-the-current-batch">¶</a>&lt;/h2&gt;
+<h2 id="section-3">embed the current batch<a class="anchor-link" href="#embed-the-current-batch">¶</a></h2>
 </div>
 </div>
 </div>
@@ -89,7 +88,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=e20f2f0e"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="multi-head-causal-self-attention"&gt;multi-head causal self-attention<a class="anchor-link" href="#multi-head-causal-self-attention">¶</a>&lt;/h2&gt;
+<h2 id="section-4">multi-head causal self-attention<a class="anchor-link" href="#multi-head-causal-self-attention">¶</a></h2>
 </div>
 </div>
 </div>
@@ -154,7 +153,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=feed-forward-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="position-wise-feed-forward-network"&gt;position-wise feed-forward network<a class="anchor-link" href="#position-wise-feed-forward-network">¶</a>&lt;/h2&gt;
+<h2 id="section-5">position-wise feed-forward network<a class="anchor-link" href="#position-wise-feed-forward-network">¶</a></h2>
 </div>
 </div>
 </div>
@@ -179,7 +178,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=attention-check-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="attention-shape-check"&gt;attention shape check<a class="anchor-link" href="#attention-shape-check">¶</a>&lt;/h2&gt;
+<h2 id="section-6">attention shape check<a class="anchor-link" href="#attention-shape-check">¶</a></h2>
 </div>
 </div>
 </div>
@@ -203,9 +202,8 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=next-step"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;p&gt;combine attention and feed-forward transformations with post-normalization: <code>LayerNorm(x + Sublayer(x))</code>, matching section 3.1.&lt;/p&gt;
-&lt;p&gt;the saved experiment results below were produced with the earlier pre-norm block. they have not been retrained after this change; use source revision <code>27127de</code> to replay those checkpoints faithfully.&lt;/p&gt;
-
+<p>combine attention and feed-forward transformations with post-normalization: <code>LayerNorm(x + Sublayer(x))</code>, matching section 3.1.</p>
+<p>the saved experiment results below were produced with the earlier pre-norm block. they have not been retrained after this change; use source revision <code>27127de</code> to replay those checkpoints faithfully.</p>
 </div>
 </div>
 </div>
@@ -241,7 +239,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=block-check-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="block-shape-check"&gt;block shape check<a class="anchor-link" href="#block-shape-check">¶</a>&lt;/h2&gt;
+<h2 id="section-7">block shape check<a class="anchor-link" href="#block-shape-check">¶</a></h2>
 </div>
 </div>
 </div>
@@ -271,8 +269,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=single-block-training"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="train-a-one-block-language-model"&gt;train a one-block language model<a class="anchor-link" href="#train-a-one-block-language-model">¶</a>&lt;/h2&gt;&lt;p&gt;the shared next-token loss trains all registered model parameters together. this notebook uses BPE tokens, not individual characters. define the loop here; the implemented one-block wrapper is in <code>src/language_models.py</code>. plain minibatch SGD exposes the update rule directly; the optimizer and learning rate are experimental choices.&lt;/p&gt;
-
+<h2 id="section-8">train a one-block language model<a class="anchor-link" href="#train-a-one-block-language-model">¶</a></h2><p>the shared next-token loss trains all registered model parameters together. this notebook uses BPE tokens, not individual characters. define the loop here; the implemented one-block wrapper is in <code>src/language_models.py</code>. plain minibatch SGD exposes the update rule directly; the optimizer and learning rate are experimental choices.</p>
 </div>
 </div>
 </div>
@@ -338,9 +335,8 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=compare-models-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="compare-bigram-and-one-block-outputs"&gt;compare bigram and one-block outputs<a class="anchor-link" href="#compare-bigram-and-one-block-outputs">¶</a>&lt;/h2&gt;&lt;p&gt;evaluate both trained models on identical sampled training and validation windows, then generate from the same prompt. delta means transformer minus bigram cross-entropy (nats per BPE token); negative favors the transformer. this is a between-model gap, not a before/after training change.&lt;/p&gt;
-&lt;p&gt;record each training budget and optimizer when interpreting results: the bigram notebook uses AdamW, while the loop above uses SGD. these models also have different parameter counts; this comparison alone does not isolate architecture.&lt;/p&gt;
-
+<h2 id="section-9">compare bigram and one-block outputs<a class="anchor-link" href="#compare-bigram-and-one-block-outputs">¶</a></h2><p>evaluate both trained models on identical sampled training and validation windows, then generate from the same prompt. delta means transformer minus bigram cross-entropy (nats per BPE token); negative favors the transformer. this is a between-model gap, not a before/after training change.</p>
+<p>record each training budget and optimizer when interpreting results: the bigram notebook uses AdamW, while the loop above uses SGD. these models also have different parameter counts; this comparison alone does not isolate architecture.</p>
 </div>
 </div>
 </div>
@@ -431,9 +427,8 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=paired-experiment-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="paired-control-and-treatment-experiment"&gt;paired control and treatment experiment<a class="anchor-link" href="#paired-control-and-treatment-experiment">¶</a>&lt;/h2&gt;&lt;p&gt;three paired seeds; identical batches and shared-component initialization; 10,000 uninterrupted AdamW updates each, rerun from the same initial seeds. the treatment adds learned positions, one transformer block, and final normalization. equal updates are not equal compute or parameter counts. validation loss is the primary outcome; these exploratory runs are not evidence of universal superiority. generated weights and results stay local under <code>artifacts/</code>.&lt;/p&gt;
-&lt;p&gt;only the training budget changed from the 1,000-update run. compare both budgets below: a widening, stable, or closing gap are all informative outcomes. full checkpoints include optimizer and random-generator state; the original short-run artifacts remain available.&lt;/p&gt;
-
+<h2 id="section-10">paired control and treatment experiment<a class="anchor-link" href="#paired-control-and-treatment-experiment">¶</a></h2><p>three paired seeds; identical batches and shared-component initialization; 10,000 uninterrupted AdamW updates each, rerun from the same initial seeds. the treatment adds learned positions, one transformer block, and final normalization. equal updates are not equal compute or parameter counts. validation loss is the primary outcome; these exploratory runs are not evidence of universal superiority. generated weights and results stay local under <code>artifacts/</code>.</p>
+<p>only the training budget changed from the 1,000-update run. compare both budgets below: a widening, stable, or closing gap are all informative outcomes. full checkpoints include optimizer and random-generator state; the original short-run artifacts remain available.</p>
 </div>
 </div>
 </div>
@@ -506,8 +501,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=text-milestones-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="text-at-1k,-2.5k,-5k,-and-10k-updates"&gt;text at 1k, 2.5k, 5k, and 10k updates<a class="anchor-link" href="#text-at-1k,-2.5k,-5k,-and-10k-updates">¶</a>&lt;/h2&gt;&lt;p&gt;same prompt and sampling seed at each checkpoint, with 100 new BPE tokens. compare changes within each model as well as between models; the samples illustrate behavior, while the loss curves provide broader evidence.&lt;/p&gt;
-
+<h2 id="section-11">text at 1k, 2.5k, 5k, and 10k updates<a class="anchor-link" href="#text-at-1k,-2.5k,-5k,-and-10k-updates">¶</a></h2><p>same prompt and sampling seed at each checkpoint, with 100 new BPE tokens. compare changes within each model as well as between models; the samples illustrate behavior, while the loss curves provide broader evidence.</p>
 </div>
 </div>
 </div>
@@ -532,8 +526,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=stack-guidance"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="compose-transformer-blocks"&gt;compose transformer blocks<a class="anchor-link" href="#compose-transformer-blocks">¶</a>&lt;/h2&gt;&lt;p&gt;each block refines the preceding representation with separate parameters. depth and block dimensions are configurable. the stack returns final embeddings and a list of attention maps in layer order; vocabulary projection remains the language-model wrapper’s responsibility. the reusable version is in <code>src/language_models.py</code>.&lt;/p&gt;
-
+<h2 id="section-12">compose transformer blocks<a class="anchor-link" href="#compose-transformer-blocks">¶</a></h2><p>each block refines the preceding representation with separate parameters. depth and block dimensions are configurable. the stack returns final embeddings and a list of attention maps in layer order; vocabulary projection remains the language-model wrapper’s responsibility. the reusable version is in <code>src/language_models.py</code>.</p>
 </div>
 </div>
 </div>
@@ -604,9 +597,8 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=all-treatments-protocol"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="all-treatments:-matched-10k-update-comparison"&gt;all treatments: matched 10k-update comparison<a class="anchor-link" href="#all-treatments:-matched-10k-update-comparison">¶</a>&lt;/h2&gt;&lt;p&gt;compare bigram, one transformer block, and two transformer blocks across seeds 42, 43, and 44. all models see the same batches and fixed evaluation windows. width 32, context 8, batch size 32; AdamW at 0.001 with weight decay 0.01. shared components start at identical values, with separate parameter objects. the second block adds parameters and compute.&lt;/p&gt;
-&lt;p&gt;question and pre-run hypothesis, controls, checkpoints, and reproduction command are in <code>experiments/depth-comparison.md</code>. validation loss is primary. the curves show the mean and full seed range, not confidence intervals. samples use the first preselected seed and are qualitative. full optimizer/RNG checkpoints and source hashes are saved locally.&lt;/p&gt;
-
+<h2 id="section-13">all treatments: matched 10k-update comparison<a class="anchor-link" href="#all-treatments:-matched-10k-update-comparison">¶</a></h2><p>compare bigram, one transformer block, and two transformer blocks across seeds 42, 43, and 44. all models see the same batches and fixed evaluation windows. width 32, context 8, batch size 32; AdamW at 0.001 with weight decay 0.01. shared components start at identical values, with separate parameter objects. the second block adds parameters and compute.</p>
+<p>question and pre-run hypothesis, controls, checkpoints, and reproduction command are in <code>experiments/depth-comparison.md</code>. validation loss is primary. the curves show the mean and full seed range, not confidence intervals. samples use the first preselected seed and are qualitative. full optimizer/RNG checkpoints and source hashes are saved locally.</p>
 </div>
 </div>
 </div>
@@ -669,9 +661,8 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=extended-depth-protocol"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="extending-depth-to-4,-6,-and-8-blocks"&gt;extending depth to 4, 6, and 8 blocks<a class="anchor-link" href="#extending-depth-to-4,-6,-and-8-blocks">¶</a>&lt;/h2&gt;&lt;p&gt;same three seeds, 10,000 updates, width 32, context 8, data, AdamW settings, and fixed evaluation windows. new models start from matching shared components and overlapping block prefixes. prior bigram/1/2-block runs are retained and loaded alongside these results; source and control compatibility are checked before combining.&lt;/p&gt;
-&lt;p&gt;the pre-run question is whether validation improvements flatten or reverse with additional depth. more blocks add parameters and compute. timings across the two runs are approximate. the plots show means and seed ranges, not confidence intervals. see <code>experiments/depth-comparison.md</code> for the experimental record and reproduction command.&lt;/p&gt;
-
+<h2 id="section-14">extending depth to 4, 6, and 8 blocks<a class="anchor-link" href="#extending-depth-to-4,-6,-and-8-blocks">¶</a></h2><p>same three seeds, 10,000 updates, width 32, context 8, data, AdamW settings, and fixed evaluation windows. new models start from matching shared components and overlapping block prefixes. prior bigram/1/2-block runs are retained and loaded alongside these results; source and control compatibility are checked before combining.</p>
+<p>the pre-run question is whether validation improvements flatten or reverse with additional depth. more blocks add parameters and compute. timings across the two runs are approximate. the plots show means and seed ranges, not confidence intervals. see <code>experiments/depth-comparison.md</code> for the experimental record and reproduction command.</p>
 </div>
 </div>
 </div>
@@ -726,8 +717,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=treatment-text-grid-heading"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="10k-treatment-samples,-side-by-side"&gt;10k treatment samples, side by side<a class="anchor-link" href="#10k-treatment-samples,-side-by-side">¶</a>&lt;/h2&gt;&lt;p&gt;same prompt and preselected training seed 42, sampling seed 123, temperature 1, and 100 generated BPE tokens. each panel shows its individual seed's validation loss; the table above reports three-seed means. spelling and line breaks are retained. these samples illustrate behavior, not overall quality.&lt;/p&gt;
-
+<h2 id="section-15">10k treatment samples, side by side<a class="anchor-link" href="#10k-treatment-samples,-side-by-side">¶</a></h2><p>same prompt and preselected training seed 42, sampling seed 123, temperature 1, and 100 generated BPE tokens. each panel shows its individual seed's validation loss; the table above reports three-seed means. spelling and line breaks are retained. these samples illustrate behavior, not overall quality.</p>
 </div>
 </div>
 </div>
@@ -748,10 +738,9 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=context-experiment-protocol"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="context-training-and-cross-evaluation"&gt;context training and cross-evaluation<a class="anchor-link" href="#context-training-and-cross-evaluation">¶</a>&lt;/h2&gt;&lt;p&gt;four blocks, width 32, contexts 8/32/128/256; three seeds and 10,000 updates. each update uses the same 256 target tokens, split at different sequence boundaries. evaluation scores the same 128 positions per split using the requested preceding history. loss units are nats per BPE token. these metrics use a different protocol from the earlier depth comparison.&lt;/p&gt;
-&lt;p&gt;at completion, each model is evaluated at every supported context length. weights stay fixed during cross-evaluation; cropped inputs use learned positions starting at zero. native-context curves show mean and seed range, not confidence intervals. tables retain each seed. generated samples use training seed 42, sampling seed 123, temperature 1, and a shared 256-token prompt truncated to the evaluation context.&lt;/p&gt;
-&lt;p&gt;experiment record: <code>experiments/context-comparison.md</code>. the cell below runs the experiment if the output directory has no results, or loads completed results. to rerun from scratch, choose a fresh output directory. results and interpretation will be walked through together; no conclusions are supplied here.&lt;/p&gt;
-
+<h2 id="section-16">context training and cross-evaluation<a class="anchor-link" href="#context-training-and-cross-evaluation">¶</a></h2><p>four blocks, width 32, contexts 8/32/128/256; three seeds and 10,000 updates. each update uses the same 256 target tokens, split at different sequence boundaries. evaluation scores the same 128 positions per split using the requested preceding history. loss units are nats per BPE token. these metrics use a different protocol from the earlier depth comparison.</p>
+<p>at completion, each model is evaluated at every supported context length. weights stay fixed during cross-evaluation; cropped inputs use learned positions starting at zero. native-context curves show mean and seed range, not confidence intervals. tables retain each seed. generated samples use training seed 42, sampling seed 123, temperature 1, and a shared 256-token prompt truncated to the evaluation context.</p>
+<p>experiment record: <code>experiments/context-comparison.md</code>. the cell below runs the experiment if the output directory has no results, or loads completed results. to rerun from scratch, choose a fresh output directory. results and interpretation will be walked through together; no conclusions are supplied here.</p>
 </div>
 </div>
 </div>
@@ -823,20 +812,18 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=context-loss-reflection"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="reflection:-context-and-loss"&gt;reflection: context and loss<a class="anchor-link" href="#reflection:-context-and-loss">¶</a>&lt;/h2&gt;&lt;p&gt;i expected the loss to go down as context increased, but it didn’t. my first thought was that there isn’t a tidy linear relationship between context and loss. more specifically, though, i realized i don’t yet understand what that relationship actually is.&lt;/p&gt;
-&lt;p&gt;the connection that makes sense to me is that you can have memories and still be wrong about how you apply them. having more information available doesn’t necessarily mean using it correctly. that gives me a way to think about the result, even if it doesn’t yet explain what happened in this experiment.&lt;/p&gt;
-
+<h2 id="section-17">reflection: context and loss<a class="anchor-link" href="#reflection:-context-and-loss">¶</a></h2><p>i expected the loss to go down as context increased, but it didn’t. my first thought was that there isn’t a tidy linear relationship between context and loss. more specifically, though, i realized i don’t yet understand what that relationship actually is.</p>
+<p>the connection that makes sense to me is that you can have memories and still be wrong about how you apply them. having more information available doesn’t necessarily mean using it correctly. that gives me a way to think about the result, even if it doesn’t yet explain what happened in this experiment.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=sinusoidal-position-notes"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="sinusoidal-positional-encoding"&gt;sinusoidal positional encoding<a class="anchor-link" href="#sinusoidal-positional-encoding">¶</a>&lt;/h2&gt;&lt;p&gt;implementation companion (assistant): <a href="https://arxiv.org/pdf/1706.03762#page=6">attention is all you need, section 3.5, page 6</a>.&lt;/p&gt;
-&lt;p&gt;for position <code>pos</code> and feature pair <code>i</code>, even features use <code>sin(pos / 10000**(2*i/d_model))</code> and odd features use <code>cos(pos / 10000**(2*i/d_model))</code>. the position vector has the same width as the token embedding, so the wrapper adds them before the transformer stack.&lt;/p&gt;
-&lt;p&gt;the module below computes fixed vectors on demand. its frequency scales are a registered buffer, not trainable parameters. both language-model wrappers accept <code>position_encoding="sinusoidal"</code>; <code>"learned"</code> remains the default for existing runs and checkpoints. select the same encoding when reconstructing a model for checkpoint loading.&lt;/p&gt;
-&lt;p&gt;this implements section 3.5 only: token-embedding scaling and the then-current pre-norm blocks were unchanged in that experiment. position ids still restart at zero when inputs are cropped. computing positions beyond the training length is possible; good predictions at those lengths are not guaranteed. the demonstration below is an untrained wiring check, not a new treatment result.&lt;/p&gt;
-
+<h2 id="section-18">sinusoidal positional encoding<a class="anchor-link" href="#sinusoidal-positional-encoding">¶</a></h2><p>implementation companion (assistant): <a href="https://arxiv.org/pdf/1706.03762#page=6">attention is all you need, section 3.5, page 6</a>.</p>
+<p>for position <code>pos</code> and feature pair <code>i</code>, even features use <code>sin(pos / 10000**(2*i/d_model))</code> and odd features use <code>cos(pos / 10000**(2*i/d_model))</code>. the position vector has the same width as the token embedding, so the wrapper adds them before the transformer stack.</p>
+<p>the module below computes fixed vectors on demand. its frequency scales are a registered buffer, not trainable parameters. both language-model wrappers accept <code>position_encoding="sinusoidal"</code>; <code>"learned"</code> remains the default for existing runs and checkpoints. select the same encoding when reconstructing a model for checkpoint loading.</p>
+<p>this implements section 3.5 only: token-embedding scaling and the then-current pre-norm blocks were unchanged in that experiment. position ids still restart at zero when inputs are cropped. computing positions beyond the training length is possible; good predictions at those lengths are not guaranteed. the demonstration below is an untrained wiring check, not a new treatment result.</p>
 </div>
 </div>
 </div>
@@ -915,10 +902,10 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=position-comparison-protocol"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="bigram-%E2%86%92-six-block-transformer-%E2%86%92-sinusoidal-encoding"&gt;bigram → six-block transformer → sinusoidal encoding<a class="anchor-link" href="#bigram-%E2%86%92-six-block-transformer-%E2%86%92-sinusoidal-encoding">¶</a>&lt;/h2&gt;&lt;p&gt;three paired arms: bigram; six transformer blocks without explicit positions; the same six blocks with sinusoidal positional encoding. context 32, width 32, two heads, seeds 42/43/44, 10,000 updates. each update uses the same 256 targets in eight sequences of 32 for every arm. token embeddings and vocabulary heads start identically; the transformers also share initial block and final-norm weights, with independent parameters.&lt;/p&gt;
-&lt;p&gt;the first contrast adds the transformer architecture, parameters, and access to history. the second isolates adding sinusoidal position vectors, with equal trainable parameter counts. causal masks remain in both transformers. the bigram uses only the final input token when scoring each target.&lt;/p&gt;
-&lt;p&gt;loss is cross-entropy in nats per BPE token on the same 1,024 sampled targets per split. tables show means, seed ranges (not confidence intervals), and paired validation differences. negative differences mean lower loss for the first named treatment. no figures or performance interpretation supplied. full methods and checkpoint schedule: <a href="../experiments/position-encoding-comparison.md">experiment record</a>.&lt;/p&gt;
-&lt;p&gt;run from the repository root:&lt;/p&gt;
+<h2 id="section-19">bigram → six-block transformer → sinusoidal encoding<a class="anchor-link" href="#bigram-%E2%86%92-six-block-transformer-%E2%86%92-sinusoidal-encoding">¶</a></h2><p>three paired arms: bigram; six transformer blocks without explicit positions; the same six blocks with sinusoidal positional encoding. context 32, width 32, two heads, seeds 42/43/44, 10,000 updates. each update uses the same 256 targets in eight sequences of 32 for every arm. token embeddings and vocabulary heads start identically; the transformers also share initial block and final-norm weights, with independent parameters.</p>
+<p>the first contrast adds the transformer architecture, parameters, and access to history. the second isolates adding sinusoidal position vectors, with equal trainable parameter counts. causal masks remain in both transformers. the bigram uses only the final input token when scoring each target.</p>
+<p>loss is cross-entropy in nats per BPE token on the same 1,024 sampled targets per split. tables show means, seed ranges (not confidence intervals), and paired validation differences. negative differences mean lower loss for the first named treatment. no figures or performance interpretation supplied. full methods and checkpoint schedule: <a href="../experiments/position-encoding-comparison.md">experiment record</a>.</p>
+<p>run from the repository root:</p>
 <div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>experiments.compare_position_encodings<span class="w"> </span>--steps<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--output<span class="w"> </span>artifacts/position-encoding-six-blocks-10k
 </pre></div>
 </div>
@@ -956,8 +943,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=position-samples-notes"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h2 id="matched-text-samples:-bigram,-six-blocks,-and-positional-encoding"&gt;matched text samples: bigram, six blocks, and positional encoding<a class="anchor-link" href="#matched-text-samples:-bigram,-six-blocks,-and-positional-encoding">¶</a>&lt;/h2&gt;&lt;p&gt;same 32-token prompt, training seed 42, sampling seed 123, temperature 1, and 100 new BPE tokens from each 10,000-update checkpoint. labels show the individual seed's validation loss, not the three-seed mean. continuations are preserved verbatim with visual wrapping. raw samples and checkpoint references are saved beside the figure in <code>artifacts/position-encoding-six-blocks-10k/text-samples.json</code>.&lt;/p&gt;
-
+<h2 id="section-20">matched text samples: bigram, six blocks, and positional encoding<a class="anchor-link" href="#matched-text-samples:-bigram,-six-blocks,-and-positional-encoding">¶</a></h2><p>same 32-token prompt, training seed 42, sampling seed 123, temperature 1, and 100 new BPE tokens from each 10,000-update checkpoint. labels show the individual seed's validation loss, not the three-seed mean. continuations are preserved verbatim with visual wrapping. raw samples and checkpoint references are saved beside the figure in <code>artifacts/position-encoding-six-blocks-10k/text-samples.json</code>.</p>
 </div>
 </div>
 </div>

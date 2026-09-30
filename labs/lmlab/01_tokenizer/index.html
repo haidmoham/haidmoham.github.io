@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>tokenization · lmlab · Mohammad Haider</title><meta name="description" content="naive, byte-level, and byte-pair tokenization in one inspectable notebook."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 01_tokenizer</p><h1>tokenization</h1><p class="lab-deck">from characters to bytes and learned merges</p><p>naive, byte-level, and byte-pair tokenization in one inspectable notebook.</p><div class="lab-meta"><span>6 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#notebook">implementation &amp; outputs</a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/01_tokenizer.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing code_cell rendered" id="cell-id=5702dffb">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>tokenization · lmlab · Mohammad Haider</title><meta name="description" content="naive, byte-level, and byte-pair tokenization in one inspectable notebook."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 01_tokenizer</p><h1>tokenization</h1><p class="lab-deck">from characters to bytes and learned merges</p><p>naive, byte-level, and byte-pair tokenization in one inspectable notebook.</p><div class="lab-meta"><span>6 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">Implementing a naive tokenizer </a></li><li><a href="#section-2">Byte-level tokenizer </a></li><li><a href="#section-3">BPE (byte-pair encoding) </a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/01_tokenizer.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing code_cell rendered" id="cell-id=5702dffb">
 <details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
 <div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
@@ -31,7 +31,7 @@
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=050c38e3"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="Implementing-a-naive-tokenizer"&gt;Implementing a naive tokenizer<a class="anchor-link" href="#Implementing-a-naive-tokenizer">¶</a>&lt;/h1&gt;
+<h1 id="section-1">Implementing a naive tokenizer<a class="anchor-link" href="#Implementing-a-naive-tokenizer">¶</a></h1>
 </div>
 </div>
 </div>
@@ -80,7 +80,7 @@ Decoded: Hello world! This is a test.
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=ad064106"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="Byte-level-tokenizer"&gt;Byte-level tokenizer<a class="anchor-link" href="#Byte-level-tokenizer">¶</a>&lt;/h1&gt;
+<h1 id="section-2">Byte-level tokenizer<a class="anchor-link" href="#Byte-level-tokenizer">¶</a></h1>
 </div>
 </div>
 </div>
@@ -115,7 +115,7 @@ Decoded torture text: Hello, world! café پاکستان 日本語 🤖 ∇²ψ
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=ed28fbbd"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-&lt;h1 id="BPE-(byte-pair-encoding)"&gt;BPE (byte-pair encoding)<a class="anchor-link" href="#BPE-(byte-pair-encoding)">¶</a>&lt;/h1&gt;
+<h1 id="section-3">BPE (byte-pair encoding)<a class="anchor-link" href="#BPE-(byte-pair-encoding)">¶</a></h1>
 </div>
 </div>
 </div>
