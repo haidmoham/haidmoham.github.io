@@ -35,6 +35,15 @@ class PublicationTests(unittest.TestCase):
         self.assertIn('must never execute',page)
         self.assertFalse(BeautifulSoup(page,'html.parser').select('script'))
         self.assertEqual((self.output/'labs/lmlab/test/source.ipynb').read_bytes(),self.raw)
+    def test_withdrawn_publication_removes_only_owned_projection(self):
+        self.render()
+        old=self.output/'labs/lmlab/publication.json'
+        old.write_text(json.dumps(self.manifest))
+        keep=self.output/'labs/lmlab/test/editorial.txt';keep.write_text('keep')
+        self.manifest['notebooks'][0]['publishable']=False
+        self.render()
+        self.assertFalse((self.output/'labs/lmlab/test/index.html').exists())
+        self.assertTrue(keep.exists())
     def test_unmarked_notebook_excluded(self):
         self.manifest['notebooks'][0]['publishable']=False
         self.assertEqual(self.render(),[])

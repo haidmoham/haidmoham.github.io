@@ -1,0 +1,33 @@
+name: Approved lmlab notebooks
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: lmlab-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/notebook-requirements.txt
+      - run: python scripts/test_lab_notebooks.py
+      - run: python scripts/sync-lmlab-publication.py
+      - run: python scripts/render-lab-hubs.py
+      - run: python scripts/validate_site.py
+      - name: Commit only the approved notebook projection
+        run: |
+          git add labs/lmlab notes.html labs/robotics/index.html
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs(lmlab): sync explicitly approved notebook publication'
+          git push origin HEAD:main

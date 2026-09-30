@@ -1,0 +1,320 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ant policy learning · robotics test bench · Mohammad Haider</title><meta name="description" content="an explicitly incomplete learning scaffold with TODO cells and no saved outputs. not a completed experiment."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/robotics/">← robotics test bench</a><p class="section-eyebrow">research notebook / ant_policy_learning</p><h1>ant policy learning</h1><p class="lab-deck">objective → policy → behavior</p><p>an explicitly incomplete learning scaffold with TODO cells and no saved outputs. not a completed experiment.</p><div class="lab-meta"><span>source only · no saved cell outputs</span><span>source f15f8a1</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#section-1">Ant policy learning: objective → policy → behavior </a></li><li><a href="#section-2">Goal </a></li><li><a href="#section-3">Setup </a></li><li><a href="#section-4">Steps </a></li><li><a href="#section-5">1. Inspect the Ant interface </a></li><li><a href="#section-6">2. Record a random-action rollout </a></li><li><a href="#section-7">3. Trace one transition </a></li><li><a href="#section-8">4. Define treatment slots </a></li><li><a href="#section-9">5. Construct the small policy </a></li><li><a href="#section-10">6. Train headlessly, then resume </a></li><li><a href="#section-11">7. Evaluate on fixed seeds </a></li><li><a href="#section-12">8. Compare treatments and render only evaluation </a></li><li><a href="#section-13">Checks </a></li><li><a href="#section-14">Next steps: C-1N transfer worksheet (prompts only) </a></li></ol><a href="https://github.com/haidmoham/robotics-test-bench/blob/f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469/experiments/2026-08-27-ant-policy-learning/ant_policy_learning.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing text_cell rendered" id="cell-id=77f30ed8df5d"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="section-1">Ant policy learning: objective → policy → behavior<a class="anchor-link" href="#Ant-policy-learning:-objective-%E2%86%92-policy-%E2%86%92-behavior">¶</a></h1><p>This notebook is a deliberately incomplete learning scaffold. Your job is to write the TODO cells in VS Code and use the outputs to connect <code>observation → policy → action → MuJoCo step → reward → policy update → changed behavior</code>.</p>
+<p>Sources: <a href="https://gymnasium.farama.org/v1.1.1/tutorials/gymnasium_basics/load_quadruped_model/">Farama custom quadruped</a>, <a href="https://gymnasium.farama.org/environments/mujoco/ant/">Ant-v5</a>, and <a href="https://stable-baselines3.readthedocs.io/en/master/guide/rl_tips.html">Stable-Baselines3 guidance</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=eb95f10c7793"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-2">Goal<a class="anchor-link" href="#Goal">¶</a></h2><p>Use Ant-v5 as a temporary quadruped to study how an objective can produce intended motion or an exploitable behavior. This is not C-1N code or C-1N evidence. Before defining the misspecified treatment, preserve this initial prediction:</p>
+<blockquote>
+<p>speed up to a high peak velocity without moving much</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=3384f3e955ec"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-3">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>Run the next two cells first. The smoke cell resets Ant, samples one legal random action, and steps once. It does not train a policy.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=43a05afb95fe">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">stable_baselines3</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPO</span>
+
+<span class="n">ENV_ID</span> <span class="o">=</span> <span class="s2">"Ant-v5"</span>
+<span class="n">SMOKE_TIMESTEPS</span> <span class="o">=</span> <span class="mi">10_000</span>
+<span class="n">MAX_TRAINING_TIMESTEPS</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+<span class="n">EVAL_SEEDS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="n">POLICY_NET_ARCH</span> <span class="o">=</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>
+<span class="n">EXPERIMENT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACTS_DIR</span> <span class="o">=</span> <span class="n">EXPERIMENT_DIR</span> <span class="o">/</span> <span class="s2">"artifacts"</span>
+<span class="n">CHECKPOINTS_DIR</span> <span class="o">=</span> <span class="n">ARTIFACTS_DIR</span> <span class="o">/</span> <span class="s2">"checkpoints"</span>
+<span class="n">LOGS_DIR</span> <span class="o">=</span> <span class="n">EXPERIMENT_DIR</span> <span class="o">/</span> <span class="s2">"logs"</span>
+<span class="n">VIDEOS_DIR</span> <span class="o">=</span> <span class="n">EXPERIMENT_DIR</span> <span class="o">/</span> <span class="s2">"videos"</span>
+<span class="n">ROLLOUTS_DIR</span> <span class="o">=</span> <span class="n">EXPERIMENT_DIR</span> <span class="o">/</span> <span class="s2">"rollouts"</span>
+
+<span class="n">EXPECTED_METRICS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"total_return"</span><span class="p">,</span>
+    <span class="s2">"net_displacement"</span><span class="p">,</span>
+    <span class="s2">"peak_absolute_velocity"</span><span class="p">,</span>
+    <span class="s2">"survival_time"</span><span class="p">,</span>
+    <span class="s2">"control_cost"</span><span class="p">,</span>
+    <span class="s2">"contact_cost"</span><span class="p">,</span>
+    <span class="s2">"termination_cause"</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">SMOKE_TIMESTEPS</span> <span class="o">&lt;</span> <span class="n">MAX_TRAINING_TIMESTEPS</span>
+<span class="k">assert</span> <span class="n">EVAL_SEEDS</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">POLICY_NET_ARCH</span> <span class="o">==</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>
+<span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">EXPECTED_METRICS</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="s2">"total_return"</span><span class="p">,</span> <span class="s2">"net_displacement"</span><span class="p">,</span> <span class="s2">"peak_absolute_velocity"</span><span class="p">,</span>
+    <span class="s2">"survival_time"</span><span class="p">,</span> <span class="s2">"control_cost"</span><span class="p">,</span> <span class="s2">"contact_cost"</span><span class="p">,</span> <span class="s2">"termination_cause"</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=bdfbe2ae7393">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># Complete smoke path: reset, sample a legal action, and take one MuJoCo step.</span>
+<span class="n">smoke_env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">ENV_ID</span><span class="p">)</span>
+<span class="n">smoke_observation</span><span class="p">,</span> <span class="n">smoke_info</span> <span class="o">=</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">smoke_action</span> <span class="o">=</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+<span class="n">next_observation</span><span class="p">,</span> <span class="n">smoke_reward</span><span class="p">,</span> <span class="n">smoke_terminated</span><span class="p">,</span> <span class="n">smoke_truncated</span><span class="p">,</span> <span class="n">next_info</span> <span class="o">=</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">smoke_action</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">smoke_observation</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">smoke_action</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">smoke_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">next_observation</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">smoke_reward</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">({</span>
+    <span class="s2">"observation_shape"</span><span class="p">:</span> <span class="n">smoke_observation</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+    <span class="s2">"action_shape"</span><span class="p">:</span> <span class="n">smoke_action</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+    <span class="s2">"reward"</span><span class="p">:</span> <span class="n">smoke_reward</span><span class="p">,</span>
+    <span class="s2">"terminated"</span><span class="p">:</span> <span class="n">smoke_terminated</span><span class="p">,</span>
+    <span class="s2">"truncated"</span><span class="p">:</span> <span class="n">smoke_truncated</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">smoke_env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=a40fb697b44b"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-4">Steps<a class="anchor-link" href="#Steps">¶</a></h2><p>Each TODO is intentionally yours. Implement one, run it, inspect its output, and write down what changed in the loop before moving on.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=df735b46a440"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-5">1. Inspect the Ant interface<a class="anchor-link" href="#1.-Inspect-the-Ant-interface">¶</a></h3><p>TODO: inspect the MuJoCo model, simulator timestep, observation structure, action bounds, and reset state. Which quantities are available to the policy, and which action dimensions reach the actuators?</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=40118bb26c20">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): create an Ant environment and inspect model/timestep/observation/action/reset details.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inspect_ant_interface</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): inspect Ant-v5 before training."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=e33c6c906b78"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-6">2. Record a random-action rollout<a class="anchor-link" href="#2.-Record-a-random-action-rollout">¶</a></h3><p>TODO: record state, action, decomposed reward terms, termination/truncation, position, and velocity. Keep unavailable measurements explicit instead of filling them with guesses.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=800665994504">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): return a pandas DataFrame with one row per random-action transition.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">record_random_rollout</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): record rollout telemetry."</span><span class="p">)</span>
+
+<span class="c1"># TODO(user): choose the columns after inspecting the environment info dictionary.</span>
+<span class="n">rollout_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"step"</span><span class="p">,</span> <span class="s2">"state"</span><span class="p">,</span> <span class="s2">"action"</span><span class="p">,</span> <span class="s2">"reward"</span><span class="p">,</span> <span class="s2">"terminated"</span><span class="p">,</span> <span class="s2">"truncated"</span><span class="p">]</span>
+<span class="n">random_rollout</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rollout_columns</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=94527865c688"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-7">3. Trace one transition<a class="anchor-link" href="#3.-Trace-one-transition">¶</a></h3><p>TODO: select a single row and show the causal path <code>state → action → dynamics → next state → reward</code>. What information is produced by the environment, and what information is chosen by a policy?</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=60124afa5ac0">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): return a readable single-transition record from your rollout.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trace_transition</span><span class="p">(</span><span class="n">rollout</span><span class="p">,</span> <span class="n">step_index</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): trace one recorded transition."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=11f428c24e90"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-8">4. Define treatment slots<a class="anchor-link" href="#4.-Define-treatment-slots">¶</a></h3><p>Keep one control and one deliberately legible treatment. The <code>misspecified</code> objective is intentionally blank: decide whether a peak, absolute, or squared velocity quantity tests your prediction, then state why.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=41282df81b17">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): define only the configuration fields you can explain.</span>
+<span class="n">treatments</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"control"</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">"misspecified"</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">"corrected"</span><span class="p">:</span> <span class="p">{},</span>
+<span class="p">}</span>
+<span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">treatments</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"control"</span><span class="p">,</span> <span class="s2">"misspecified"</span><span class="p">,</span> <span class="s2">"corrected"</span><span class="p">}</span>
+
+<span class="c1"># TODO(user): choose and implement the misspecified reward; do not delegate the choice.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">misspecified_reward</span><span class="p">(</span><span class="n">transition</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): choose peak, absolute, squared, or another stated velocity objective."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=fe2234f26155"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-9">5. Construct the small policy<a class="anchor-link" href="#5.-Construct-the-small-policy">¶</a></h3><p>TODO: construct PPO with <code>MlpPolicy</code> and two hidden layers of 64 units. Read the Stable-Baselines3 constructor while you decide the remaining hyperparameters; do not copy a configuration you cannot explain.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=4d936c29231c">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): construct PPO("MlpPolicy", ...) with net_arch=POLICY_NET_ARCH.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_policy</span><span class="p">(</span><span class="n">training_env</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): construct the small PPO policy."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=4346dde135a0"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-10">6. Train headlessly, then resume<a class="anchor-link" href="#6.-Train-headlessly,-then-resume">¶</a></h3><p>TODO: implement a <code>10_000</code>-step headless smoke run before a resumable run up to <code>1_000_000</code> steps. Put checkpoints and TensorBoard logs beneath <code>artifacts/</code>; do not render during training.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=87b37ee3abc9">
+<details class="source-cell"><summary>inspect code · cell 08</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): add your checkpoint callback and resumable training path.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_headlessly</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">total_timesteps</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">,</span> <span class="n">log_dir</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): run a 10k smoke training pass, then resume deliberately."</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">SMOKE_TIMESTEPS</span> <span class="o">==</span> <span class="mi">10_000</span>
+<span class="k">assert</span> <span class="n">MAX_TRAINING_TIMESTEPS</span> <span class="o">==</span> <span class="mi">1_000_000</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=216c764db62b"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-11">7. Evaluate on fixed seeds<a class="anchor-link" href="#7.-Evaluate-on-fixed-seeds">¶</a></h3><p>TODO: evaluate deterministic policies on seeds <code>[0, 1, 2, 3, 4]</code>. Keep the training objective separate from evaluation metrics. One training seed per treatment is enough for this learning fixture, not for a benchmark claim.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=12f47ad8dd5e">
+<details class="source-cell"><summary>inspect code · cell 09</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): return one metric row per treatment and evaluation seed.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluate_deterministically</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">treatment_name</span><span class="p">,</span> <span class="n">seeds</span><span class="o">=</span><span class="n">EVAL_SEEDS</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): evaluate deterministic rollouts on fixed seeds."</span><span class="p">)</span>
+
+<span class="n">evaluation_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"treatment"</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">,</span> <span class="o">*</span><span class="n">EXPECTED_METRICS</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">evaluation_table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"treatment"</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">,</span> <span class="o">*</span><span class="n">EXPECTED_METRICS</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=fb1af3216c49"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="section-12">8. Compare treatments and render only evaluation<a class="anchor-link" href="#8.-Compare-treatments-and-render-only-evaluation">¶</a></h3><p>TODO: fill the plot with your evaluation table, then render a selected evaluation rollout as inline RGB frames. Do not use rendered training frames as evidence.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=21d16ddbb197">
+<details class="source-cell"><summary>inspect code · cell 10</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># TODO(user): replace the empty shell with a metric comparison after evaluation.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"TODO: treatment comparison after fixed-seed evaluation"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"treatment"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"chosen evaluation metric"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">axis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># TODO(user): create an env with render_mode="rgb_array" and display evaluation frames inline.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">render_evaluation_frames</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"TODO(user): render evaluation only, never training."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=5da76628a65f"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-13">Checks<a class="anchor-link" href="#Checks">¶</a></h2><p>Before interpreting behavior, check that each treatment has the same fixed evaluation seeds, all expected metrics, retained checkpoints/rollout provenance, and a stated termination cause. A visually attractive rollout is one sample, not a conclusion.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=c47f39a446a9"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="section-14">Next steps: C-1N transfer worksheet (prompts only)<a class="anchor-link" href="#Next-steps:-C-1N-transfer-worksheet-(prompts-only)">¶</a></h2><p>Do not write C-1N code here. When the Ant loop is understandable, answer these prompts before creating an adapter:</p>
+<ol>
+<li>What makes a C-1N reset deterministic, and what scenario state must be recorded?</li>
+<li>Which observation-vector quantities are available to a policy, with units and ordering?</li>
+<li>Which 12 actuator actions are exposed, and what are their bounds and meanings?</li>
+<li>What control timestep and frame skip connect one policy action to MuJoCo dynamics?</li>
+<li>Which termination conditions are physical failures versus time limits?</li>
+<li>What decomposed objective terms express intended motion and discourage exploitable behavior?</li>
+<li>How will checkpoints preserve policy, objective version, simulator version, seed, and rollout state?</li>
+<li>Which fixed scenarios and seeds will evaluate a policy independently of its training objective?</li>
+</ol>
+</div>
+</div>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/robotics/">← all robotics test bench notebooks</a><a href="https://github.com/haidmoham/robotics-test-bench/blob/f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469/experiments/2026-08-27-ant-policy-learning/ant_policy_learning.ipynb">source provenance ↗</a></footer></body></html>

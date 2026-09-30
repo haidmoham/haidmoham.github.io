@@ -38,24 +38,6 @@
       "path": "notebooks/04_autograd.ipynb",
       "sha256": "97b241633a3e32d326af7379312a009e6947e44b89c175b2933afc0122a5f872",
       "publishable": true
-    },
-    {
-      "slug": "05_cuda_cpp_basics",
-      "title": "cuda / c++ basics",
-      "subtitle": "the first steps below the framework",
-      "description": "an unexecuted compile-and-run workspace. no gpu performance result is claimed.",
-      "path": "notebooks/05_cuda_cpp_basics.ipynb",
-      "sha256": "b4914c6e13a9d588a34b6ef81bf019ec2623f71e567ea4d45207e9e0f6198848",
-      "publishable": true
-    },
-    {
-      "slug": "cuda_setup",
-      "title": "cuda setup",
-      "subtitle": "making the execution environment inspectable",
-      "description": "an unexecuted environment setup notebook. commands are displayed, never run by this site.",
-      "path": "notebooks/cuda_setup.ipynb",
-      "sha256": "153833e6ddfce4a51d73041fa3dc2b649bba5c831dca152b4b2d23b9eb960412",
-      "publishable": true
     }
   ]
 }
