@@ -16,6 +16,10 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 - Before landing or publishing a commit that changes public technical claims, experiment ordinals, C-1N checkpoint state, or source provenance, use the installed `commit-boundary` skill with `.ontology/commit-rules.md`.
 - If a required skill or policy tool is unavailable, resolve that dependency from its canonical source before the gated action when authorization allows; then run the required check. Do not silently substitute for a publish or semantic-review gate.
 
+## typography
+
+- Prefer sans-serif typography throughout the portfolio and notebook spaces. Do not use delicate or italic editorial serifs. Blocky slab serifs such as Rockwell are an acceptable exception when deliberately chosen.
+
 ## mobile and performance
 
 - design and verify the portfolio mobile first, including a 320px-wide viewport. readable text, useful touch targets, resume access, project evidence, and contact must work without desktop interaction assumptions.
