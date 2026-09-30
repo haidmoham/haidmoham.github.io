@@ -1,4 +1,4 @@
-nbconvert==7.16.6
+nbconvert==7.17.1
 nbformat==5.11.1
 beautifulsoup4==4.15.0
 bleach==6.4.0
