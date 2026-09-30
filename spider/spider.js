@@ -936,6 +936,8 @@ async function loadRelease(release) {
   const definition = RELEASES[release];
   if (!definition) return;
   stop();
+  playButton.disabled = true;
+  resetButton.disabled = true;
   status.textContent = `Loading ${definition.label}…`;
   let modelXml;
   try {
@@ -984,6 +986,8 @@ async function loadRelease(release) {
     geom.delete();
     return id;
   });
+  playButton.disabled = false;
+  resetButton.disabled = false;
   releaseDescription.textContent = definition.description;
   status.textContent = `Live 3D · ${definition.label} · MuJoCo ${mujoco.mj_versionString()} · ${definition.source}`;
   if (currentRelease === 'v0.2') beginStandSuite();
@@ -1071,6 +1075,27 @@ function disposeRenderer() {
   if (renderer) renderer.dispose();
 }
 
+function showSimulationError(error) {
+  const message = document.createElement('p');
+  message.className = 'explorer-error';
+  message.textContent = 'Live simulation is unavailable in this browser. The recorded comparison and checkpoint evidence remain available below.';
+  const image = document.createElement('img');
+  image.className = 'simulation-fallback';
+  image.src = '/assets/c1n/walking-comparison.jpg';
+  image.alt = 'Recorded comparison of four C-1N walking policies; this image is not the live simulation.';
+  const link = document.createElement('a');
+  link.href = window.location.pathname + '#walking';
+  link.className = 'simulation-fallback-link';
+  link.textContent = 'watch the recorded comparison ↓';
+  stage.replaceChildren(image, message, link);
+  releaseSelect.disabled = true;
+  playButton.disabled = true;
+  resetButton.disabled = true;
+  cameraResetButton.disabled = true;
+  cameraFollowButton.disabled = true;
+  console.warn('C-1N simulation startup failed', error);
+}
+
 async function initialise() {
   try {
     setupRenderer();
@@ -1094,7 +1119,7 @@ async function initialise() {
     resetButton.addEventListener('click', restart);
     releaseSelect.addEventListener('change', () => loadRelease(releaseSelect.value).catch((error) => {
       status.textContent = 'Live simulation unavailable';
-      stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical C-1N repository for the native simulation.</p>`;
+      showSimulationError(error);
     }));
     cameraResetButton.addEventListener('click', resetCamera);
     cameraFollowButton.addEventListener('click', () => setCameraFollow(!cameraFollow));
@@ -1106,7 +1131,7 @@ async function initialise() {
   } catch (error) {
     disposeRenderer();
     status.textContent = 'Live simulation unavailable';
-    stage.innerHTML = `<p class="explorer-error">${error.message} See the canonical C-1N repository for the native simulation.</p>`;
+    showSimulationError(error);
   }
 }
 
