@@ -342,3 +342,12 @@ The automatic homepage refresh reads the explicitly published canonical checkpoi
 Refreshed all 17 canonical default-branch revisions from the preceding audit before publication. All are unchanged except `spider`, now `b75c0c7f4d198be794d340948244a7c884e91e17`, which adds the inspected publication feed and matching media. Existing claim dispositions and verification gaps remain.
 
 The requested live STRIDE port lives in `haidmoham/spider-web` at `71c141d`. It exports accepted `walk_fast_500` checkpoint SHA `e411e89f8cb90058d06442211ee94ede9a6bff050a9c059ed0bce06db966b856`, model, and controller into WASM. The portfolio copies that source without replacing the comparison film. The explorer defaults to STRIDE; historical options remain. Maximum native/WASM five-second qpos error is 1.21e-6, qvel error 5.46e-5. Reset repeats identically. Browser play, reset, follow camera, and STAND/STRIDE switching were checked. No new terrain, push, physical-phone, or population claim is made. Homepage simulation link receives a filled blue button and visible keyboard focus.
+
+## 2026-09-30 · lab notebook preview (scoped, not production promotion)
+
+- lmlab source: `7e31866dc2ed1e921f19cb30fed713d54afed2e4`, six original notebooks inspected; exact bytes and hashes retained in publication manifest. Tokenizer/bigram/autograd retain saved outputs; attention and CUDA workspaces have no saved cell output blocks. No cells were executed.
+- Robotics: existing static-support and C-1N leg-workspace notebook projections retained unchanged. Public experiment numbering and source provenance unchanged.
+- Causal Atlas: live Railway deployment of `c07e81e88bde8466ad77fbd6427786d63913918b`, with 12 deterministic/randomized engine tests previously passed. Public copy distinguishes one-browser simulation from actual geographic server deployment and illustrative latency from measured latency.
+- Log Pose: canonical `370b0769cf81845c8ff4dddb3a614b6ef685a5dc`; copy limited to evidence-backed market research. No claim of validated investment recommendations.
+- Pokédex: canonical `59ff8494382739e89edd421339d5d7fb6933c8d9`; verified collection coverage 19 species / 23 cards / 15 illustrators. Price selection and external artist discovery explicitly remain future work.
+- This is a scoped preview audit. It is not the full-site reconciliation required before a production main push. Physical old-phone performance and preview browser QA remain unverified until the deployed preview can be inspected.

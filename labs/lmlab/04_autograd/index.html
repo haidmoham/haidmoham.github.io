@@ -1,0 +1,312 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>automatic differentiation · lmlab · Mohammad Haider</title><meta name="description" content="an implementation notebook with retained cell outputs. source and output are shown together."><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/portfolio-pages.css"><link rel="stylesheet" href="/labs/notebook.css"></head><body class="portfolio-page lab-reader"><nav class="portfolio-nav" aria-label="main"><a class="portfolio-name" href="/">mohammad haider <span>/ software engineer</span></a><div><a href="/projects.html">work</a><a href="/notes.html">lab notebooks</a><a href="/resume.html">resumes</a></div></nav><header class="lab-hero"><a href="/labs/lmlab/">← lmlab</a><p class="section-eyebrow">research notebook / 04_autograd</p><h1>automatic differentiation</h1><p class="lab-deck">following gradients through a computation</p><p>an implementation notebook with retained cell outputs. source and output are shown together.</p><div class="lab-meta"><span>7 saved output blocks</span><span>source 7e31866</span><span>static export · never re-executed</span></div></header><main class="reader-layout"><aside class="reader-aside"><p class="section-eyebrow">in this notebook</p><ol><li><a href="#notebook">implementation &amp; outputs</a></li></ol><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/04_autograd.ipynb">pinned source ↗</a><a href="./source.ipynb" download>download notebook ↓</a></aside><article id="notebook" class="notebook-body"><div class="evidence-note"><strong>reading this record</strong><p>code is folded so the argument and saved outputs come first. expand any cell to inspect the implementation. saved outputs are historical evidence from the source notebook, not a new run or independent verification.</p></div><div class="cell border-box-sizing code_cell rendered" id="cell-id=691e4daf">
+<details class="source-cell"><summary>inspect code · cell 01</summary><div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="n">requires_grad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_accumulate_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">+=</span> <span class="n">grad</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">topo_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">_op</span> <span class="o">==</span> <span class="s2">"mul"</span><span class="p">:</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">*</span> <span class="n">right</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">right</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">*</span> <span class="n">left</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">_op</span> <span class="o">==</span> <span class="s2">"neg"</span><span class="p">:</span>
+                <span class="n">parent</span><span class="p">,</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="o">-</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">_op</span> <span class="o">==</span> <span class="s2">"add"</span><span class="p">:</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+                <span class="n">right</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">_op</span> <span class="o">==</span> <span class="s2">"sub"</span><span class="p">:</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+                <span class="n">right</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="o">-</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">_op</span> <span class="o">==</span> <span class="s2">"div"</span><span class="p">:</span>
+                <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">/</span> <span class="n">right</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">right</span><span class="o">.</span><span class="n">_accumulate_grad</span><span class="p">(</span>
+                    <span class="o">-</span><span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">*</span> <span class="n">left</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="n">right</span><span class="o">.</span><span class="n">data</span><span class="o">**</span><span class="mi">2</span>
+                <span class="p">)</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Tensor(data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">, grad=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">)"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span> <span class="ow">or</span> <span class="n">other</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="s2">"add"</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span> <span class="ow">or</span> <span class="n">other</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="s2">"sub"</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="s2">"neg"</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span> <span class="ow">or</span> <span class="n">other</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="s2">"mul"</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>    
+        <span class="k">return</span> <span class="n">out</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_grad</span> <span class="ow">or</span> <span class="n">other</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="s2">"div"</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_parents</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">topo_sort</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">visit</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">_parents</span><span class="p">:</span>
+            <span class="n">visit</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="n">order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="n">visit</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">order</span>
+
+    
+
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">3.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[3]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>(Tensor(data=[2.], grad=None), Tensor(data=[3.], grad=None))</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=44bee163">
+<details class="source-cell"><summary>inspect code · cell 02</summary><div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="s1">'topo_sort'</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[4]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=3fa4191f">
+<details class="source-cell"><summary>inspect code · cell 03</summary><div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+<span class="n">c</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># [1.]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># [3.]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># [2.]</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1.]
+[3.]
+[2.]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=2cb4e044">
+<details class="source-cell"><summary>inspect code · cell 04</summary><div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">3.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">a</span>
+<span class="n">e</span> <span class="o">=</span> <span class="o">-</span><span class="n">d</span>
+
+<span class="n">e</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># [-4.]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># [-2.]</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[-4.]
+[-2.]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=bfab7ec4">
+<details class="source-cell"><summary>inspect code · cell 05</summary><div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">5.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="n">f</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"f ="</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"df/da ="</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"df/db ="</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>f = [4.]
+df/da = [3.33333333]
+df/db = [-0.66666667]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=965b27a4">
+<details class="source-cell"><summary>inspect code · cell 06</summary><div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f_plain</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span>
+
+
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">a0</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+<span class="n">df_da</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">f_plain</span><span class="p">(</span><span class="n">a0</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span>
+    <span class="o">-</span> <span class="n">f_plain</span><span class="p">(</span><span class="n">a0</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span>
+
+<span class="n">df_db</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">f_plain</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">b0</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="o">-</span> <span class="n">f_plain</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">b0</span> <span class="o">-</span> <span class="n">eps</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"finite difference df/da ="</span><span class="p">,</span> <span class="n">df_da</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"finite difference df/db ="</span><span class="p">,</span> <span class="n">df_db</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>finite difference df/da = 3.3333333333551702
+finite difference df/db = -0.6666666666710341
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" id="cell-id=3a652214">
+<details class="source-cell"><summary>inspect code · cell 07</summary><div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mf">5.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="n">f</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"autograd df/da ="</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"autograd df/db ="</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div></details>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>autograd df/da = [3.33333333]
+autograd df/db = [-0.66666667]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article></main><footer class="portfolio-footer"><a href="/labs/lmlab/">← all lmlab notebooks</a><a href="https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/04_autograd.ipynb">source provenance ↗</a></footer></body></html>
