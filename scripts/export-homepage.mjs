@@ -35,7 +35,7 @@ if (runtimeScripts.length === 0) {
 html = html
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
   .replace(/<link\b[^>]*\brel=["']modulepreload["'][^>]*>/gi, '')
-  .replace('<head>', '<head><link id="portfolio-enhancement-styles" rel="stylesheet" href="/portfolio-enhancement.css"><script src="/portfolio-enhancement.js" defer></script>')
+  .replace('<head>', '<head><link rel="stylesheet" href="/cynthia-easter-egg.css"><link id="portfolio-enhancement-styles" rel="stylesheet" href="/portfolio-enhancement.css"><script src="/portfolio-enhancement.js" defer></script>')
   .replace('<body>', '<body class="portfolio-lightweight">')
   // A frozen preview should describe what is visible, not invite a reader to
   // use a control that is intentionally unavailable in reading view. The

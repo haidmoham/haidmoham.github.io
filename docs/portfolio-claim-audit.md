@@ -384,3 +384,46 @@ The owner separated the personal shin86 project ecosystem from this professional
 - **Homepage export:** the previous page imported an older bootstrap through both its helper import and the layout/prefetch modules. A coherent four-file `curated-20260930` module graph now serves the page, bootstrap, layout context, and prefetch policy. Original versioned assets remain available. The static body was rendered from the active component and retains disabled pre-enhancement controls and bounded C-1N feed markers. The notebook hub link is present in static and hydrated content. An allowlisted catalogue prevents excluded entries in a stale or unexpected feed from reappearing.
 
 Verification: static integrity; 83 Node frontend tests including five new curation/module-graph checks; eight feed/resume sync tests; STRIDE policy parity and Wasm trajectory checks passed. Notebook publication tests ran in the existing notebook environment. Final deployed-browser hydration, mobile layout, keyboard interaction, and preview-toggle checks remain to be performed on the exact preview commit. The cloud browser could not open the local loopback test URL; this is not counted as rendered-browser verification. Hosting configuration, checkpoint identity, robotics ordinals, and native controller behavior are unchanged by this curation.
+
+
+## 2026-10-01 · Cynthia link and publication reconciliation
+
+Reviewed the homepage's static and hydrated copy, current project catalogue, three work pages, about/availability pages, notebook hubs, pocket destinations, preview captions, and repeated descriptions before this main publication. The requested addition is a semantic, keyboard-accessible Pokéball link to the Cynthia champion rematch. It is a small navigation easter egg, not a new professional project entry or an experimental result.
+
+Fresh default-branch revisions were resolved through GitHub:
+
+| repository | inspected revision |
+| --- | --- |
+| tiramisu | `8aa5680b2a0a9db04c94bd91efb46cf481238240` |
+| indigo-circuit | `4acad7e461af7696971f06e1fdd2b2b0694562c9` |
+| social-impact-analysis | `30f39bce815fcbd30cb003aff4b71f092e164ec8` |
+| test-bench | `a65e3316404fd66cdfc080eddbaadb6c8fbffa29` |
+| fourier-drawing | `4e8514a141e8c1da1247608fcd5ab2485d6bd577` |
+| voidpulse-jellyfish | `fc5c30fc872d6704b2b14920abe83410ba4b82be` |
+| punkcubes | `43e02269e9e63b0cb497edb407d295c788bfef8d` |
+| flowers | `0b9d95b186bc93f5a001625aedac23345bbf8464` |
+| magnet | `700a968926a4ec9ff78eb071be8964e84d286e69` |
+| nebvis | `ece544bfa58a61b0b3d72fd5b60462afe93d03a7` |
+| soundspace | `1a8814f16abdde2e9b13e09104b3ac4274730d4a` |
+| agent-physics-lab | `06682833602b6da4c5f2083e7457bc7963d46438` |
+| voidpulsev2 | `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0` |
+| robotics-test-bench | `f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469` |
+| lmlab | `14097234b07f0bfa90d4dcb65b017cdacefb0972` |
+| spider | `b75c0c7f4d198be794d340948244a7c884e91e17` |
+| spider-web | `339897178b6a7ebf22fd5b1b297859e8a25f0046` |
+| causal-atlas | `c07e81e88bde8466ad77fbd6427786d63913918b` |
+| log-pose | `142801010b8c425b1569e2605c5a6df5aa78b90f` |
+
+Prior implementation evidence is reused only where the source revision and relevant claim remain unchanged. Removed personal projects remain excluded from the active catalogue; historical records are retained.
+
+Changes since the latest audit were inspected separately:
+
+- Tiramisu: inspected the comparison from `3e51fe0` through `8aa5680`, including the recording-identity guards, metadata enrichment, typed source-absence/outage states, attribution, retry cooldown, and reader flow. The existing limited lyric-reader/focus/comments/p5-canvas description remains supported; no claim of universal provider coverage is added. Corrected the overlooked creative-work introduction from “WebGL treatment” to “decorative cherry-blossom canvas.” The source README and `src/presentation/LyricReader.tsx`, `src/lookup/recordingIdentity.ts`, and `src/lookup/TiramisuLyricsProvider.ts` support the current description. Provider availability and underlying lyric rights are external limits, not proven by a successful lookup.
+- LM Lab: the new commit only adds explicit publication metadata. Its four approved notebooks remain pinned to `7e31866`, with matching recorded hashes. Source-only attention is still labelled; the older homepage measurements remain pinned to `19222f1`. No notebook cells were executed.
+- Log Pose: reviewed the investor-discovery audit, decision-brief view, and research-model changes from `370b076` to `1428010`. The app adds local analyst-authored notes and source-linked decision briefs. Existing portfolio copy correctly calls it a research prototype and does not claim validated investment recommendations, historical replay, or verified investability.
+- C-1N: the live canonical checkpoint manifest still selects STRIDE / `walk_fast_500` at source `14808d5`, with mean-policy speed 0.887987 m/s and 0 falls in 24 fixed evaluations. Slip, contact fragmentation, and unproven terrain/push recovery limits remain. `spider-web` has the same tree as the prior reviewed `71c141d`; the current head is its merge commit. No checkpoint, controller, ordinal, or provenance change is made.
+- Causal Atlas remains at the reviewed revision. The copy still distinguishes five in-browser replicas and illustrative transport from geographic servers, and excludes consensus, durable storage, and cross-key transactions.
+
+Verification: static site integrity; 75 existing Node field/portfolio tests; 7 notebook-publication tests; 8 existing resume/checkpoint sync tests; STRIDE native policy parity and WASM trajectory checks; JavaScript syntax and diff whitespace checks. No new automated tests were added. The notebook suite initially lacked `nbformat` in the system Python, then passed using the committed pinned requirements in an isolated uv environment. Docker is unavailable locally, so container build/smoke verification is left to the exact-commit site-integrity CI rather than counted as a local pass.
+
+Browser review uses an isolated Vercel preview of the static deployment content, including the actual homepage hydration module. The Pokéball is visible after hydration and has a 48px-high semantic link; the source-site destinations are explicit absolute URLs. At 320px and 390px usable iframe layout widths, both source-site links remain visible with 48px targets and no horizontal overflow. Keyboard focus on the portfolio link has a visible solid outline. These layout checks supplement desktop inspection, not physical-phone testing. Publication and destination checks are recorded separately after deployment. Employer metrics remain user-authored and unverified against private employer records. No new experiment, provider-service guarantee, or physical-device performance claim is made.
