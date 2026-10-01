@@ -45,11 +45,10 @@ test('the active homepage module graph has exactly one page and one bootstrap', 
 test('static and hydrated featured selections agree and use real product captures', () => {
   const staticIds = [...html.matchAll(/<article class="project-plate [^"]+" id="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(staticIds, catalogue.featured);
-  assert.ok(staticIds.includes('causal-atlas'));
+  assert.ok(staticIds.includes('receipts'));
   assert.equal(catalogue.projects.find(project => project.id === 'lm').href, '/labs/lmlab/');
   assert.ok(html.includes('href="/labs/lmlab/"'));
-  for (const name of ['tiramisu', 'causal-atlas']) {
-    const src = `/work/${name}-product-20260930.jpg`;
+  for (const src of ['/work/tiramisu-product-20260930.jpg', '/work/receipts-product-20261001.jpg']) {
     const bytes = fs.readFileSync(path.join(root, src));
     assert.equal(bytes.subarray(0, 3).toString('hex'), 'ffd8ff');
     assert.ok(html.includes(src));
@@ -57,7 +56,7 @@ test('static and hydrated featured selections agree and use real product capture
   }
   const tiramisu = catalogue.projects.find(project => project.id === 'tiramisu');
   assert.equal(tiramisu.href, 'https://lyrics.mhaider.dev/');
-  assert.ok(!catalogue.projects.find(project => project.id === 'causal-atlas').source);
+  assert.equal(catalogue.projects.find(project => project.id === 'receipts').source, 'https://github.com/haidmoham/political-receipts');
 });
 
 test('the catalogue, feed source, saved feeds, and static portfolio exclude personal listings', () => {

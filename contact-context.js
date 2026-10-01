@@ -14,6 +14,7 @@
       'fourier',
       'jelly',
       'tiramisu',
+      'receipts',
       'magnet',
       'mural',
       'creative-engineering',
