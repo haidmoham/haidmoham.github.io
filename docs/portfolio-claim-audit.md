@@ -435,3 +435,18 @@ Receipts replaces only the seventh featured Causal Atlas slot and its production
 Canonical source inspected: [political-receipts at 8a3b9f3](https://github.com/haidmoham/political-receipts/tree/8a3b9f39686388d8035ecf72ef18f8af78563ae4), especially src/receipt.js and docs/website.md. The viewer bundles 539 roster members and 532 finance summaries; source code states selected roll-call and financial-disclosure coverage explicitly. No inference of motives or influence is made. The separate extension has no Chrome Web Store release claim.
 
 Observed product capture: https://receipts.mhaider.dev/receipt.html?id=B001314 in the cloud browser on October 1, 2026. The image shows dated campaign funding and selected recorded decisions. Browser observation is UI evidence, not proof of financial or experimental facts. Text and numbers are grounded in the canonical bundled records and their methodology.
+
+## Log Pose featured replacement — 2026-10-06 (draft)
+
+Log Pose replaces Indigo Circuit in selected-work slot 03. C-1N, LM Lab, and every other featured position remain unchanged. The historical Indigo Circuit record and `/projects.html#indigo` and `#work-indigo` anchors remain available under earlier implementation notes.
+
+Canonical evidence inspected at [734fddd](https://github.com/haidmoham/log-pose/tree/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a):
+
+- [`src/log_pose/acquire.py`](https://github.com/haidmoham/log-pose/blob/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a/src/log_pose/acquire.py) validates source identity, capture cutoffs, content type, and response size.
+- [`src/log_pose/storage.py`](https://github.com/haidmoham/log-pose/blob/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a/src/log_pose/storage.py) retains raw/text hashes, capture and ingestion times, per-attempt outcomes, conflict-safe capture inserts, and cutoff-aware reads.
+- [`README.md`](https://github.com/haidmoham/log-pose/blob/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a/README.md) documents pinned inventory exports, source-category-year co-listings, the bounded read-only graph API, and exact retained-record drill-down. Co-listings are observations, not established company relationships, market share, or investment outcomes.
+- [`docs/reliability.md`](https://github.com/haidmoham/log-pose/blob/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a/docs/reliability.md) separates application, retained-data, derivation, and evidence checks. No uptime or independently verified research claim is added.
+
+The maintained static HTML and active `page-curated-20260930.js` catalogue are updated together, following the prior Receipts slot update in commit `11dbaa7`. The historical companion Sites authoring source is not available in the current account; the canonical Git deployment source is the reviewable source for this bounded edit. No dormant generated chunks or archived pages are rewritten.
+
+This is a feature-branch draft, not a production release. The canonical Drive resume PDFs auto-sync to main; they must not be replaced until the reviewed resume release is authorized. Employment claims, other project claims, and the full-site reconciliation required before a main publication remain outside this bounded draft review.
