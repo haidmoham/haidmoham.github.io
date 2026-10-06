@@ -46,9 +46,9 @@ test('static and hydrated featured selections agree and use real product capture
   const staticIds = [...html.matchAll(/<article class="project-plate [^"]+" id="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(staticIds, catalogue.featured);
   assert.ok(staticIds.includes('receipts'));
-  assert.deepEqual(staticIds, ['robotics', 'lm', 'logpose', 'fourier', 'jelly', 'tiramisu', 'receipts']);
+  assert.deepEqual(staticIds, ['robotics', 'lm', 'logpose', 'indigo', 'fourier', 'jelly', 'tiramisu', 'receipts']);
   assert.equal(catalogue.projects.find(project => project.id === 'logpose').source, 'https://github.com/haidmoham/log-pose');
-  assert.ok(!catalogue.featured.includes('indigo'));
+  assert.ok(catalogue.featured.includes('indigo'));
   assert.ok(read('projects.html').includes('id="work-indigo"'));
   assert.ok(read('projects.html').includes('id="work-logpose"'));
   assert.equal(catalogue.projects.find(project => project.id === 'lm').href, '/labs/lmlab/');

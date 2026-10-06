@@ -436,9 +436,11 @@ Canonical source inspected: [political-receipts at 8a3b9f3](https://github.com/h
 
 Observed product capture: https://receipts.mhaider.dev/receipt.html?id=B001314 in the cloud browser on October 1, 2026. The image shows dated campaign funding and selected recorded decisions. Browser observation is UI evidence, not proof of financial or experimental facts. Text and numbers are grounded in the canonical bundled records and their methodology.
 
-## Log Pose featured replacement — 2026-10-06 (draft)
+## Log Pose and Indigo Circuit featured work — 2026-10-06 (draft)
 
-Log Pose replaces Indigo Circuit in selected-work slot 03. C-1N, LM Lab, and every other featured position remain unchanged. The historical Indigo Circuit record and `/projects.html#indigo` and `#work-indigo` anchors remain available under earlier implementation notes.
+Log Pose occupies selected-work slot 03, immediately followed by restored Indigo Circuit at slot 04, as requested by the user. Every other project retains its relative order. The creative-work divider remains with Fourier Drawing. The one-page resume draft keeps Log Pose. Both `/projects.html#indigo` and `#work-indigo` anchors remain available.
+
+Indigo Circuit uses its existing product capture and bounded implementation copy from portfolio main revision `1740fe4`. Its canonical [README](https://github.com/haidmoham/indigo-circuit/blob/4acad7e461af7696971f06e1fdd2b2b0694562c9/README.md), re-read for this restoration, supports the retained DuckDB/dbt pipeline, Glicko-2 ratings, shadow-validation/direct-write distinction, and approximate model-interval limitations. No new capability or operational-success claim is introduced.
 
 Canonical evidence inspected at [734fddd](https://github.com/haidmoham/log-pose/tree/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a):
 
