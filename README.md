@@ -9,6 +9,7 @@ Personal portfolio for Mohammad Haider, a software engineer working across produ
 | Project | Open the source |
 | --- | --- |
 | Log Pose | [log-pose](https://github.com/haidmoham/log-pose) |
+| Indigo Circuit | [indigo-circuit](https://github.com/haidmoham/indigo-circuit) |
 | C-1N | [spider](https://github.com/haidmoham/spider) · [robotics-test-bench](https://github.com/haidmoham/robotics-test-bench) |
 | Tiramisu | [tiramisu](https://github.com/haidmoham/tiramisu) |
 | Fourier Drawing | [fourier-drawing](https://github.com/haidmoham/fourier-drawing) |
