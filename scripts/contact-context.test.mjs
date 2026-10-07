@@ -51,3 +51,9 @@ test('prefill changes only fields with a validated value', () => {
   assert.equal(fields['#discovery-source'].value, '');
   assert.equal(applied.project, '');
 });
+
+test('Log Pose contact links preserve project context', () => {
+  const context = loadContextModule();
+  assert.equal(context.readContactContext('?project=logpose&from=project').project, 'logpose');
+  assert.equal(context.readContactContext('?project=indigo&from=project').project, 'indigo');
+});

@@ -11,6 +11,7 @@
       'robotics-test-bench',
       'lmlab',
       'indigo',
+      'logpose',
       'fourier',
       'jelly',
       'tiramisu',
