@@ -452,3 +452,37 @@ Canonical evidence inspected at [734fddd](https://github.com/haidmoham/log-pose/
 The maintained static HTML and active `page-curated-20260930.js` catalogue are updated together, following the prior Receipts slot update in commit `11dbaa7`. The historical companion Sites authoring source is not available in the current account; the canonical Git deployment source is the reviewable source for this bounded edit. No dormant generated chunks or archived pages are rewritten.
 
 This is a feature-branch draft, not a production release. The canonical Drive resume PDFs auto-sync to main; they must not be replaced until the reviewed resume release is authorized. Employment claims, other project claims, and the full-site reconciliation required before a main publication remain outside this bounded draft review.
+
+
+## 2026-10-07 · PR 27 publication reconciliation
+
+Before landing the reviewed Log Pose / Indigo Circuit selection, refreshed the canonical default-branch revisions below and compared the only sources that moved since the preceding full-site audit. Reviewed the current homepage and active hydration catalogue, project and work pages, about/availability/contact pages, pocket links, notebook and robotics navigation, and preserved archive descriptions. Historical notebook outputs and archived checkpoint records remain historical evidence, not newly executed results.
+
+| repository | freshly checked revision |
+| --- | --- |
+| tiramisu | `8f4144bb0c99753c557ecbfe9c38a6aa14a87d6d` |
+| indigo-circuit | `4acad7e461af7696971f06e1fdd2b2b0694562c9` |
+| social-impact-analysis | `30f39bce815fcbd30cb003aff4b71f092e164ec8` |
+| test-bench | `a65e3316404fd66cdfc080eddbaadb6c8fbffa29` |
+| fourier-drawing | `4e8514a141e8c1da1247608fcd5ab2485d6bd577` |
+| voidpulse-jellyfish | `fc5c30fc872d6704b2b14920abe83410ba4b82be` |
+| magnet | `700a968926a4ec9ff78eb071be8964e84d286e69` |
+| nebvis | `ece544bfa58a61b0b3d72fd5b60462afe93d03a7` |
+| agent-physics-lab | `06682833602b6da4c5f2083e7457bc7963d46438` |
+| voidpulsev2 | `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0` |
+| robotics-test-bench | `f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469` |
+| lmlab | `14097234b07f0bfa90d4dcb65b017cdacefb0972` |
+| spider | `b75c0c7f4d198be794d340948244a7c884e91e17` |
+| spider-web | `339897178b6a7ebf22fd5b1b297859e8a25f0046` |
+| causal-atlas | `c07e81e88bde8466ad77fbd6427786d63913918b` |
+| log-pose | `734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a` |
+| political-receipts | `8a3b9f39686388d8035ecf72ef18f8af78563ae4` |
+
+All revisions other than Tiramisu and Log Pose match the preceding inspected evidence. Their corresponding implementation claims and explicit limits remain unchanged. Removed personal projects remain excluded. C-1N's current `public/checkpoint.json` was read again: STRIDE / walk_fast_500, pinned source 14808d5, 0.887987 m/s recorded mean-policy speed and 0 falls in 24 fixed flat-ground evaluations; foot-slip/contact-fragmentation and unproven terrain/push-recovery limits remain. Archived STAND records are preserved rather than rewritten as current results.
+
+- Tiramisu: inspected the full source comparison from 8aa5680 to [8f4144b](https://github.com/haidmoham/tiramisu/tree/8f4144bb0c99753c557ecbfe9c38a6aa14a87d6d), plus README, `src/App.tsx`, `server/genius-comments/core.ts`, and `api/genius-comments/index.ts`. The canonical panel is labelled Annotations and the server uses the official Genius `/referents` endpoint. Corrected the four active copies in `index.html`, `projects.html`, `work/creative.html`, and `_next/static/chunks/page-curated-20260930.js`: “song comments” becomes “Genius annotations”; “public Genius comments” becomes “public Genius lyric annotations.” Existing plain-text reader, focus-mode, decorative p5 canvas, and provider-failure boundaries remain. No new provider-availability guarantee is made.
+- Log Pose: current head is the PR's already inspected [734fddd](https://github.com/haidmoham/log-pose/tree/734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a). Re-read README, acquisition and storage implementation, and the comparison from the prior full-site revision. The bounded portfolio copy remains supported: source hashes, capture and independent arrival times, retained records, read-only graph queries, dated source searches and audits. Co-listings remain source observations, not verified relationships or market share. Additional research features do not broaden the portfolio's claim.
+
+The approved featured order is exactly robotics, lm, logpose, indigo, fourier, jelly, tiramisu, receipts. Log Pose is 03 and Indigo Circuit is 04; all other relative order, the Fourier divider, layout, destinations, and stable source/experiment identities are preserved. No resume, host configuration, checkpoint, controller, or project source change is included.
+
+Verification: original reviewed head 3a6862cb passed exact-commit Site integrity (including static route validation, frontend/publication/sync tests, STRIDE parity, Docker build and deployment smoke checks). The publication reconciliation makes only the above deterministic wording correction and this audit record. The new commit must pass the same CI before merge. Direct live-product probes were unavailable through the research tool; those failures are not a successful runtime test. Physical old-phone, mobile/WebGL and external provider-write behavior were not newly tested. Employer metrics remain user-authored and unverified against private employer records. Production deployment and served content will be checked after landing.
