@@ -25,6 +25,16 @@ def sync():
     if len(manifest.get('notebooks',[]))>100:raise ValueError('unexpected publication size')
     # CUDA is excluded from this portfolio by the owner's editorial choice.
     manifest['notebooks']=[n for n in manifest['notebooks'] if 'cuda' not in n.get('slug','').lower()]
+    # This exact published notebook uses Embedding + Linear with AdamW, not
+    # counts. Correct only its known label; preserve its pinned source bytes.
+    # Evidence: lmlab/notebooks/02_bigram.ipynb at the revision below.
+    for item in manifest['notebooks']:
+        if (revision == '7e31866dc2ed1e921f19cb30fed713d54afed2e4'
+                and item.get('slug') == '02_bigram'
+                and item.get('path') == 'notebooks/02_bigram.ipynb'
+                and item.get('sha256') == 'a2f7571e44570eed58701a3e88a8a31a60663c0bfc98e745b21f208bc2a494c9'
+                and item.get('description') == 'token streams, training and validation splits, and a count-based starting point.'):
+            item['description'] = 'token streams, training and validation splits, and a neural bigram baseline.'
     with tempfile.TemporaryDirectory() as temp:
         temp=Path(temp)
         for item in manifest['notebooks']:

@@ -486,3 +486,49 @@ All revisions other than Tiramisu and Log Pose match the preceding inspected evi
 The approved featured order is exactly robotics, lm, logpose, indigo, fourier, jelly, tiramisu, receipts. Log Pose is 03 and Indigo Circuit is 04; all other relative order, the Fourier divider, layout, destinations, and stable source/experiment identities are preserved. No resume, host configuration, checkpoint, controller, or project source change is included.
 
 Verification: original reviewed head 3a6862cb passed exact-commit Site integrity (including static route validation, frontend/publication/sync tests, STRIDE parity, Docker build and deployment smoke checks). The publication reconciliation makes only the above deterministic wording correction and this audit record. The new commit must pass the same CI before merge. Direct live-product probes were unavailable through the research tool; those failures are not a successful runtime test. Physical old-phone, mobile/WebGL and external provider-write behavior were not newly tested. Employer metrics remain user-authored and unverified against private employer records. Production deployment and served content will be checked after landing.
+
+## 2026-10-14 · PR 28 share-identity publication reconciliation
+
+Refreshed all 17 canonical default-branch revisions below before publication. The preceding full-site audit is the October 7 section and portfolio merge `da99252`; current main is `fa12280473132e7dd42f983e4981fffb78e8a7b1`. Reviewed the identity candidate `c3f7b739a64512d75080900b7f28e2b060e4cff0` and the bounded factual correction described below. No underlying project implementation, notebook source/output, project hierarchy, experiment ordinal, or checkpoint is changed.
+
+| repository | freshly checked revision |
+| --- | --- |
+| tiramisu | `8f4144bb0c99753c557ecbfe9c38a6aa14a87d6d` |
+| indigo-circuit | `4acad7e461af7696971f06e1fdd2b2b0694562c9` |
+| social-impact-analysis | `30f39bce815fcbd30cb003aff4b71f092e164ec8` |
+| test-bench | `a65e3316404fd66cdfc080eddbaadb6c8fbffa29` |
+| fourier-drawing | `4e8514a141e8c1da1247608fcd5ab2485d6bd577` |
+| voidpulse-jellyfish | `fc5c30fc872d6704b2b14920abe83410ba4b82be` |
+| magnet | `700a968926a4ec9ff78eb071be8964e84d286e69` |
+| nebvis | `ece544bfa58a61b0b3d72fd5b60462afe93d03a7` |
+| agent-physics-lab | `06682833602b6da4c5f2083e7457bc7963d46438` |
+| voidpulsev2 | `0bc4b91fe7491e0ba4b86ce8cce58b8954003db0` |
+| robotics-test-bench | `f15f8a1b1a3b02f5f24df5ba0e13da42d61ee469` |
+| lmlab | `e107dbf8b7fc25488b74a45436b1ce38bf5bd8e6` |
+| spider | `b75c0c7f4d198be794d340948244a7c884e91e17` |
+| spider-web | `339897178b6a7ebf22fd5b1b297859e8a25f0046` |
+| causal-atlas | `c07e81e88bde8466ad77fbd6427786d63913918b` |
+| log-pose | `734fddd33d88a5ac3c63cf3f7b8df1ab3f1bb76a` |
+| political-receipts | `9d168a2dd8d3d9c80bdc30259f54d002ac5f83fd` |
+
+Fifteen source revisions exactly match October 7; their earlier implementation evidence is reused only because the relevant source and portfolio claims remain unchanged. The two moved sources were compared and re-read separately. Since the October 7 portfolio merge, main changed only generated project-activity records and the user-maintained canonical resume PDF. The activity-feed descriptions and scope labels remain unchanged; LM Lab's latest-source reference advances to `e107dbf`, alongside rolling dates and activity counts. Archived pages and historical notebook records are unchanged.
+
+Compared all 23 HTML files modified by the identity candidate against current main: page bodies are identical apart from the homepage's saved metadata payload; the homepage's visible body and decoded RSC data outside metadata are unchanged. The active hydration catalogue is unchanged. The approved featured order remains robotics, lm, logpose, indigo, fourier, jelly, tiramisu, receipts. The additional wording correction below changes only the inaccurate notebook label and its matching descriptions.
+
+### LM Lab · bounded factual correction
+
+The [full source comparison](https://github.com/haidmoham/lmlab/compare/14097234b07f0bfa90d4dcb65b017cdacefb0972...e107dbf8b7fc25488b74a45436b1ce38bf5bd8e6) contains three commits adding Triton row-softmax scaffolding, checks/benchmark tooling, an explicitly unmeasured report, and documentation. Existing tokenizer, bigram, attention, transformer implementations, experiment runners, notebook bytes, and the public notebook manifest remain unchanged. Re-read the current tokenizer/language-model source, the historical `19222f1` numerical notebooks, and the four `7e31866` notebook exports. The Unicode/token counts, 1,000-step AdamW result, single-batch validation comparison, and historical pre-norm/two-head shapes remain supported as recorded evidence. Current transformer code is post-norm; that distinction remains explicit. The four published notebooks retain their 6/5/0/7 saved-output counts, including source-only attention.
+
+Found and corrected an older description: “a count-based starting point” becomes “a neural bigram baseline” in `labs/lmlab/publication.json`, the LM Lab hub, and the bigram reader's visible introduction and description/OG/Twitter metadata. The [pinned notebook](https://github.com/haidmoham/lmlab/blob/7e31866dc2ed1e921f19cb30fed713d54afed2e4/notebooks/02_bigram.ipynb) defines an embedding-plus-linear model and AdamW training, not a count estimator. No numerical result or notebook cell changes.
+
+The upstream publication manifest still contains the inaccurate phrase. The existing hourly sync has no same-revision skip and would otherwise restore it on its next successful run. A small portfolio-only editorial correction therefore applies only when the repository's validated manifest has revision `7e31866dc2ed1e921f19cb30fed713d54afed2e4`, slug `02_bigram`, path `notebooks/02_bigram.ipynb`, SHA-256 `a2f7571e44570eed58701a3e88a8a31a60663c0bfc98e745b21f208bc2a494c9`, and that exact old description. The normal download/hash gate remains in place; source bytes and outputs are untouched. A future source revision or hash falls outside this correction and needs its own review. The canonical LM Lab repository was not edited. New GPU correctness or performance remains unmeasured and is not promoted into portfolio claims.
+
+### Receipts · source unchanged except introductory wording
+
+The [complete comparison](https://github.com/haidmoham/political-receipts/compare/8a3b9f39686388d8035ecf72ef18f8af78563ae4...9d168a2dd8d3d9c80bdc30259f54d002ac5f83fd) contains one README sentence edit; implementation and bundled data are unchanged. Re-read README, `docs/website.md`, `src/receipt.js`, and `src/compare.js` against the homepage and production-page copy. The 539-member / 532-finance-summary snapshot, selected roll-call/disclosure coverage, dated candidate comparisons, and official-source links remain supported. Missing data remain unknown; no motive or influence is inferred and no Chrome Web Store release is claimed. No Receipts copy correction is needed.
+
+### C-1N · checkpoint and limitations retained
+
+Re-read the canonical [public/checkpoint.json](https://github.com/haidmoham/spider/blob/b75c0c7f4d198be794d340948244a7c884e91e17/public/checkpoint.json), blob `8b5c5e546e21cae1dbe3d759c6da4051e6dec3a8`. It still selects STRIDE / `walk_fast_500`, source `14808d5dd08af8f003f1e445e039c588c1f55bd1`, with recorded mean-policy speed 0.887987 m/s, sampled speed 0.821139 m/s, and 0 falls in 24 fixed flat-ground evaluations. Homepage and explorer retain foot-slip/contact-fragmentation, shared deterministic initial-state, and unproven terrain/push-recovery/efficiency limits. Preserved SPAWN/SHUFFLE/STAND records remain historical.
+
+Verification boundary: this reconciliation was read-only source/diff inspection followed by the exact label correction, guarded sync edit, and this record. No tests, builds, notebook rendering/execution, GPU execution, independent finance-data recount, or live-product runtime checks were performed for this audit. Prior runtime observations remain historical, not a fresh provider/deployment guarantee. Employer metrics remain user-authored and unverified against private employer records. The identity preview and CI checks are documented separately in PR 28; they are not evidence of underlying project results. Final-commit CI and production served-content verification remain publication steps.

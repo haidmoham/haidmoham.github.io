@@ -16,7 +16,7 @@
       "slug": "02_bigram",
       "title": "the bigram baseline",
       "subtitle": "a first language model, with the data boundary visible",
-      "description": "token streams, training and validation splits, and a count-based starting point.",
+      "description": "token streams, training and validation splits, and a neural bigram baseline.",
       "path": "notebooks/02_bigram.ipynb",
       "sha256": "a2f7571e44570eed58701a3e88a8a31a60663c0bfc98e745b21f208bc2a494c9",
       "publishable": true
