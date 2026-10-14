@@ -2,6 +2,7 @@
 import { cp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyPortfolioIdentity } from './portfolio-identity.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [assetDirectory, responseUrl] = process.argv.slice(2);
@@ -17,6 +18,9 @@ if (!html.includes('vinext.navigationRuntime') || !html.includes('/_next/static/
 if (html.includes('/@vite/') || html.includes('/@react-refresh')) {
   throw new Error('Development HTML cannot be imported.');
 }
+// Normalize both crawler-visible tags and the decoded route metadata before
+// saving runtime scripts, so hydration and future exports keep the same card.
+html = applyPortfolioIdentity(html, { canonicalUrl: 'https://mhaider.dev/' });
 const assetRoot = path.resolve(assetDirectory);
 const localAssetPaths = [...html.matchAll(/(?:src|href)="(\/_next\/[^"?#]+)"/g)];
 for (const [, assetPath] of localAssetPaths) {
