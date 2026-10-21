@@ -22,7 +22,7 @@ The [project archive](https://mhaider.dev/projects.html) includes the older expe
 
 - Static HTML, CSS, and JavaScript; no runtime framework or build requirement.
 - The homepage is exported from the companion portfolio source with [`scripts/export-homepage.mjs`](scripts/export-homepage.mjs); supporting pages are maintained as static documents here.
-- Railway hosts `mhaider.dev`; Vercel hosts `c1n.mhaider.dev`; GitHub Pages mirrors `main`.
+- Vercel hosts `mhaider.dev` and `c1n.mhaider.dev` from the same static source with host-aware routing; GitHub Pages mirrors `main`.
 - DNS is managed through Cloudflare.
 
 ## structure

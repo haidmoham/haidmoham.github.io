@@ -134,7 +134,20 @@ def main() -> int:
     require(nginx.count("return 308 https://c1n.mhaider.dev/;") == 2, "Railway must redirect both C-1N route forms to Vercel")
     root_route = vercel.get("routes", [{}])[0]
     require(root_route.get("src") == "^/$" and root_route.get("dest") == "/c1n/index.html", "Vercel must serve the C-1N document at the subdomain root")
+    c1n_host = [{"type": "host", "value": "c1n.mhaider.dev"}]
+    require(root_route.get("has") == c1n_host, "only the C-1N host may replace the portfolio homepage")
     require("wasm-unsafe-eval" in root_route.get("headers", {}).get("Content-Security-Policy", ""), "Vercel CSP must allow WebAssembly compilation")
+    portfolio_roots = [route for route in vercel["routes"] if route.get("src") == "^/$" and not route.get("has")]
+    require(len(portfolio_roots) == 1 and portfolio_roots[0].get("dest") == "/index.html", "Vercel must serve the unchanged portfolio at its root and preview URLs")
+    global_headers = [route for route in vercel["routes"] if route.get("src") == "^/.*$" and route.get("continue")]
+    require(len(global_headers) == 1, "Vercel must apply the portfolio CSP to all static documents")
+    policy = global_headers[0].get("headers", {}).get("Content-Security-Policy", "")
+    for directive in ("connect-src 'self' https://formspree.io", "form-action 'self' https://formspree.io", "'unsafe-eval'", "'wasm-unsafe-eval'"):
+        require(directive in policy, f"Vercel CSP must preserve {directive}")
+    compatibility = [route for route in vercel["routes"] if route.get("src") == "^/c1n/?$"]
+    require(len(compatibility) == 1 and compatibility[0].get("missing") == c1n_host and compatibility[0].get("status") == 308 and compatibility[0].get("headers", {}).get("Location") == "https://c1n.mhaider.dev/", "both portfolio C-1N route forms must redirect without changing the C-1N host")
+    wasm_routes = [route for route in vercel["routes"] if route.get("src") == r"^/.*\.wasm$"]
+    require(len(wasm_routes) == 1 and wasm_routes[0].get("headers", {}).get("Content-Type") == "application/wasm", "Vercel must serve the existing Wasm runtime with its MIME type")
     redirect_routes = {
         route.get("src"): (route.get("status"), route.get("headers", {}).get("Location"))
         for route in vercel.get("routes", [])
@@ -152,6 +165,8 @@ def main() -> int:
     }
     for source, destination in expected_redirects.items():
         require(redirect_routes.get(source) == (308, destination), f"Vercel must permanently redirect {source} to {destination}")
+        matching = [route for route in vercel["routes"] if route.get("src") == source]
+        require(len(matching) == 1 and matching[0].get("has") == c1n_host, f"{source} must redirect only on C-1N, avoiding portfolio redirect loops")
 
     validate_integrated_portfolio()
 

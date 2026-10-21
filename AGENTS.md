@@ -6,7 +6,7 @@ This file defines repository-specific rules for `haidmoham.github.io`. Global ag
 
 - Keep the site static HTML, CSS, and JavaScript. Do not add a framework or build step unless the user asks.
 - `main` in `haidmoham/haidmoham.github.io` is the only deployment source of truth.
-- Railway deploys `mhaider.dev` from `main` with `Dockerfile`, `railway.json`, and `railway-nginx.conf.template`. Vercel deploys `c1n.mhaider.dev` from the same commit with `vercel.json`. Preserve these files.
+- Vercel deploys `mhaider.dev` and `c1n.mhaider.dev` from the same `main` commit with host-aware routing in `vercel.json`. Preserve the historical `Dockerfile`, `railway.json`, and `railway-nginx.conf.template`; Railway is no longer required for portfolio hosting.
 - GitHub Pages also deploys from `main` as a static mirror. Do not treat the Pages deployment as the production authority for `mhaider.dev`.
 - A normal publish is one commit and one push to `main`. Do not copy site files between hosts or make host-only edits.
 - Keep the C-1N browser runtime, models, and vendored Wasm under `spider/`. Keep `c1n.mhaider.dev/` as the public document route and both `mhaider.dev/c1n` forms as permanent redirects.
