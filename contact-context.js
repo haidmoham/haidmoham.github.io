@@ -1,6 +1,7 @@
 (function contactContext() {
   const allowedValues = {
     topic: new Set([
+      'full-time-data-science',
       'full-time-software-engineering',
       'research-scientific-computing',
       'creative-engineering-collaboration',
