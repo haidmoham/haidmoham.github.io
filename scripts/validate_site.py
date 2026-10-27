@@ -55,7 +55,7 @@ def validate_integrated_portfolio() -> None:
     homepage = (ROOT / "index.html").read_text(encoding="utf-8")
     parser = AssetParser()
     parser.feed(homepage)
-    require("".join(parser.titles) == "Mohammad Haider — Software Engineer", "homepage must give software engineering top billing")
+    require("".join(parser.titles) == "Mohammad Haider — Data Science & Applied Statistics", "draft homepage must lead with data science and applied statistics")
     require("vinext.navigationRuntime" in homepage, "homepage must retain its complete hydration bootstrap")
     require("/_next/static/" in homepage, "homepage must load its versioned client assets")
     require("portfolioredo." not in homepage and ".chatgpt.site" not in homepage, "homepage must not point at a prototype host")
