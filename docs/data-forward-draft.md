@@ -37,3 +37,11 @@ The hero now names the statistics background and the data pipeline, estimation, 
 - **Evidence gap:** Mewtwo is not part of the existing portfolio hierarchy, and an independently accessible public evaluation record was not established. No Mewtwo results or private artifacts are published in this draft. A public evidence trail and separate approval for any project prominence or ordering change would be needed before adding it to the portfolio hierarchy.
 - **Preserved:** visual character and engineering depth; the eight featured project identities and order are unchanged. The work remains a draft, not a production release.
 - **Verification gap:** Vercel marks the branch preview ready, but browser access reached Vercel login. Deployed content and its desktop/mobile presentation have not been inspected under an authenticated session. Local rendered checks do not prove production behavior or physical-device performance.
+
+## Résumé refinement
+
+The résumé summary now says “nearly four years,” consistent with the displayed employment dates. The prior single-batch bigram loss is replaced in the résumé by the public [depth comparison](https://github.com/haidmoham/lmlab/blob/89818868982278e20722639ee59fa61e1a9e9cec/experiments/depth-comparison.md): five transformer depths (1, 2, 4, 6, 8), three paired seeds, 10,000 equal updates, and fixed evaluation windows. The 1- and 8-block mean validation losses are 3.5293 and 3.3371 nats per BPE token. Equal updates are not equal compute; the résumé retains that qualification. This is an AI-assisted learning project, not a production inference claim. The report, not a new run, is the evidence.
+
+Indigo and C-1N bullets were shortened while retaining the observational and simulation boundaries; the linked sources retain detailed interval and shared-initial-state limits. Log Pose still labels co-listings as observations. The HTML remains a review draft.
+
+The revised résumé was checked in the local browser at desktop and 320px; no page-level horizontal overflow was measured. Its print CSS was inspected and retains the draft label, but the in-app browser did not expose a print preview after the print command, so rendered pagination and page breaks remain unverified. No PDF was generated or submitted.
