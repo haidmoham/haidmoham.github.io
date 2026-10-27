@@ -1,0 +1,27 @@
+/* Draft QA: make small evidence and navigation text readable on the existing palette. */
+.intro-career,
+.plate-boundary span,
+.notebook-preview p,
+.causal-study .study-source,
+.causal-study .mask-row span,
+.causal-study .token-line button span,
+.causal-study .mask-row .masked,
+.signal-instrument .instrument-note,
+.ledger-entry > div p,
+.ledger-entry > div a,
+.project-evidence-art figcaption,
+.project-evidence-art figcaption a,
+.ledger-heading p,
+.experience article div span,
+.virginia-tech span,
+.skills p,
+.archive p,
+footer span,
+footer a { color: #4c5747; }
+.causal-study .token-line button[aria-pressed="true"] span { color: #f3f0e7; }
+@media (max-width: 400px) {
+  .causal-study .token-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .causal-study .token-line button { min-width: 0; }
+}
+.project-ledger > p { color: #4c5747; }
+

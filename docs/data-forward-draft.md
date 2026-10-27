@@ -14,3 +14,13 @@ Draft based on portfolio commit `351ed7033932d4a5d43b9fd3a46c7d50f1fc32f2`. The 
 1. Credibility: retained the software engineer identity; attributed independent work separately from Microsoft and UVA; described UVA's load-time improvement as a team effort.
 2. Methods: kept Indigo's experimental interval and fallback caveats, Log Pose's observation boundary, the single-batch LM Lab result, and C-1N's fixed evaluation and limits. No new experimental results were claimed.
 3. Responsive/accessibility/interaction: preserve existing static markup, visual order, controls, and styles; browser verification remains required. The draft label and noindex tag are included for review.
+
+## Local browser QA follow-up · 2026-10-27
+
+Reviewed the exact draft files with the in-app browser at desktop (1280px) and 320px and 390px viewport overrides. Neither mobile width had document-level horizontal overflow. At 320px and 390px, the original five attention controls clipped longer labels; the draft stylesheet changes those controls to three columns at widths up to 400px. The labels now fit in their controls, and selecting a token by mouse or keyboard updates the selected state and accessible mask description. The focus outline and skip-to-work link were observed; resume navigation opened the resume page, and the Indigo contact link opened the contact form with `project=indigo` and `entry_surface=project` prefilled. No message was submitted.
+
+Computed color checks found low-contrast small text in the existing design, including the career line (3.58:1) and evidence/limit labels. The draft stylesheet darkens those labels; a DOM-based check of visible text on solid backgrounds returned no remaining items below 4.5:1 in that scoped pass. This is not a full WCAG audit or a color-vision simulation. Selected attention state uses position, a filled button, and an accessible pressed state as well as color.
+
+The preview switch changed to off, removed the canvas, retained the static SVG, and the accessibility tree reported the interactive controls disabled. The test did not instrument every animation loop or measure physical-device performance. An identical minified React hydration error #418 appeared on both this draft and the unchanged baseline served in the same browser. The rendered copy and tested controls worked after hydration; the pre-existing error remains unresolved.
+
+Vercel's API reported the Git preview ready. The in-app browser was redirected to Vercel login; no protected served-page or deployed desktop/mobile visual check was possible with the available browser session. No protection or account permissions were changed. There was no installed Vercel CLI or existing CLI auth file available for `vercel curl`; no credentials were created.
