@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "through": "2026-10-27",
+  "through": "2026-10-28",
   "windowDays": 28,
   "meaning": "Default-branch commit activity. Counts do not establish quality, project completion, or experimental results.",
   "projects": [
@@ -11,10 +11,6 @@
       "language": "Jupyter Notebook",
       "updatedAt": "2026-09-14",
       "activity": [
-        {
-          "date": "2026-09-30",
-          "commits": 0
-        },
         {
           "date": "2026-10-01",
           "commits": 0
@@ -121,6 +117,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -148,10 +148,6 @@
       "updatedAt": "2026-09-15",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 0
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -257,6 +253,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -271,10 +271,6 @@
       "updatedAt": "2026-10-26",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 1
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -380,6 +376,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -394,10 +394,6 @@
       "updatedAt": "2026-10-02",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 9
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -504,6 +500,10 @@
         {
           "date": "2026-10-27",
           "commits": 0
+        },
+        {
+          "date": "2026-10-28",
+          "commits": 0
         }
       ],
       "visual": "/project-state/tiramisu.svg",
@@ -516,10 +516,6 @@
       "language": "TypeScript",
       "updatedAt": "2026-08-28",
       "activity": [
-        {
-          "date": "2026-09-30",
-          "commits": 0
-        },
         {
           "date": "2026-10-01",
           "commits": 0
@@ -626,6 +622,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -640,10 +640,6 @@
       "updatedAt": "2026-09-13",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 0
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -749,6 +745,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -763,10 +763,6 @@
       "updatedAt": "2026-09-08",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 0
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -872,6 +868,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
@@ -886,10 +886,6 @@
       "updatedAt": "2026-09-13",
       "activity": [
         {
-          "date": "2026-09-30",
-          "commits": 0
-        },
-        {
           "date": "2026-10-01",
           "commits": 0
         },
@@ -995,6 +991,10 @@
         },
         {
           "date": "2026-10-27",
+          "commits": 0
+        },
+        {
+          "date": "2026-10-28",
           "commits": 0
         }
       ],
